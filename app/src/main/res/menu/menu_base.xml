@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/nav_main"
+            android:icon="@drawable/ic_reports"
+            android:title="Главное меню"
+        />
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_orders"
+            android:icon="@drawable/ic_order"
+            android:title="Заказы" />
+
+        <item
+            android:id="@+id/nav_orders_real"
+            android:icon="@drawable/ic_order"
+            android:title="Продажа" />
+        <item
+            android:id="@+id/nav_journal"
+            android:icon="@drawable/ic_journal"
+            android:title="Журнал документов" />
+
+    </group>
+
+    <item android:title="Справочники">
+        <menu>
+
+            <item
+                android:id="@+id/nav_clients"
+                android:icon="@drawable/ic_clients"
+                android:title="Клиенты" />
+
+            <item
+                android:id="@+id/nav_catalog"
+                android:icon="@drawable/ic_catalog"
+                android:title="Товары" />
+        </menu>
+    </item>
+
+    <item android:title="Другие">
+        <menu>
+            <item
+                android:id="@+id/nav_reports"
+                android:icon="@drawable/ic_reports"
+                android:title="Отчеты" />
+            <item
+                android:id="@+id/nav_messages"
+                android:icon="@android:drawable/ic_btn_speak_now"
+                android:title="Сообщения" />
+        </menu>
+    </item>
+
+    <item android:title="">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@android:drawable/ic_btn_speak_now"
+                android:title="Базы данных" />
+
+            <item
+                android:id="@+id/nav_settings_obmen"
+                android:icon="@android:drawable/ic_btn_speak_now"
+                android:title="Настройки обмена" />
+        </menu>
+    </item>
+</menu>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:shrinkColumns="*"
+        android:stretchColumns="1">
+
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="Дата"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_text_date"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                tools:layout_margin="10dp"/>
+
+            <EditText
+                android:focusable="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:id="@+id/order_date"
+                tools:layout_margin="10dp" />
+        </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:text="Организация"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/order_text_organization"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            tools:layout_margin="10dp"/>
+
+        <Spinner
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/order_spinner_organization"
+            android:spinnerMode="dialog"
+            tools:layout_margin="10dp"/>
+    </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:text="Клиент"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_text_client"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                tools:layout_margin="10dp"/>
+
+            <EditText
+                android:focusable="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:id="@+id/order_editText_client"
+                tools:layout_margin="10dp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:text="Договор"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_text_dogovor"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                tools:layout_margin="10dp"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_spinner_dogovor"
+                android:spinnerMode="dialog"
+                tools:layout_margin="10dp"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:text="Склад"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_text_sklad"
+                tools:text="Склад"
+                android:contentDescription="Склад"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                tools:layout_margin="10dp"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/order_spinner_sklad"
+                tools:layout_margin="10dp"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:text="Тип цен"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_tipcen"
+                tools:text="Тип цен"
+                android:contentDescription="Тип цен"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                tools:layout_margin="10dp"/>
+
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/order_spinner_tipcen"
+                tools:layout_margin="10dp"/>
+
+        </TableRow>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/btn_create_doc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Выгрузить сейчас"
+                tools:layout_margin="10dp"/>
+
+            <Button
+                android:id="@+id/save_order_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Выгрузить позже"
+                tools:layout_margin="10dp"/>
+        </LinearLayout>
+
+</TableLayout>
+

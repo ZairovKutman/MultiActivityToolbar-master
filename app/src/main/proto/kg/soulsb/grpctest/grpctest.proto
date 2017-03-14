@@ -1,0 +1,235 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "kg.soulsb.ayu.grpctest";
+option java_outer_classname = "GrpcAyuProto";
+option objc_class_prefix = "GTP";
+
+package ayugrpc;
+
+service AyuService {
+
+	rpc GetClients(Agent) returns (Points){}
+
+	rpc GetContracts(Agent) returns (Contracts){}
+
+	rpc GetWarehouses(Agent) returns(Warehouses){}
+
+	rpc GetReport(ReportInput) returns (ReportOutput){}
+
+	rpc GetPriceTypes(Agent) returns (PriceTypes){}
+
+	rpc GetItems(Agent) returns(Items){}
+
+	rpc CreateDoc(DocPurch) returns(OperationStatus){}
+
+	rpc GetReports(Agent) returns(Reports){}
+
+	rpc GetPrices(Agent) returns (Prices){}
+
+	rpc GetStock(Agent) returns (Stocks){}
+
+	rpc SendLocation(Location) returns(OperationStatus){}
+
+	rpc GetOrganizations(Agent) returns(Organizations){}
+
+	rpc GetAppSettings(Agent) returns(Settings){}
+
+	rpc GetAllData(Agent) returns(ExchangeData){}
+
+	rpc CheckDeviceStatus(Device) returns(DeviceStatus){}
+
+}
+
+message ExchangeData{
+	Settings settings = 1;
+	Organizations organizations = 2;
+	Points points = 3;
+	Contracts contracts = 4;
+	Warehouses warehouses = 5;
+	PriceTypes price_types = 6;
+	Items items = 7;
+	Prices prices = 8;
+	Stocks stocks = 9;
+	Reports reports = 10;
+	bool status = 11;
+	string error_message = 12;
+}
+
+message Points{
+	repeated Point point = 1;
+}
+
+message Contracts{
+	repeated Contract contract = 1;
+}
+
+message Warehouses{
+	repeated Warehouse warehouse = 1;
+}
+
+message PriceTypes{
+	repeated PriceType price_type = 1;
+}
+
+message Items{
+	repeated Item item = 1;
+}
+
+message Prices{
+	repeated Price price = 1;
+}
+
+message Stocks{
+	repeated Stock stock = 1;
+}
+
+message Organizations{
+	repeated Organization organization = 1;
+}
+
+message Device{
+	string agent = 1;
+	string device_id = 2;
+}
+
+message DeviceStatus{
+	bool active = 1;
+	string comment = 2;
+}
+
+message Agent{
+	string id = 1;
+	string name = 2;
+	string guid = 3;
+}
+
+message Point{
+	string description = 1;
+	string latitude = 2;
+	string longitude = 3;
+	string address = 4;
+	string phone_number = 5;
+	string code = 6;
+	string guid = 7;
+	double debt = 8;
+}
+
+message Report{
+	string description = 1;
+	string guid = 2;
+}
+
+message Reports{
+	repeated Report report = 1;
+}
+
+message ReportInput{
+	Agent agent = 1;
+	string report_guid = 2;
+	string date_start = 3;
+	string date_end = 4;
+}
+
+message ReportOutput{
+	string report_guid = 1;
+	string description = 2;
+	bytes report_file = 3;
+}
+
+message Contract{
+	string guid = 1;
+	string description = 2;
+	string point_guid = 3;
+}
+
+message Warehouse{
+	string guid = 1;
+	string description = 2;
+	string code = 3;
+}
+
+message Item{
+	string guid = 1;
+	string code = 2;
+	string description = 3;
+	string unit = 4;
+	double price = 5;
+	int32 stock = 6;
+}
+
+message Organization{
+	string description = 1;
+	string guid = 2;
+}
+
+message PriceType{
+	string guid = 1;
+	string code = 2;
+	string description = 3;
+}
+
+message PurchDocLine{
+	string item_guid = 1;
+	int32 quantity = 2;
+	double price = 3;
+	double amount = 4;
+}
+
+message DocPurch {
+	string agent = 1;
+	string client_guid = 2;
+	string date = 3;
+	string warehouse_guid = 4;
+	string contract_guid = 5;
+	string price_type_guid = 6;
+	string delivery_date = 7;
+	string comment = 8;
+	string organization_guid = 10;
+	repeated PurchDocLine lines = 9;
+	int32 doc_type = 11;
+	string doc_id = 12;
+}
+
+message OperationStatus{
+	enum Status{
+		OK = 0;
+		ERROR = 1;
+	}
+	Status status = 1;
+	string comment = 2;
+}
+
+message Price {
+	string price_type = 1;
+	string item = 2;
+	double price = 3;
+}
+
+message Stock{
+	string item = 1;
+	string warehouse = 2;
+	int32 stock = 3;
+}
+
+message Location {
+	Agent agent = 1;
+	string latitude = 2;
+	string longitude = 3;
+	string date = 4;
+}
+
+message Settings{
+	bool can_create_orders = 1;
+	bool can_create_sales = 2;
+	bool send_all_documents_with_exchange = 3;
+	bool force_daily_exchange = 4;
+	bool force_gps_turn_on = 5;
+	bool forbit_select_client_with_outstanding_debt = 6;
+	bool can_get_gpc_coordinates_of_clients = 7;
+	bool create_order_at_clients_coordinates = 8;
+	bool create_sales_at_clients_coordinates = 9;
+	string password_for_app_settings = 10;
+	bool status = 11;
+	string error_message = 12;
+}

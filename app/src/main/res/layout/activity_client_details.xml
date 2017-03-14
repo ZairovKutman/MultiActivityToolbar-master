@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:text="Наименование клиента"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientName"
+        android:textAlignment="center"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:text="Долг:"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientDebtText" />
+
+    <TextView
+        android:id="@+id/ClientDebt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:textColor="@color/colorAccent" />
+
+    <TextView
+        android:text="Адрес: "
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientAddressText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientAddress"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/holo_blue_dark" />
+
+    <TextView
+        android:text="Телефоны"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientPhoneText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientPhone"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/holo_blue_dark" />
+
+    <TextView
+        android:text="Комментарий"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientCommentText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientComment"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/holo_blue_dark" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:text="Долгота"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ClientLongitude"
+            android:paddingRight="20dp" />
+
+        <TextView
+            android:text="Широта"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ClientLatitude"
+            android:paddingRight="20dp" />
+
+        <Button
+            android:text="Проложить путь"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ClientMap"
+            android:minHeight="1dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp" />
+
+    </LinearLayout>
+    <Button
+        android:text="Позвонить"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientCall"
+        android:layout_margin="10dp" />
+
+</LinearLayout>

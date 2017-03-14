@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="kg.soulsb.ayu"
+          xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="kg.soulsb.ayu.activities.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="kg.soulsb.ayu.activities.BaseActivity"
+            android:label="@string/title_activity_base"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name="kg.soulsb.ayu.activities.OtherActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name="kg.soulsb.ayu.activities.NoHamburger"
+                  android:label="@string/app_name"
+                  android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name="kg.soulsb.ayu.activities.NoToolbar"
+                  android:label="@string/app_name"
+                  android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.ReportsActivity"
+                  android:label="Отчеты"
+                  android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.zakaz.OrderAddActivity"
+            android:label="Создать заказ"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.zakaz.ChooseClientTableActivity"
+            android:label="Выбрать клиента"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.SettingsObmenActivity"
+            android:label="Настройки обмена"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.SettingsBasesActivity"
+            android:label="Базы данных"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.SettingsBasesAddEditActivity"
+            android:label="Добавить базу данных"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.ClientsTableActivity"
+            android:label="Клиенты"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.ClientDetailActivity"
+            android:label="Данные клиента"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name="kg.soulsb.ayu.activities.ItemsTableActivity"
+            android:label="Товары"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.BaseDetailActivity"
+            android:label="Изменить базу данных"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.ReportsDetailActivity"
+            android:label="Сформированный отчет"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.SavedDocumentsActivity"
+            android:label="Журнал документов"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
+        <service android:name="kg.soulsb.ayu.services.MyService"/>
+    </application>
+
+</manifest>

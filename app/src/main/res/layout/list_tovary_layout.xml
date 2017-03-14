@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:text="товар"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tovar_name"
+        android:layout_weight="1"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        android:fontFamily="sans-serif"
+        android:textSize="18sp"
+        android:layout_margin="8dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginRight="20dp">
+
+        <TextView
+            android:text="Цена"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tovar_price"
+            android:layout_weight="1"
+            android:textColor="?android:attr/colorActivatedHighlight" />
+
+        <TextView
+            android:text="остаток"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/stock_list"
+            android:layout_weight="1"
+            android:textColor="@android:color/holo_blue_light" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_marginRight="20dp">
+
+        <TextView
+            android:text="Количество"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tovar_quantity"
+            android:textColor="?android:attr/colorActivatedHighlight" />
+
+        <TextView
+            android:text="Сумма"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tovar_sum"
+
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
+
+</LinearLayout>

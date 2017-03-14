@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">АЮ</string>
+    <string name="action_settings">Загрузить данные</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="nav_drawer_opened">Слайдер открыт</string>
+    <string name="nav_drawer_closed">Слайдер закрыт</string>
+</resources>
