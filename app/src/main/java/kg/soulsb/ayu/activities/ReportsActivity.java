@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import io.grpc.ManagedChannel;
@@ -52,6 +53,10 @@ public class ReportsActivity extends BaseActivity {
     EditText startDate;
     private AyuServiceGrpc.AyuServiceBlockingStub blockingStub;
     boolean shouldDownload = true;
+
+    AlertDialog.Builder d2;
+    ProgressBar progressBar;
+    AlertDialog alertDialog;
 
 
     @Override
@@ -182,6 +187,16 @@ public class ReportsActivity extends BaseActivity {
                                 d1.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
+                                        d2 = new AlertDialog.Builder(ReportsActivity.this);
+                                        LayoutInflater inflater = getLayoutInflater();
+                                        View dialogView = inflater.inflate(R.layout.loading_dialog, null);
+                                        progressBar = (ProgressBar) dialogView.findViewById(R.id.loading_bar);
+
+                                        d2.setTitle("Загрузка отчета");
+                                        d2.setMessage("Подождите...");
+                                        d2.setView(dialogView);
+                                        alertDialog = d2.create();
+                                        alertDialog.show();
                                         downloadReport(baza, position);
                                     }
                                 });
@@ -193,6 +208,17 @@ public class ReportsActivity extends BaseActivity {
                         }
 
                         if (shouldDownload) {
+                            d2 = new AlertDialog.Builder(ReportsActivity.this);
+                            LayoutInflater inflater = getLayoutInflater();
+                            View dialogView = inflater.inflate(R.layout.loading_dialog, null);
+                            progressBar = (ProgressBar) dialogView.findViewById(R.id.loading_bar);
+
+                            d2.setTitle("Загрузка отчета");
+                            d2.setMessage("Подождите...");
+                            d2.setView(dialogView);
+                            alertDialog = d2.create();
+                            alertDialog.show();
+
                             downloadReport(baza,position);
                         }
 
@@ -284,12 +310,12 @@ public class ReportsActivity extends BaseActivity {
             report.setContentHTML(decoded);
             report.setDateStart(startDate.getText().toString());
             report.setDateEnd(endDate.getText().toString());
+            report.setBase(CurrentBaseClass.getInstance().getCurrentBase());
 
             SavedReportsRepo savedReportsRepo = new SavedReportsRepo();
 
             savedReportsRepo.delete(report);
             savedReportsRepo.insert(report);
-
 
             startActivity(intent);
 
@@ -321,6 +347,7 @@ public class ReportsActivity extends BaseActivity {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            alertDialog.dismiss();
         }
     }
 }

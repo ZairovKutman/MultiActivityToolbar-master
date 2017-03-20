@@ -52,6 +52,7 @@ public class ClientsTableActivity extends BaseActivity implements MaterialSearch
                 intent.putExtra("longitude", client.getLongitude());
                 intent.putExtra("latitude", client.getLatitude());
                 intent.putExtra("debt", Double.toString(client.getDebt()));
+                intent.putExtra("guid", client.getGuid());
                 startActivity(intent);
             }
         });

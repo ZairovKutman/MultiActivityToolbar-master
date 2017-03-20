@@ -7,35 +7,39 @@
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/usingBase"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+        android:id="@+id/usingBase" />
 
     <TextView
         android:text="TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/last_obmen_text"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+        android:id="@+id/last_obmen_text" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="8dp"
+        android:text="Загрузить данные"
+        android:textColor="@color/cardview_light_background"
+        android:translationZ="8dp" />
 
     <ProgressBar
+        android:id="@+id/progressBar"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
         android:minWidth="100dip"
         android:padding="20dp" />
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/loading_comment"
-        android:textAlignment="center"
-        android:layout_marginBottom="10dp" />
-
-    <Button
-        android:text="Загрузить данные"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_marginTop="20dp" />
+        android:layout_marginBottom="10dp"
+        android:textAlignment="center" />
+
+
 </LinearLayout>

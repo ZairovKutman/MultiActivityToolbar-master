@@ -13,12 +13,12 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:text="Дата"
+                android:id="@+id/order_text_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_text_date"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_margin="10dp"/>
+                android:text="Дата"
+                android:textAlignment="textEnd"
+                tools:layout_margin="20dp" />
 
             <EditText
                 android:focusable="false"
@@ -34,12 +34,12 @@
         android:layout_height="match_parent" >
 
         <TextView
-            android:text="Организация"
+            android:id="@+id/order_text_organization"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/order_text_organization"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
-            tools:layout_margin="10dp"/>
+            android:text="Организация"
+            android:textAlignment="textEnd"
+            tools:layout_margin="20dp" />
 
         <Spinner
             android:layout_width="match_parent"
@@ -54,12 +54,12 @@
             android:layout_height="match_parent" >
 
             <TextView
-                android:text="Клиент"
+                android:id="@+id/order_text_client"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_text_client"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_margin="10dp"/>
+                android:text="Клиент"
+                android:textAlignment="textEnd"
+                tools:layout_margin="20dp" />
 
             <EditText
                 android:focusable="false"
@@ -75,19 +75,19 @@
             android:layout_height="match_parent" >
 
             <TextView
-                android:text="Договор"
+                android:id="@+id/order_text_dogovor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_text_dogovor"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_margin="10dp"/>
+                android:text="Договор"
+                android:textAlignment="textEnd"
+                tools:layout_margin="20dp" />
 
             <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/order_spinner_dogovor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:spinnerMode="dialog"
-                tools:layout_margin="10dp"/>
+                tools:layout_margin="10dp" />
         </TableRow>
 
         <TableRow
@@ -95,14 +95,14 @@
             android:layout_height="match_parent" >
 
             <TextView
-                android:text="Склад"
+                android:id="@+id/order_text_sklad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_text_sklad"
-                tools:text="Склад"
                 android:contentDescription="Склад"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_margin="10dp"/>
+                android:text="Склад"
+                android:textAlignment="textEnd"
+                tools:layout_margin="20dp"
+                tools:text="Склад" />
 
             <Spinner
                 android:layout_width="match_parent"
@@ -117,20 +117,20 @@
             android:layout_height="match_parent" >
 
             <TextView
-                android:text="Тип цен"
+                android:id="@+id/order_tipcen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/order_tipcen"
-                tools:text="Тип цен"
                 android:contentDescription="Тип цен"
-                android:textAppearance="@android:style/TextAppearance.Material.Medium"
-                tools:layout_margin="10dp"/>
+                android:text="Тип цен"
+                android:textAlignment="textEnd"
+                tools:layout_margin="20dp"
+                tools:text="Тип цен" />
 
             <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/order_spinner_tipcen"
-                tools:layout_margin="10dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout_margin="10dp" />
 
         </TableRow>
 
@@ -141,16 +141,23 @@
 
             <Button
                 android:id="@+id/btn_create_doc"
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="@color/colorPrimary"
+                android:elevation="8dp"
                 android:text="Выгрузить сейчас"
-                tools:layout_margin="10dp"/>
+                android:textColor="@color/cardview_light_background"
+                android:translationZ="8dp"
+                tools:layout_margin="10dp" />
 
             <Button
                 android:id="@+id/save_order_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="8dp"
+                android:translationZ="8dp"
                 android:layout_weight="1"
                 android:text="Выгрузить позже"
                 tools:layout_margin="10dp"/>

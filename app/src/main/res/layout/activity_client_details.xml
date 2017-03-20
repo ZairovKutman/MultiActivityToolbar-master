@@ -64,9 +64,13 @@
         android:paddingLeft="20dp"
         android:textColor="@android:color/holo_blue_dark" />
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
         <TextView
             android:text="Долгота"
             android:layout_width="wrap_content"
@@ -81,21 +85,55 @@
             android:id="@+id/ClientLatitude"
             android:paddingRight="20dp" />
 
+            <TextView
+                android:id="@+id/Client_accuracy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="20dp"
+                android:text="Точность"
+                android:textColor="@color/colorPrimary" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/Client_saveLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:minHeight="1dp"
+                android:text="Снять координаты" />
+
         <Button
             android:text="Проложить путь"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ClientMap"
             android:minHeight="1dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp" />
+        </LinearLayout>
+
 
     </LinearLayout>
+
     <Button
-        android:text="Позвонить"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/ClientCall"
-        android:layout_margin="10dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_margin="10dp"
+        android:background="@android:drawable/ic_menu_call"
+        android:backgroundTint="@android:color/holo_green_light"
+        android:textAlignment="center" />
 
 </LinearLayout>

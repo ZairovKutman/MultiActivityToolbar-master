@@ -80,7 +80,8 @@ public class SavedReportsRepo {
                 + ", "+Report.KEY_Datestart
                 + ", "+Report.KEY_Dateend
                 + ", "+Report.KEY_Contenthtml
-                + " FROM " + Report.TABLE_SAVED;
+                + " FROM " + Report.TABLE_SAVED
+                + " WHERE "+ Report.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         // looping through all rows and adding to list
@@ -90,12 +91,11 @@ public class SavedReportsRepo {
                 Report report = new Report();
                 report.setReportId(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_ReportId)));
                 report.setGuid(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Guid)));
-                report.setGuid(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Base)));
+                report.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Base)));
                 report.setName(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Name)));
                 report.setDateStart(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Datestart)));
                 report.setDateEnd(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Dateend)));
                 report.setContentHTML(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Contenthtml)));
-
                 arrayList.add(report);
             } while (cursor.moveToNext());
         }

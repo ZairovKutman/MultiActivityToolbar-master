@@ -39,6 +39,8 @@ service AyuService {
 
 	rpc CheckDeviceStatus(Device) returns(DeviceStatus){}
 
+	rpc SetPointLocation(PointLocation) returns(OperationStatus){}
+
 }
 
 message ExchangeData{
@@ -232,4 +234,11 @@ message Settings{
 	string password_for_app_settings = 10;
 	bool status = 11;
 	string error_message = 12;
+}
+
+message PointLocation{
+	Agent agent = 1;
+	Point point = 2;
+	string latitude = 3;
+	string longitude = 4;
 }

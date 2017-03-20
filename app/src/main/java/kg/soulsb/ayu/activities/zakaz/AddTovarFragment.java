@@ -38,7 +38,7 @@ import kg.soulsb.ayu.models.Stock;
  */
 
 public class AddTovarFragment extends Fragment {
-    ArrayList<Item> arrayList;
+    ArrayList<Item> arrayList = new ArrayList<Item>();
     EditText editText;
     OrderAddActivity parentActivity;
     TovarAdapter arrayAdapter;
@@ -62,7 +62,6 @@ public class AddTovarFragment extends Fragment {
 
         // создаем список товаров
         final ListView listView = (ListView) v.findViewById(R.id.list_view_tovary);
-        arrayList = new ArrayList<Item>();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

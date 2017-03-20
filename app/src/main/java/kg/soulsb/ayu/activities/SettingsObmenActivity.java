@@ -241,7 +241,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting tovar
             Items items = exchangeData.items;
             ItemsRepo itemsRepo = new ItemsRepo();
-
+            itemsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (kg.soulsb.ayu.grpctest.nano.Item item: items.item)
             {
                 Item item1 = new Item(item.guid,item.description,item.unit, item.price,item.stock);
@@ -254,7 +254,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting warehouses
             Warehouses warehouses = exchangeData.warehouses;
             WarehousesRepo warehousesRepo = new WarehousesRepo();
-
+            warehousesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Warehouse warehouse: warehouses.warehouse)
             {
                 kg.soulsb.ayu.models.Warehouse warehouse1 = new kg.soulsb.ayu.models.Warehouse(warehouse.guid,warehouse.description);
@@ -267,7 +267,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting contracts
             Contracts contracts = exchangeData.contracts;
             ContractsRepo contractsRepo = new ContractsRepo();
-
+            contractsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Contract contract: contracts.contract)
             {
                 kg.soulsb.ayu.models.Contract contract1 = new kg.soulsb.ayu.models.Contract(contract.guid,contract.description,contract.pointGuid);
@@ -281,7 +281,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting Organization
             Organizations organizations = exchangeData.organizations;
             OrganizationsRepo organizationsRepo = new OrganizationsRepo();
-
+            organizationsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Organization organization: organizations.organization)
             {
                 kg.soulsb.ayu.models.Organization organization1 = new kg.soulsb.ayu.models.Organization(organization.guid,organization.description);
@@ -294,7 +294,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting price types
             PriceTypes priceTypes = exchangeData.priceTypes;
             PriceTypesRepo priceTypesRepo = new PriceTypesRepo();
-
+            priceTypesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (PriceType priceType: priceTypes.priceType)
             {
                 kg.soulsb.ayu.models.PriceType priceType1 = new kg.soulsb.ayu.models.PriceType(priceType.guid,priceType.description);
@@ -307,7 +307,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting prices
             Prices prices = exchangeData.prices;
             PricesRepo pricesRepo = new PricesRepo();
-
+            pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Price price: prices.price)
             {
                 kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
@@ -320,7 +320,7 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting Stocks
             Stocks stocks = exchangeData.stocks;
             StocksRepo stocksRepo = new StocksRepo();
-
+            stocksRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Stock stock: stocks.stock)
             {
                 kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item,stock.warehouse,stock.stock);
@@ -333,7 +333,7 @@ public class SettingsObmenActivity extends BaseActivity {
             //getting reports
             Reports reports = exchangeData.reports;
             ReportsRepo reportsRepo = new ReportsRepo();
-
+            reportsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Report report: reports.report)
             {
                 kg.soulsb.ayu.models.Report report1 = new kg.soulsb.ayu.models.Report(report.guid,report.description);

@@ -49,7 +49,7 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 public class MyService extends Service {
     private static final String TAG = "MyService";
     private LocationManager mLocationManager = null;
-    private static final int LOCATION_INTERVAL = 7000;
+    private static final int LOCATION_INTERVAL = 2000;
     private static final float LOCATION_DISTANCE = 1;
     Location mLastLocation;
     String currentBaseString="";
@@ -57,10 +57,9 @@ public class MyService extends Service {
     private Timer mTimer = null;
 
     private class LocationListener implements android.location.LocationListener {
-
         private Baza baza;
 
-        public LocationListener(String provider) {
+        LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
         }
@@ -102,7 +101,7 @@ public class MyService extends Service {
             return;
         }
 
-        System.out.println("currentbase: "+currentBaseString);
+        System.out.println("currentbase: "+currentBaseString+" lat="+mLastLocation.getLatitude()+" long="+mLastLocation.getLongitude());
         if (mLastLocation.getLatitude() == 0 && mLastLocation.getLongitude() == 0) return;
         baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
         String mHost = baza.getHost();
@@ -216,7 +215,7 @@ public class MyService extends Service {
         private ManagedChannel mChannel;
         private String name;
 
-        public GrpcTask(ManagedChannel mChannel, String name) {
+        private GrpcTask(ManagedChannel mChannel, String name) {
             this.mChannel = mChannel;
             this.name = name;
         }

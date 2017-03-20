@@ -235,24 +235,7 @@ public class AddOrderFragment extends Fragment {
             public void onClick(View v) {
                 if (!documentIsReady()) return;
 
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
-
-                if (sharedPreferences.contains("default_name")) {
-                    currentBaseString = sharedPreferences.getString("default_name", null);
-                }
-
-                DBHelper dbHelper = new DBHelper(getContext());
-                DatabaseManager.initializeInstance(dbHelper);
-                ArrayList<Baza> arrayList = new BazasRepo().getBazasObject();
-
-                for (Baza baza: arrayList)
-                {
-                    if (baza.getName().equals(currentBaseString))
-                    {
-                        this.baza = baza;
-                    }
-                }
-
+                baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
 
                 String mHost = baza.getHost();
                 int mPort = baza.getPort();
