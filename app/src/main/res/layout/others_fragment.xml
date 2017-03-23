@@ -14,9 +14,11 @@
             android:layout_height="wrap_content"
             android:id="@+id/textView8"
             android:textStyle="normal|bold"
+            android:layout_marginRight="15dp"
             android:minWidth="120dp" />
 
         <EditText
+            style="@style/spinner_style"
             android:focusable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,6 +42,7 @@
             android:minWidth="120dp" />
 
         <EditText
+            style="@style/spinner_style"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"

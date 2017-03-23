@@ -37,6 +37,7 @@ public class OrdersRepo {
                 + Order.KEY_pricetype  + "   TEXT    ,"
                 + Order.KEY_warehouse  + "   TEXT    ,"
                 + Order.KEY_BAZA  + "   TEXT    ,"
+                + Order.KEY_Organization  + "   TEXT    ,"
                 + Order.KEY_date  + "   TEXT);";
     }
 
@@ -70,7 +71,7 @@ public class OrdersRepo {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Order.KEY_OrderID, order.getOrderID());
-        values.put(Order.KEY_BAZA, CurrentBaseClass.getInstance().getCurrentBase());
+        values.put(Order.KEY_BAZA, order.getBaza());
         values.put(Order.KEY_clientGUID, order.getClient());
         values.put(Order.KEY_comment, order.getComment());
         values.put(Order.KEY_date, order.getDate());
@@ -81,6 +82,7 @@ public class OrdersRepo {
         values.put(Order.KEY_pricetype, order.getPriceType());
         values.put(Order.KEY_warehouse,order.getWarehouse());
         values.put(Order.KEY_totalSum,order.getTotalSum());
+        values.put(Order.KEY_Organization,order.getOrganization());
 
         // Inserting Row
         orderId=(int)db.insert(Order.TABLE, null, values);
@@ -124,6 +126,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_pricetype
                 + ", "+Order.KEY_warehouse
                 + ", "+Order.KEY_totalSum
+                + ", "+Order.KEY_Organization
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"'";
 
@@ -134,6 +137,7 @@ public class OrdersRepo {
             do {
                 Order order = new Order();
                 order.setOrderID(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID)));
+                order.setOrganization(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Organization)));
                 order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
                 order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
                 order.setComment(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_comment)));
@@ -182,5 +186,102 @@ public class OrdersRepo {
         DatabaseManager.getInstance().closeDatabase();
 
         return arrayList;
+    }
+
+    public void setDocDelivered(String orderID, boolean b) {
+            SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put(Order.KEY_isDelivered, Boolean.toString(b));
+
+            String whereClause = Order.KEY_OrderID + " = '"+orderID+"'";
+            // Inserting Row
+            db.update(Order.TABLE, values, whereClause, null);
+            DatabaseManager.getInstance().closeDatabase();
+    }
+
+    public ArrayList<Order> getOrdersObjectNotDelivered(String baza) {
+        ArrayList<Order> arrayList = new ArrayList<>();
+
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT " + Order.KEY_OrderID
+                + ", "+Order.KEY_BAZA
+                + ", "+Order.KEY_clientGUID
+                + ", "+Order.KEY_comment
+                + ", "+Order.KEY_date
+                + ", "+Order.KEY_dateSend
+                + ", "+Order.KEY_Doctype
+                + ", "+Order.KEY_dogovor
+                + ", "+Order.KEY_isDelivered
+                + ", "+Order.KEY_pricetype
+                + ", "+Order.KEY_warehouse
+                + ", "+Order.KEY_totalSum
+                + ", "+Order.KEY_Organization
+                + " FROM " + Order.TABLE
+                + " WHERE "+Order.KEY_BAZA+" = '"+baza+"' AND "+Order.KEY_isDelivered+" = 'false'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setOrderID(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID)));
+                order.setOrganization(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Organization)));
+                order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
+                order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
+                order.setComment(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_comment)));
+                order.setDate(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_date)));
+                order.setDateSend(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dateSend)));
+                order.setDoctype(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Doctype)));
+                order.setDogovor(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dogovor)));
+                order.setPriceType(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_pricetype)));
+                order.setWarehouse(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_warehouse)));
+                if (cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isDelivered)).equals("true"))
+                    order.setDelivered(true);
+                else
+                    order.setDelivered(false);
+                ArrayList<Item> itemArrayList = new ArrayList<>();
+
+                String selectItemQuery =  " SELECT " + Order.KEY_OrderID
+                        + ", "+Item.KEY_Guid
+                        + ", "+Item.KEY_Name
+                        + ", "+Item.KEY_Price
+                        + ", "+Item.KEY_Quantity
+                        + ", "+Item.KEY_ItemId
+                        + " FROM " + Order.TABLE_ITEM
+                        + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
+
+                Cursor myCursor = db.rawQuery(selectItemQuery, null);
+
+                if (myCursor.moveToFirst()) {
+                    do {
+                        Item item = new Item();
+                        item.setItemId(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_ItemId)));
+                        item.setName(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Name)));
+                        item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
+                        item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
+                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        itemArrayList.add(item);
+                    } while (myCursor.moveToNext());
+                }
+                myCursor.close();
+
+                order.setArraylistTovar(itemArrayList);
+                arrayList.add(order);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return arrayList;
+    }
+
+    public void deleteDocDelivered() {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String whereClause = Order.KEY_isDelivered + " = '"+"true"+"' AND "+Order.KEY_BAZA+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
+        db.delete(Order.TABLE,whereClause,null);
+        DatabaseManager.getInstance().closeDatabase();
     }
 }

@@ -12,15 +12,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
+import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.models.Baza;
+import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.MyServiceActivatorClass;
 import kg.soulsb.ayu.singletons.UserSettings;
@@ -31,7 +35,9 @@ public class MainActivity extends BaseActivity {
     private Spinner baza;
     ArrayList<Baza> arrayList=new ArrayList<>();
     ArrayAdapter<Baza> arrayAdapter;
-
+    ListView listViewDocuments;
+    ArrayList<Order> orderArrayList = new ArrayList<>();
+    OrderAdapter orderArrayAdapter;
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -125,6 +131,12 @@ public class MainActivity extends BaseActivity {
         updateCurrentBaseOnSpinner();
         setUpNavView();
 
+        listViewDocuments = (ListView) findViewById(R.id.listView_documents);
+
+        orderArrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
+        orderArrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, orderArrayList);
+        listViewDocuments.setAdapter(orderArrayAdapter);
+        listViewDocuments.setEmptyView(findViewById(R.id.empty));
     }
 
     private void updateCurrentBaseOnSpinner() {
@@ -163,7 +175,7 @@ public class MainActivity extends BaseActivity {
         DBHelper dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
         arrayList = new BazasRepo().getBazasObject();
-        arrayAdapter = new ArrayAdapter<Baza>(this, android.R.layout.simple_spinner_item,arrayList);
+        arrayAdapter = new ArrayAdapter<Baza>(this, R.layout.baza_spinner_item,arrayList);
         baza.setAdapter(arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
     }

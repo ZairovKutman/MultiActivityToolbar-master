@@ -54,39 +54,6 @@ public class StocksRepo {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    public ArrayList<Stock> getStocksObject() {
-        ArrayList<Stock> arrayList = new ArrayList<>();
-
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + Stock.KEY_Stock
-                + ", "+Stock.KEY_StockId
-                + ", "+Stock.KEY_ItemGuid
-                + ", "+Stock.KEY_Base
-                + ", "+Stock.KEY_WarehouseGuid
-                + " FROM " + Stock.TABLE;
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        // looping through all rows and adding to list
-
-        if (cursor.moveToFirst()) {
-            do {
-                Stock stock = new Stock();
-                stock.setStockId(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_StockId)));
-                stock.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Base)));
-                stock.setItemGuid(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_ItemGuid)));
-                stock.setWarehouseGuid(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_WarehouseGuid)));
-                stock.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Stock))));
-
-
-                arrayList.add(stock);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return arrayList;
-    }
 
     public double getItemStockByWarehouse(String itemGUID, String warehouse) {
         double stock=0;
@@ -104,7 +71,10 @@ public class StocksRepo {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
         DatabaseManager.getInstance().closeDatabase();
 
         return stock;

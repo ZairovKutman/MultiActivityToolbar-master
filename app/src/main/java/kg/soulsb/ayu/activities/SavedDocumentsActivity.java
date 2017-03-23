@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,11 +38,15 @@ public class SavedDocumentsActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
+                if (orderArrayList.get(i).isDelivered())
+                {
+                    Toast.makeText(SavedDocumentsActivity.this,"Документ уже выгружен, редактирование запрещено.",Toast.LENGTH_SHORT).show();
+                }
+                else{
                 Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
                 intent.putExtra("doctype",orderArrayList.get(i).getDoctype());
                 intent.putExtra("savedobj", orderArrayList.get(i));
-                startActivity(intent);
+                startActivity(intent);}
             }
         });
 

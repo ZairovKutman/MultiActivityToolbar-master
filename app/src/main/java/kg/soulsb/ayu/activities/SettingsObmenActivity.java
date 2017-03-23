@@ -5,19 +5,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.adapters.ClientAdapter;
+import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
 import kg.soulsb.ayu.grpctest.nano.Contract;
 import kg.soulsb.ayu.grpctest.nano.Contracts;
 import kg.soulsb.ayu.grpctest.nano.Device;
 import kg.soulsb.ayu.grpctest.nano.DeviceStatus;
+import kg.soulsb.ayu.grpctest.nano.DocPurch;
+import kg.soulsb.ayu.grpctest.nano.Docs;
+import kg.soulsb.ayu.grpctest.nano.DocsStatus;
 import kg.soulsb.ayu.grpctest.nano.ExchangeData;
 import kg.soulsb.ayu.grpctest.nano.Items;
+import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Organization;
 import kg.soulsb.ayu.grpctest.nano.Organizations;
 import kg.soulsb.ayu.grpctest.nano.Point;
@@ -25,6 +33,7 @@ import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.PriceType;
 import kg.soulsb.ayu.grpctest.nano.PriceTypes;
 import kg.soulsb.ayu.grpctest.nano.Prices;
+import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
 import kg.soulsb.ayu.grpctest.nano.Report;
 import kg.soulsb.ayu.grpctest.nano.Reports;
 import kg.soulsb.ayu.grpctest.nano.Settings;
@@ -38,10 +47,12 @@ import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
+import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
+import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
@@ -50,11 +61,14 @@ import kg.soulsb.ayu.models.Item;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.grpctest.nano.Price;
+import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 import org.json.JSONException;
@@ -69,11 +83,14 @@ public class SettingsObmenActivity extends BaseActivity {
     ProgressBar progressBar;
     TextView loadingComment;
     TextView lastObmenText;
-    Button loadButton;
+    Button loadButton,loadOnlyDocButton;
     int globalCounter = 0;
     Baza baza = null;
     String currentBaseString;
-
+    ListView listViewDocuments;
+    ArrayAdapter<Order> arrayAdapter;
+    ArrayList<Order> arrayList = new ArrayList<>();
+    boolean fullObmen = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +101,12 @@ public class SettingsObmenActivity extends BaseActivity {
         loadingComment = (TextView) findViewById(R.id.loading_comment);
         lastObmenText = (TextView) findViewById(R.id.last_obmen_text);
         loadButton = (Button) findViewById(R.id.button);
+        loadOnlyDocButton = (Button) findViewById(R.id.button_only_documents);
+        listViewDocuments = (ListView) findViewById(R.id.listView_documents);
+
+        arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
+        arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
+        listViewDocuments.setAdapter(arrayAdapter);
 
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         lastObmenText.setText("Добавьте базу данных");
@@ -115,12 +138,33 @@ public class SettingsObmenActivity extends BaseActivity {
                 if (baza!= null) {
                 loadingComment.setText("Подключение... "+"5%");
                 try {
+                    fullObmen = true;
+                    loadButton.setEnabled(false);
+                    loadOnlyDocButton.setEnabled(false);
                     doFullObmen();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }}
                 else{
                 Toast.makeText(getBaseContext(),"Создайте базу данных",Toast.LENGTH_SHORT).show();}
+            }
+        });
+
+        loadOnlyDocButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (baza!= null) {
+                    loadingComment.setText("Подключение... "+"5%");
+                    try {
+                        fullObmen = false;
+                        loadButton.setEnabled(false);
+                        loadOnlyDocButton.setEnabled(false);
+                        doFullObmen();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }}
+                else{
+                    Toast.makeText(getBaseContext(),"Создайте базу данных",Toast.LENGTH_SHORT).show();}
             }
         });
 
@@ -179,18 +223,80 @@ public class SettingsObmenActivity extends BaseActivity {
             publishProgress("Проверка устройства в базе данных... 0%");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
-            if (!deviceStatus.active) {publishProgress("Ошибка, доступ с этого телефона запрещен"); return null;}
+            if (!deviceStatus.active) {
+                publishProgress("Ошибка, доступ с этого телефона запрещен");
+                return null;
+            }
 
             //
-            publishProgress("Загружаю... 1%");
-            ExchangeData exchangeData = blockingStub.getAllData(request);
+            publishProgress("Выгрузка документов... 2%");
 
+            //Выгружаю документы
+            DocPurch docPurchArray[] = new DocPurch[arrayList.size()];
+            for (Order order : arrayList) {
+                DocPurch docPurch = new DocPurch();
+                docPurch.organizationGuid = order.getOrganization();
+                docPurch.agent = name;
+                docPurch.clientGuid = order.getClient();
+                docPurch.comment = order.getComment();
+                docPurch.deliveryDate = order.getDateSend();
+                docPurch.contractGuid = order.getDogovor();
+                docPurch.date = order.getDate();
+                docPurch.warehouseGuid = order.getWarehouse();
+                docPurch.priceTypeGuid = order.getPriceType();
+                docPurch.docType = Integer.parseInt(order.getDoctype());
+                docPurch.docId = order.getOrderID();
+
+                ArrayList<Item> itemsList = order.getArraylistTovar();
+
+                PurchDocLine[] purchDocLines = new PurchDocLine[itemsList.size()];
+                int counter = 0;
+                for (Item item : itemsList) {
+                    PurchDocLine line = new PurchDocLine();
+                    line.amount = item.getQuantity() * item.getPrice();
+                    line.itemGuid = item.getGuid();
+                    line.price = item.getPrice();
+                    line.quantity = item.getQuantity();
+
+                    purchDocLines[counter] = line;
+                    counter++;
+                }
+
+                docPurch.lines = purchDocLines;
+
+                docPurchArray[arrayList.indexOf(order)] = docPurch;
+            }
+            if (arrayList.size() > 0){
+                Docs docs = new Docs();
+                docs.doc = docPurchArray;
+                DocsStatus docsStatus = blockingStub.getDocuments(docs);
+
+                for (int i=0;i<docsStatus.docsStatus.length;i++) {
+                    if (docsStatus.docsStatus[i].operationStatus.status == 0)
+                    {
+                        new OrdersRepo().setDocDelivered(docsStatus.docsStatus[i].docId, true);
+                        System.out.println("DOCUMENTS DELIVERED: "+docsStatus.docsStatus[i].operationStatus.status+"$"+docsStatus.docsStatus[i].operationStatus.comment);
+                    }
+                }
+            }
+            //Конец выгрузки документов
+            if (!fullObmen)
+            {
+                return new Points();
+            }
+
+            new OrdersRepo().deleteDocDelivered();
+
+            publishProgress("Загружаю данные из сервера... 7%");
+
+            ExchangeData exchangeData = blockingStub.getAllData(request);
 
             publishProgress("Загрузка настроек... 10%");
             Settings settings = exchangeData.settings;
 
-            if (!settings.status) {publishProgress("Ошибка: "+settings.errorMessage);}
-
+            if (!settings.status) {
+                publishProgress("Ошибка: " + settings.errorMessage);
+            }
             // Получаю настройки
             SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -225,11 +331,9 @@ public class SettingsObmenActivity extends BaseActivity {
 
             // getting clients
             ClientsRepo clientsRepo = new ClientsRepo();
-            // TODO: удалить только данные связанные с базой.
             clientsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Point point: pointIterator.point)
             {
-                System.out.println(point.debt);
                 Client client = new Client(point.guid,point.description,point.address, point.phoneNumber,point.latitude,point.longitude,point.debt);
                 client.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 clientsArray.add(client);
@@ -402,6 +506,12 @@ public class SettingsObmenActivity extends BaseActivity {
             editor1.apply();
 
             setUpNavView();
+
+            arrayList.clear();
+            arrayList.addAll(new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase()));
+            arrayAdapter.notifyDataSetChanged();
+            loadButton.setEnabled(true);
+            loadOnlyDocButton.setEnabled(true);
         }
     }
 }

@@ -45,31 +45,6 @@ public class PriceTypesRepo {
         return priceTypeId;
     }
 
-    public ArrayList<String> getPricetypesName()
-    {
-        ArrayList<String> arrayList = new ArrayList<>();
-
-
-
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + PriceType.KEY_Name
-                + " FROM " + PriceType.TABLE
-                + " WHERE" + PriceType.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
-
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                arrayList.add(cursor.getString(cursor.getColumnIndexOrThrow(PriceType.KEY_Name)));
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return arrayList;
-    }
 
     public void deleteTable() {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
@@ -103,7 +78,10 @@ public class PriceTypesRepo {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
         DatabaseManager.getInstance().closeDatabase();
 
         return arrayList;

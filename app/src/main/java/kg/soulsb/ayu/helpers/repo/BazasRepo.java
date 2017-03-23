@@ -63,31 +63,6 @@ public class BazasRepo {
 
     }
 
-    public ArrayList<String> getBazasName()
-    {
-        ArrayList<String> arrayList = new ArrayList<>();
-
-
-
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + Baza.KEY_Name
-                + " FROM " + Baza.TABLE;;
-
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                arrayList.add(cursor.getString(cursor.getColumnIndexOrThrow(Baza.KEY_Name)));
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return arrayList;
-    }
-
     public void deleteTable() {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         db.delete(Baza.TABLE,null,null);
@@ -120,7 +95,10 @@ public class BazasRepo {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
         DatabaseManager.getInstance().closeDatabase();
 
         return arrayList;

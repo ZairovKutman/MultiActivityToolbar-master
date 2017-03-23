@@ -2,6 +2,8 @@ package kg.soulsb.ayu.helpers.repo;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.Location;
+
 import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Client;
@@ -131,6 +133,21 @@ public class ClientsRepo {
         DatabaseManager.getInstance().closeDatabase();
 
         return arrayList;
+    }
+
+    public void setClientLocation(String guid,Location location)
+    {
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(Client.KEY_Latitude, location.getLatitude());
+        values.put(Client.KEY_Longitude, location.getLongitude());
+
+        String whereClause = Client.KEY_Guid + " = '"+guid+"'";
+        // Inserting Row
+        db.update(Client.TABLE, values, whereClause, null);
+        DatabaseManager.getInstance().closeDatabase();
+
     }
 
     public void deleteByBase(String bazaString)

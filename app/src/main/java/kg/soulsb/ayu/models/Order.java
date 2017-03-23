@@ -26,6 +26,7 @@ public class Order implements Serializable {
     public static String KEY_comment     = "comment";
     public static String KEY_isDelivered     = "isDelivered";
     public static String KEY_totalSum     = "totalSum";
+    public static String KEY_Organization = "Organization";
 
     private String orderID;
     private String priceType;

@@ -41,6 +41,8 @@ service AyuService {
 
 	rpc SetPointLocation(PointLocation) returns(OperationStatus){}
 
+	rpc GetDocuments(Docs) returns (DocsStatus){}
+
 }
 
 message ExchangeData{
@@ -191,6 +193,19 @@ message DocPurch {
 	repeated PurchDocLine lines = 9;
 	int32 doc_type = 11;
 	string doc_id = 12;
+}
+
+message Docs{
+	repeated DocPurch doc = 1;
+}
+
+message DocsStatus{
+	repeated DocStatus docs_status = 1;
+}
+
+message DocStatus{
+	string doc_id = 1;
+	OperationStatus operation_status = 2;
 }
 
 message OperationStatus{

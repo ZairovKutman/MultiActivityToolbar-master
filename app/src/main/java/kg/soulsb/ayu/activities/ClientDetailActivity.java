@@ -36,6 +36,7 @@ import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Point;
 import kg.soulsb.ayu.grpctest.nano.PointLocation;
 import kg.soulsb.ayu.grpctest.nano.Points;
+import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.UserSettings;
@@ -151,7 +152,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                     View dialogView = inflater.inflate(R.layout.loading_dialog, null);
                     progressBar = (ProgressBar) dialogView.findViewById(R.id.loading_bar);
 
-                    d.setTitle("Выгрузка документа");
+                    d.setTitle("Отправка координатов");
                     d.setMessage("Подождите...");
                     d.setView(dialogView);
                     alertDialog = d.create();
@@ -319,8 +320,10 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                 Toast.makeText(getBaseContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
             }
             else {
-
-
+                //TODO: изменить в базе локацию клиента.
+                new ClientsRepo().setClientLocation(getIntent().getStringExtra("guid"),currentLocation);
+                clientLatitudeTextView.setText("Широта: "+currentLocation.getLatitude());
+                clientLongitudeTextView.setText("Долгота: "+currentLocation.getLongitude());
                 Toast.makeText(getBaseContext(),"Успех! геолокация отправлена. =)",Toast.LENGTH_SHORT).show();
             }
         }

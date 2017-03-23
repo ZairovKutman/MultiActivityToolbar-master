@@ -57,7 +57,7 @@ public class AddTovarFragment extends Fragment {
         otborArrayList.add("Показать все");
         otborArrayList.add("Отбор 1");
         otborArrayList.add("Отбор 2");
-        ArrayAdapter<String> otborAdapter = new ArrayAdapter<String>(this.getActivity(),android.R.layout.simple_spinner_item,otborArrayList);
+        ArrayAdapter<String> otborAdapter = new ArrayAdapter<String>(this.getActivity(),R.layout.baza_spinner_item,otborArrayList);
         otborSpinner.setAdapter(otborAdapter);
 
         // создаем список товаров

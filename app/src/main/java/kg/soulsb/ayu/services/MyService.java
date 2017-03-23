@@ -51,7 +51,7 @@ public class MyService extends Service {
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 2000;
     private static final float LOCATION_DISTANCE = 1;
-    Location mLastLocation;
+    Location mLastLocation = new Location("null");
     String currentBaseString="";
     Baza baza;
     private Timer mTimer = null;

@@ -2,6 +2,9 @@ package kg.soulsb.ayu.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +52,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
             holder.txtTitle = (TextView)row.findViewById(R.id.text_client);
             holder.txtDetail = (TextView)row.findViewById(R.id.text_detail);
             holder.delivered = (ImageView)row.findViewById(R.id.delivered);
+            holder.image = (ImageView)row.findViewById(R.id.imageView_doc);
             row.setTag(holder);
         }
         else
@@ -69,9 +73,14 @@ public class OrderAdapter extends ArrayAdapter<Order> {
             holder.txtDetail.setText("Заказ от "+order.getDate()+", сумма = "+order.getTotalSum());
 
         if (order.isDelivered())
+        {
+            holder.image.setColorFilter(ContextCompat.getColor(context,android.R.color.holo_green_dark));
             holder.delivered.setVisibility(View.VISIBLE);
-        else
+        }
+        else {
+            holder.image.setColorFilter(ContextCompat.getColor(context,android.R.color.darker_gray));
             holder.delivered.setVisibility(View.INVISIBLE);
+        }
 
         return row;
     }
@@ -81,6 +90,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
         TextView txtTitle;
         TextView txtDetail;
         ImageView delivered;
+        ImageView image;
     }
 
 }

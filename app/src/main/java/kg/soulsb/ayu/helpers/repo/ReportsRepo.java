@@ -105,7 +105,10 @@ public class ReportsRepo {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
         DatabaseManager.getInstance().closeDatabase();
 
         return arrayList;

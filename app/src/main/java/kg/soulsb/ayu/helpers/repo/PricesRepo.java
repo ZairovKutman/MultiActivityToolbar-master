@@ -54,39 +54,6 @@ public class PricesRepo {
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    public ArrayList<Price> getPricesObject() {
-        ArrayList<Price> arrayList = new ArrayList<>();
-
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + Price.KEY_Price
-                + ", "+Price.KEY_PriceId
-                + ", "+Price.KEY_Guid
-                + ", "+Price.KEY_Base
-                + ", "+Price.KEY_PriceTypeGuid
-                + " FROM " + Price.TABLE;
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        // looping through all rows and adding to list
-
-        if (cursor.moveToFirst()) {
-            do {
-                Price price = new Price();
-                price.setPriceId(cursor.getString(cursor.getColumnIndexOrThrow(Price.KEY_PriceId)));
-                price.setGuid(cursor.getString(cursor.getColumnIndexOrThrow(Price.KEY_Guid)));
-                price.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Price.KEY_Base)));
-                price.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Price.KEY_Price))));
-                price.setPriceTypeGuid(cursor.getString(cursor.getColumnIndexOrThrow(Price.KEY_PriceTypeGuid)));
-
-
-                arrayList.add(price);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return arrayList;
-    }
 
     public double getItemPriceByPriceType(String itemGuid, String priceTypeGuid)
     {
@@ -105,7 +72,10 @@ public class PricesRepo {
             } while (cursor.moveToNext());
         }
 
-        cursor.close();
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
         DatabaseManager.getInstance().closeDatabase();
 
         return price;

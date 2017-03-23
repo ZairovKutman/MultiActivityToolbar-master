@@ -15,16 +15,58 @@
         android:layout_height="wrap_content"
         android:id="@+id/last_obmen_text" />
 
-    <Button
-        android:id="@+id/button"
+    <TextView
+        android:id="@+id/textView11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="@color/colorPrimary"
-        android:elevation="8dp"
-        android:text="Загрузить данные"
-        android:textColor="@color/cardview_light_background"
-        android:translationZ="8dp" />
+        android:text="Выгружаемые документы"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textStyle="bold" />
+
+    <ListView
+        android:id="@+id/listView_documents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:foregroundGravity="center"
+        android:maxHeight="120dp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_only_documents"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:elevation="8dp"
+            android:text="Выгрузить документы"
+            android:textColor="@color/cardview_light_background"
+            android:translationZ="8dp"
+            android:layout_marginRight="5dp"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/colorAccent"
+            android:elevation="8dp"
+            android:text="Полный обмен"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/cardview_light_background"
+            android:translationZ="8dp"
+            />
+    </LinearLayout>
+
 
     <ProgressBar
         android:id="@+id/progressBar"

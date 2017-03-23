@@ -162,7 +162,7 @@ public class AddOrderFragment extends Fragment {
         DBHelper dbHelper = new DBHelper(getContext());
         DatabaseManager.initializeInstance(dbHelper);
         arrayListWarehouse = new WarehousesRepo().getWarehousesObject();
-        ArrayAdapter<Warehouse> arrayAdapter = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListWarehouse);
+        ArrayAdapter<Warehouse> arrayAdapter = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListWarehouse);
         spinner_warehouse.setAdapter(arrayAdapter);
         spinner_warehouse.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -182,20 +182,20 @@ public class AddOrderFragment extends Fragment {
         editText_organization = (Spinner) v.findViewById(R.id.order_spinner_organization);
 
         arrayListOrganization = new OrganizationsRepo().getOrganizationsObject();
-        ArrayAdapter<Organization> organizationArrayAdapter = new ArrayAdapter<Organization>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListOrganization);
+        ArrayAdapter<Organization> organizationArrayAdapter = new ArrayAdapter<Organization>(this.getActivity(), R.layout.baza_spinner_item, arrayListOrganization);
         editText_organization.setAdapter(organizationArrayAdapter);
 
         // CLIENT CONTRACT
         spinner_contract = (Spinner) v.findViewById(R.id.order_spinner_dogovor);
         if (clientGUID != null){
             arrayListContract = new ContractsRepo().getContractsObject(clientGUID);
-            arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListContract);
+            arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
             spinner_contract.setAdapter(arrayAdapterContract);
         }
         // PRICE TYPE
         spinner_pricetype = (Spinner) v.findViewById(R.id.order_spinner_tipcen);
         arrayListPriceType = new PriceTypesRepo().getPricetypesObject();
-        ArrayAdapter<PriceType> arrayAdapterPriceType = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListPriceType);
+        ArrayAdapter<PriceType> arrayAdapterPriceType = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListPriceType);
         spinner_pricetype.setAdapter(arrayAdapterPriceType);
 
         spinner_pricetype.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -314,7 +314,7 @@ public class AddOrderFragment extends Fragment {
         clientLong = client.getLongitude();
         DatabaseManager.initializeInstance(dbHelper);
         arrayListContract = new ContractsRepo().getContractsObject(clientGUID);
-        arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListContract);
+        arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
         spinner_contract.setAdapter(arrayAdapterContract);
         docId = parentActivity.order.getOrderID();
         editText.setText(parentActivity.order.getDate());
@@ -400,7 +400,7 @@ public class AddOrderFragment extends Fragment {
                 editText_client.setText(my_data);
                 DatabaseManager.initializeInstance(dbHelper);
                 arrayListContract = new ContractsRepo().getContractsObject(clientGUID);
-                arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), android.R.layout.simple_spinner_item, arrayListContract);
+                arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
                 spinner_contract.setAdapter(arrayAdapterContract);
             }
         }
