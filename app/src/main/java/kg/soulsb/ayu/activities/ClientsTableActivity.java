@@ -81,7 +81,6 @@ public class ClientsTableActivity extends BaseActivity{
             public boolean onQueryTextChange(String newText) {
 
                     arrayAdapter.getFilter().filter(newText);
-                    arrayAdapter.notifyDataSetChanged();
                     System.out.println(newText);
 
                 return true;
