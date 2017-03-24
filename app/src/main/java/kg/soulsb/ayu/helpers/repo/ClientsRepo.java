@@ -109,7 +109,8 @@ public class ClientsRepo {
                 + ", "+Client.KEY_Phone
                 + ", "+Client.KEY_Debt
                 + " FROM " + Client.TABLE
-                + " WHERE "+Client.KEY_Base+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
+                + " WHERE "+Client.KEY_Base+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'"
+                + " ORDER BY "+Client.KEY_Name+" ASC;";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         // looping through all rows and adding to list

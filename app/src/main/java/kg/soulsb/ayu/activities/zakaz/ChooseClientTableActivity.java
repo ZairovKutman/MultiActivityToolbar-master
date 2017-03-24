@@ -10,7 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import android.support.v7.widget.SearchView;
 
 import java.util.ArrayList;
 
@@ -29,7 +29,8 @@ import kg.soulsb.ayu.singletons.UserSettings;
  */
 
 public class ChooseClientTableActivity extends BaseActivity {
-
+    SearchView searchView;
+    ClientAdapter arrayAdapter;
     ArrayList<Client> arrayList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +39,7 @@ public class ChooseClientTableActivity extends BaseActivity {
         DBHelper dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
         arrayList = new ClientsRepo().getClientsObject();
-
-        final ClientAdapter arrayAdapter = new ClientAdapter(this,R.layout.list_client_layout, arrayList);
+        arrayAdapter = new ClientAdapter(this,R.layout.list_client_layout, arrayList);
         final ListView listViewClients = (ListView) findViewById(R.id.list_view_clients);
 
         listViewClients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -73,8 +73,20 @@ public class ChooseClientTableActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_search, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        MaterialSearchView searchView = (MaterialSearchView) findViewById(R.id.search_view);
-        searchView.setMenuItem(item);
+        searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                arrayAdapter.getFilter().filter(newText);
+                arrayAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
         return true;
     }
 

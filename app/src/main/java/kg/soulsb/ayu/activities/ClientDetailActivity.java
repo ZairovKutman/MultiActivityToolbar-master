@@ -139,7 +139,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
         clientSaveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: Сделать так чтобы можно было снять координаты и отправить
+
                 if (currentLocation.getLatitude()!=0 || currentLocation.getLongitude()!=0)
                 {
                     baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
@@ -320,7 +320,6 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                 Toast.makeText(getBaseContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
             }
             else {
-                //TODO: изменить в базе локацию клиента.
                 new ClientsRepo().setClientLocation(getIntent().getStringExtra("guid"),currentLocation);
                 clientLatitudeTextView.setText("Широта: "+currentLocation.getLatitude());
                 clientLongitudeTextView.setText("Долгота: "+currentLocation.getLongitude());

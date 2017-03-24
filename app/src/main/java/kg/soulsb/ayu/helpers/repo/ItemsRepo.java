@@ -71,7 +71,8 @@ public class ItemsRepo {
                 + ", "+Item.KEY_Stock
                 + ", "+Item.KEY_Base
                 + " FROM " + Item.TABLE
-                + " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
+                + " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'"
+                + " ORDER BY "+Client.KEY_Name+" ASC;";
 
         Cursor cursor = db.rawQuery(selectQuery, null);
         // looping through all rows and adding to list

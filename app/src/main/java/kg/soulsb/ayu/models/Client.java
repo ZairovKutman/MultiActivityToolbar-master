@@ -58,7 +58,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return getName();
+        return getName().toLowerCase();
     }
 
     public String getClientId() {

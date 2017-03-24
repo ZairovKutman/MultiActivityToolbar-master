@@ -8,7 +8,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
+import android.support.v7.widget.SearchView;
+
+
 import java.util.ArrayList;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.adapters.ClientAdapter;
@@ -20,23 +22,25 @@ import kg.soulsb.ayu.models.Client;
 /**
  * Created by Sultanbek Baibagyshev on 1/16/17.
  */
-public class ClientsTableActivity extends BaseActivity implements MaterialSearchView.OnQueryTextListener{
-    private MaterialSearchView searchView;
+public class ClientsTableActivity extends BaseActivity{
+    private SearchView searchView;
     private ListView listViewClients;
     private ClientAdapter arrayAdapter;
     private ArrayList<Client> arrayList;
+    Menu myMenu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clients);
 
+
         DBHelper dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
 
         arrayList = new ClientsRepo().getClientsObject();
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
-        searchView.setOnQueryTextListener(this);
         arrayAdapter = new ClientAdapter(this,R.layout.list_client_layout, arrayList);
+
+
 
         listViewClients = (ListView) findViewById(R.id.list_view_clients);
         listViewClients.setTextFilterEnabled(true);
@@ -62,8 +66,27 @@ public class ClientsTableActivity extends BaseActivity implements MaterialSearch
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.action_search, menu);
+
         MenuItem item = menu.findItem(R.id.action_search);
-        searchView.setMenuItem(item);
+        searchView = (SearchView) item.getActionView();
+        myMenu = menu;
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                    arrayAdapter.getFilter().filter(newText);
+                    arrayAdapter.notifyDataSetChanged();
+                    System.out.println(newText);
+
+                return true;
+            }
+        });
         return true;
     }
 
@@ -81,19 +104,4 @@ public class ClientsTableActivity extends BaseActivity implements MaterialSearch
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (TextUtils.isEmpty(newText)) {
-            listViewClients.clearTextFilter();
-        }
-        else {
-            listViewClients.setFilterText(newText);
-        }
-        return true;
-    }
 }

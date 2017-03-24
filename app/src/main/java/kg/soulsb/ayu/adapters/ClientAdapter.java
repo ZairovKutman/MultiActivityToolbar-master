@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import kg.soulsb.ayu.models.Client;
  * Created by Sultanbek Baibagyshev on 1/16/17.
  */
 
-public class ClientAdapter extends ArrayAdapter<Client> {
+public class ClientAdapter extends ArrayAdapter<Client> implements Filterable {
     Context context;
     int layoutResourceId;
     List<Client> data = null;
@@ -52,13 +53,16 @@ public class ClientAdapter extends ArrayAdapter<Client> {
             holder = (ClientHolder)row.getTag();
         }
 
-        Client client = data.get(position);
+        Client client = getItem(position);
         holder.txtTitle.setText(client.getName());
         holder.txtAddress.setText(client.getAddress());
         if (client.getDebt()>0)
             holder.txtTitle.setTextColor(Color.RED);
         return row;
+
+
     }
+
 
     static class ClientHolder
     {
