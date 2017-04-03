@@ -1,5 +1,7 @@
 package kg.soulsb.ayu.activities.zakaz;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -39,11 +41,11 @@ public class OrderAddActivity extends BaseActivity {
     String clientLong="0";
     Location clientLocation = new Location("");
     Order order = null;
+    Fragment addOrder = new AddOrderFragment();
     float distance=0;
     public Location getLocation() {
         System.out.println(" I GOT A LOCATION: lat="+CurrentLocationClass.getInstance().getCurrentLocation().getLatitude()
                 +" long="+CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
-
         return CurrentLocationClass.getInstance().getCurrentLocation();
     }
 
@@ -59,8 +61,7 @@ public void locationUpdate(){
             clientLocation.setLongitude(Double.parseDouble(clientLong));
             distance = mLastLocation.distanceTo(clientLocation);
             System.out.println("DISTANCE = "+distance);
-            if (distance<51)
-            {
+            if (distance<51) {
                 addOrderFragment.createDocButton.setEnabled(true);
             }
             else {
@@ -80,6 +81,36 @@ public void locationUpdate(){
     }
 
     @Override
+    public void onBackPressed()
+    {
+        createDialog();
+    }
+
+    private void createDialog() {
+
+        AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
+        alertDlg.setMessage("Сохранить документ перед выходом?");
+        alertDlg.setCancelable(false); // We avoid that the dialong can be cancelled, forcing the user to choose one of the options
+        alertDlg.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (addOrderFragment.documentIsReady()) {
+                            addOrderFragment.saveDocument(false);
+                            Toast.makeText(getBaseContext(),"Сохранено",Toast.LENGTH_SHORT).show();
+                            OrderAddActivity.super.onBackPressed();
+                        }
+                    }
+        });
+
+        alertDlg.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                OrderAddActivity.super.onBackPressed();
+            }
+        });
+        alertDlg.create().show();
+    }
+
+    @Override
     protected void onResume()
     {
         super.onResume();
@@ -88,11 +119,10 @@ public void locationUpdate(){
         String flag;
         if (doctype.equals("1")){
             flag = sharedPreferences.getString(UserSettings.create_sales_at_clients_coordinates,"false");}
-        else{
+        else {
             flag = sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates,"false");
         }
-        if (flag.equals("true"))
-        {
+        if (flag.equals("true")) {
             mTimer = new Timer();
             mTimer.scheduleAtFixedRate(new OrderAddActivity.TimeDisplay(), 2000, 2000);
         }
@@ -137,12 +167,19 @@ public void locationUpdate(){
 
         if (getIntent().getStringExtra("doctype").equals("1")) {
             doctype = "1";
-            setTitle("Создать реализацию");
+            if (getIntent().getSerializableExtra("savedobj")!=null)
+                setTitle("Сохраненный документ - Продажа");
+            else
+                setTitle("Новый документ - Продажа");
         }
         else
         {
             doctype = "0";
-            setTitle("Создать заказ");
+            if (getIntent().getSerializableExtra("savedobj")!=null)
+                setTitle("Сохраненный документ - Заказ");
+            else
+                setTitle("Новый документ - Заказ");
+
         }
 
         order = (Order) getIntent().getSerializableExtra("savedobj");
@@ -168,7 +205,6 @@ public void locationUpdate(){
     public void addItem(Item item, int quantity)
     {
         orderedItemsArrayList.put(item,quantity);
-        System.out.println(orderedItemsArrayList.get(item));
     }
     public Map<Item, Integer> getSelectedItems()
     {
@@ -177,7 +213,7 @@ public void locationUpdate(){
 
     public void setupViewPager(ViewPager viewPager) {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        Fragment addOrder = new AddOrderFragment();
+
         adapter.addFrag(addOrder, "Клиент");
         adapter.addFrag(new AddTovarFragment(), "Товары");
         adapter.addFrag(new OthersFragment(), "Прочее");
@@ -203,7 +239,6 @@ public void locationUpdate(){
 
     public void updatePrices()
     {
-
         AddTovarFragment fragment = (AddTovarFragment) adapter.getItem(1);
         if (fragment != null)
             fragment.updatePrices();
@@ -219,7 +254,6 @@ public void locationUpdate(){
 
     public void updateStock()
     {
-
         AddTovarFragment fragment = (AddTovarFragment) adapter.getItem(1);
         if (fragment != null)
             fragment.updateStock();

@@ -67,7 +67,16 @@ public class ClientsRepo {
                 + " FROM " + Client.TABLE
                 + " WHERE "+Client.KEY_Guid+"='"+guid+"' AND "+Client.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        Cursor cursor;
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
+
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {

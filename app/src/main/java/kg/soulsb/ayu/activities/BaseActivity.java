@@ -190,7 +190,7 @@ public class BaseActivity extends AppCompatActivity implements
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (checkDailyExchange()) return super.onOptionsItemSelected(item);
+        if (checkDailyExchange() && id != R.id.nav_settings) return super.onOptionsItemSelected(item);
         //noinspection SimplifiableIfStatement
         switch (id)
         {

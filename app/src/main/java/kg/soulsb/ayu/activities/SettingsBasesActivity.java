@@ -150,5 +150,11 @@ public class SettingsBasesActivity extends BaseActivity {
         arrayAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        updateListView();
+    }
 
 }

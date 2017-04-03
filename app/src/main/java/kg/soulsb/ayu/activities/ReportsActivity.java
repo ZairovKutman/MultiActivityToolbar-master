@@ -22,6 +22,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.adapters.ReportsAdapter;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.ReportInput;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
@@ -73,7 +74,7 @@ public class ReportsActivity extends BaseActivity {
 
         reports = new ReportsRepo().getReportsObject();
 
-        ArrayAdapter<Report> arrayAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,reports);
+        ReportsAdapter arrayAdapter = new ReportsAdapter(this,R.layout.reports_list,reports);
 
         listView.setAdapter(arrayAdapter);
 

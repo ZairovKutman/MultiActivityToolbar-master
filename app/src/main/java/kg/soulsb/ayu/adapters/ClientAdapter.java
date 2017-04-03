@@ -50,6 +50,7 @@ public class ClientAdapter extends ArrayAdapter<Client> implements Filterable {
             holder = new ClientHolder();
             holder.txtTitle = (TextView)row.findViewById(R.id.listClient);
             holder.txtAddress = (TextView)row.findViewById(R.id.listAddress);
+            holder.txtDebt = (TextView)row.findViewById(R.id.client_debt);
 
             row.setTag(holder);
         }
@@ -61,8 +62,15 @@ public class ClientAdapter extends ArrayAdapter<Client> implements Filterable {
         Client client = getItem(position);
         holder.txtTitle.setText(client.getName());
         holder.txtAddress.setText(client.getAddress());
-        if (client.getDebt()>0)
+        if (client.getDebt()>0) {
             holder.txtTitle.setTextColor(Color.RED);
+            holder.txtDebt.setText("Долг: "+Double.toString(client.getDebt())+" сом");
+        }
+        else
+        {
+            holder.txtTitle.setTextColor(Color.DKGRAY);
+            holder.txtDebt.setText("");
+        }
         return row;
 
 
@@ -119,5 +127,6 @@ public class ClientAdapter extends ArrayAdapter<Client> implements Filterable {
     {
         TextView txtTitle;
         TextView txtAddress;
+        TextView txtDebt;
     }
 }

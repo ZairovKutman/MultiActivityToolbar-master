@@ -62,7 +62,7 @@
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.SettingsObmenActivity"
-            android:label="Настройки обмена"
+            android:label="Обмен данными"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
 

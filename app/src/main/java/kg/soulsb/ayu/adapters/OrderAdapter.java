@@ -60,7 +60,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
             holder = (OrderHolder) row.getTag();
         }
 
-        Order order = data.get(position);
+        Order order = getItem(position);
         DBHelper dbHelper = new DBHelper(getContext());
         DatabaseManager.initializeInstance(dbHelper);
         ClientsRepo clientsRepo = new ClientsRepo();

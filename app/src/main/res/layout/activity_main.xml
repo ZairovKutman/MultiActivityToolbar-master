@@ -41,6 +41,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView_last_obmen"
         android:padding="10dp" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
     <TextView
         android:id="@+id/main_textView_notDeliveredDocuments"

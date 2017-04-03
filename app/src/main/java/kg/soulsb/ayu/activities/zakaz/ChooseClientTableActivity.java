@@ -83,7 +83,6 @@ public class ChooseClientTableActivity extends BaseActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 arrayAdapter.getFilter().filter(newText);
-                arrayAdapter.notifyDataSetChanged();
                 return true;
             }
         });

@@ -30,6 +30,7 @@ import android.widget.Toast;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.activities.MainActivity;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
 import kg.soulsb.ayu.grpctest.nano.Device;
@@ -95,6 +96,7 @@ public class AddOrderFragment extends Fragment {
     ArrayList<Contract> arrayListContract;
     EditText editText;
     ArrayAdapter<Contract> arrayAdapterContract;
+    ArrayAdapter<String> arrayAdapterContractNull;
     ArrayList<Warehouse> arrayListWarehouse;
     ArrayList<PriceType> arrayListPriceType;
     ArrayList<Organization> arrayListOrganization;
@@ -192,6 +194,13 @@ public class AddOrderFragment extends Fragment {
             arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
             spinner_contract.setAdapter(arrayAdapterContract);
         }
+        else
+        {
+            ArrayList<String> newArray = new ArrayList<>();
+            newArray.add(" ");
+            arrayAdapterContractNull = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, newArray);
+            spinner_contract.setAdapter(arrayAdapterContractNull);
+        }
         // PRICE TYPE
         spinner_pricetype = (Spinner) v.findViewById(R.id.order_spinner_tipcen);
         arrayListPriceType = new PriceTypesRepo().getPricetypesObject();
@@ -221,6 +230,7 @@ public class AddOrderFragment extends Fragment {
                 if (documentIsReady()) {
                     saveDocument(false);
                     Toast.makeText(getContext(),"Сохранено",Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
                 }
 
             }
@@ -264,7 +274,7 @@ public class AddOrderFragment extends Fragment {
         return v;
     }
 
-    private boolean documentIsReady() {
+    public boolean documentIsReady() {
         // TODO: Проверить на заполненность всех полей
 
         // Дата
@@ -513,7 +523,7 @@ public class AddOrderFragment extends Fragment {
             getActivity().finish();
         }
     }
-    private void saveDocument(boolean b) {
+    public void saveDocument(boolean b) {
         Order order = new Order();
 
         // ID is timestamp

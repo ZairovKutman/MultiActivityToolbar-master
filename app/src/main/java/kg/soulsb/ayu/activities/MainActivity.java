@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
 import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
@@ -132,11 +133,23 @@ public class MainActivity extends BaseActivity {
         setUpNavView();
 
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
+        updateDocuments();
+    }
 
+    private void updateDocuments()
+    {
         orderArrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
         orderArrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, orderArrayList);
         listViewDocuments.setAdapter(orderArrayAdapter);
         listViewDocuments.setEmptyView(findViewById(R.id.empty));
+        listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
+                intent.putExtra("doctype",orderArrayList.get(i).getDoctype());
+                intent.putExtra("savedobj", orderArrayList.get(i));
+                startActivity(intent);}
+        });
     }
 
     private void updateCurrentBaseOnSpinner() {
@@ -184,6 +197,8 @@ public class MainActivity extends BaseActivity {
     protected void onResume()
     {
         super.onResume();
+        updateListView();
         setUpNavView();
+        updateDocuments();
     }
 }

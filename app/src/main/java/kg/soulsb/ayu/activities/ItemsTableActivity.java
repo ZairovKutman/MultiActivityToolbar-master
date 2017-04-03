@@ -1,6 +1,8 @@
 package kg.soulsb.ayu.activities;
 
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ public class ItemsTableActivity extends BaseActivity {
     private ListView listViewTovary;
     private TovarAdapter arrayAdapter;
     private ArrayList<Item> arrayList;
+    SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +32,26 @@ public class ItemsTableActivity extends BaseActivity {
         arrayAdapter = new TovarAdapter(this,R.layout.list_tovary_layout, arrayList);
         listViewTovary.setAdapter(arrayAdapter);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.action_search, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                arrayAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
+        return true;
     }
 
     @Override

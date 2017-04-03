@@ -55,6 +55,7 @@ public class MyService extends Service {
     String currentBaseString="";
     Baza baza;
     private Timer mTimer = null;
+    boolean isSending = false;
 
     private class LocationListener implements android.location.LocationListener {
         private Baza baza;
@@ -253,22 +254,23 @@ public class MyService extends Service {
                 System.out.println("status 1 ДОБАВИЛ В БАЗУ ДАННЫХ");
             }
             System.out.println(bl.status+" "+bl.comment);
+            if (!isSending) {
+                isSending = true;
+                arrayList = myLocationsRepo.getMyLocationsObject();
+                for (MyLocation list : arrayList) {
+                    agent = new Agent();
+                    agent.name = list.getAgent();
+                    request.agent = agent;
+                    request.date = list.getFormattedDate();
+                    request.latitude = list.getLatitude();
+                    request.longitude = list.getLongitude();
 
-            arrayList = myLocationsRepo.getMyLocationsObject();
-
-            for (MyLocation list: arrayList)
-            {
-                agent = new Agent();
-                agent.name = list.getAgent();
-                request.agent = agent;
-                request.date = list.getFormattedDate();
-                request.latitude = list.getLatitude();
-                request.longitude = list.getLongitude();
-
-                myLocationsRepo = new MyLocationsRepo();
-                bl = blockingStub.sendLocation(request);
-                if (bl.status == 0)
-                    myLocationsRepo.delete(list);
+                    myLocationsRepo = new MyLocationsRepo();
+                    bl = blockingStub.sendLocation(request);
+                    if (bl.status == 0)
+                        myLocationsRepo.delete(list);
+                }
+                isSending = false;
             }
             return null;
         }

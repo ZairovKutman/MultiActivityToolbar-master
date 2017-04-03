@@ -9,6 +9,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
 
 
@@ -23,15 +27,15 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.helpers.repo.ClientsRepo;
+
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
-import kg.soulsb.ayu.models.Client;
+
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.adapters.TovarAdapter;
-import kg.soulsb.ayu.models.Stock;
+
 
 /**
  * Created by Sultanbek Baibagyshev on 1/10/17.
@@ -45,23 +49,56 @@ public class AddTovarFragment extends Fragment {
     PricesRepo pricesRepo;
     StocksRepo stocksRepo;
     OrderAddActivity activityMy;
-
+    Spinner otborSpinner;
+    ListView listView;
+    SearchView searchView;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.add_tovar_fragment,container,false);
 
         // Создаем отбор
-        Spinner otborSpinner = (Spinner) v.findViewById(R.id.spinner_otbor);
+        otborSpinner = (Spinner) v.findViewById(R.id.spinner_otbor);
         ArrayList<String> otborArrayList = new ArrayList<String>();
         otborArrayList.add("Показать все");
-        otborArrayList.add("Отбор 1");
-        otborArrayList.add("Отбор 2");
+        otborArrayList.add("Показать выбранные товары");
+
         ArrayAdapter<String> otborAdapter = new ArrayAdapter<String>(this.getActivity(),R.layout.baza_spinner_item,otborArrayList);
         otborSpinner.setAdapter(otborAdapter);
 
+        otborSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (otborSpinner.getItemAtPosition(position).equals("Показать выбранные товары"))
+                {
+                    ArrayList<Item> arrayList2 = new ArrayList<Item>();
+                    for (Item item: arrayList)
+                    {
+                        if (item.getQuantity()>0)
+                        {
+                            arrayList2.add(item);
+                        }
+                    }
+                    arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList2);
+                    listView.setAdapter(arrayAdapter);
+                    arrayAdapter.notifyDataSetChanged();
+                }
+                else
+                {
+                    arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList);
+                    listView.setAdapter(arrayAdapter);
+                    arrayAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         // создаем список товаров
-        final ListView listView = (ListView) v.findViewById(R.id.list_view_tovary);
+        listView = (ListView) v.findViewById(R.id.list_view_tovary);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -135,7 +172,32 @@ public class AddTovarFragment extends Fragment {
 
         arrayAdapter = new TovarAdapter(this.getActivity(),R.layout.list_tovary_layout,arrayList);
         listView.setAdapter(arrayAdapter);
+
+        setHasOptionsMenu(true);
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.action_search, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) item.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                arrayAdapter.getFilter().filter(newText);
+                System.out.println(newText);
+                return true;
+            }
+        });
+
     }
 
     @Override

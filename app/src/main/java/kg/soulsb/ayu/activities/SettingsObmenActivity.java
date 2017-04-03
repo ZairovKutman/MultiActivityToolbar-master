@@ -1,10 +1,13 @@
 package kg.soulsb.ayu.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -12,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
 import kg.soulsb.ayu.adapters.ClientAdapter;
 import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.grpctest.nano.Agent;
@@ -107,7 +111,14 @@ public class SettingsObmenActivity extends BaseActivity {
         arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
         arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
         listViewDocuments.setAdapter(arrayAdapter);
-
+        listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
+                intent.putExtra("doctype",arrayList.get(i).getDoctype());
+                intent.putExtra("savedobj", arrayList.get(i));
+                startActivity(intent);}
+        });
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         lastObmenText.setText("Добавьте базу данных");
 
@@ -180,9 +191,28 @@ public class SettingsObmenActivity extends BaseActivity {
         mHost = baza.getHost();
         mPort = baza.getPort();
 
-        SettingsObmenActivity.GrpcTask grpcTask = new SettingsObmenActivity.GrpcTask(ManagedChannelBuilder.forAddress(mHost,mPort)
+        final SettingsObmenActivity.GrpcTask grpcTask = new SettingsObmenActivity.GrpcTask(ManagedChannelBuilder.forAddress(mHost,mPort)
                 .usePlaintext(true).build(),CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
         grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable()
+        {
+            @Override
+            public void run() {
+                if ( grpcTask.getStatus() == AsyncTask.Status.RUNNING )
+                {
+                    grpcTask.cancel(true);
+                    loadingComment.setText("Таймаут, сервер не отвечает, попробуйте еще раз");
+                    progressBar.setVisibility(View.INVISIBLE);
+                    arrayList.clear();
+                    arrayList.addAll(new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase()));
+                    arrayAdapter.notifyDataSetChanged();
+                    loadButton.setEnabled(true);
+                    loadOnlyDocButton.setEnabled(true);
+                }
+            }
+        }, 150000 );
     }
 
     @Override

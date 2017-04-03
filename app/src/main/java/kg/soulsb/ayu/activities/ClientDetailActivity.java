@@ -142,6 +142,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
 
                 if (currentLocation.getLatitude()!=0 || currentLocation.getLongitude()!=0)
                 {
+                    if (currentLocation.getAccuracy()<=20) {
                     baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
 
 
@@ -160,11 +161,15 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
 
                     ClientDetailActivity.GrpcTask grpcTask = new ClientDetailActivity.GrpcTask(ManagedChannelBuilder.forAddress(mHost,mPort)
                             .usePlaintext(true).build(),CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
-                    grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
+                    grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);}
+                    else
+                    {
+                        Toast.makeText(getBaseContext(),"Точность должна быть меньше 20 м.",Toast.LENGTH_SHORT).show();
+                    }
 
                 }
                 else
-                    Toast.makeText(getBaseContext(),"Точность должна быть меньше 20 м.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),"Местоположение не определено.",Toast.LENGTH_SHORT).show();
 
             }
         });

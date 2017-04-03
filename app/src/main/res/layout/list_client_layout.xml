@@ -1,26 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:text="Клиент"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listClient"
+            android:fontFamily="sans-serif"
+            android:layout_margin="8dp"
+            android:textAlignment="textStart" />
 
-    <TextView
-        android:text="Клиент"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listClient"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
-        android:fontFamily="sans-serif"
-        android:textSize="18sp"
-        android:layout_margin="8dp"
-        android:textAlignment="textStart" />
+        <TextView
+            android:text="Адрес"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listAddress"
+            android:textAlignment="textStart"
+            android:textColor="@android:color/holo_orange_dark"
+            android:paddingLeft="10dp" />
 
-    <TextView
-        android:text="Адрес"
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/listAddress"
-        android:textAlignment="textStart"
-        android:textColor="@android:color/holo_orange_dark"
-        android:paddingLeft="10dp" />
+        android:layout_height="match_parent"
+        android:elevation="20dp"
+        android:gravity="right"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/client_debt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:text=""
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
 
 </LinearLayout>

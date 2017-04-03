@@ -42,7 +42,7 @@
             android:minWidth="120dp" />
 
         <EditText
-            style="@style/spinner_style"
+            style="@style/spinner_style_no_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
