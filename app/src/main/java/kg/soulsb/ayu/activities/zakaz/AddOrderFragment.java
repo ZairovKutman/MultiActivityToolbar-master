@@ -89,7 +89,6 @@ public class AddOrderFragment extends Fragment {
     Button createDocButton;
     Button saveDocButton;
     private AyuServiceGrpc.AyuServiceBlockingStub blockingStub;
-    String currentBaseString;
     String clientGUID;
     String clientLat="0";
     String clientLong="0";

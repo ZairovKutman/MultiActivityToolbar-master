@@ -87,6 +87,7 @@ public class SettingsObmenActivity extends BaseActivity {
     ProgressBar progressBar;
     TextView loadingComment;
     TextView lastObmenText;
+    TextView textViewEmpty;
     Button loadButton,loadOnlyDocButton;
     int globalCounter = 0;
     Baza baza = null;
@@ -107,7 +108,7 @@ public class SettingsObmenActivity extends BaseActivity {
         loadButton = (Button) findViewById(R.id.button);
         loadOnlyDocButton = (Button) findViewById(R.id.button_only_documents);
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
-
+        textViewEmpty = (TextView) findViewById(R.id.textViewEmpty);
         arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
         arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
         listViewDocuments.setAdapter(arrayAdapter);
@@ -122,6 +123,13 @@ public class SettingsObmenActivity extends BaseActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         lastObmenText.setText("Добавьте базу данных");
 
+        if (arrayList.isEmpty())
+        {
+            textViewEmpty.setVisibility(View.VISIBLE);
+        }
+        else{
+            textViewEmpty.setVisibility(View.INVISIBLE);
+        }
         if (sharedPreferences.contains("default_name")) {
             currentBaseString = sharedPreferences.getString("default_name", null);
             lastObmenText.setText("Последний обмен: " + sharedPreferences.getString("LAST_OBMEN","никогда"));
@@ -542,6 +550,19 @@ public class SettingsObmenActivity extends BaseActivity {
             arrayAdapter.notifyDataSetChanged();
             loadButton.setEnabled(true);
             loadOnlyDocButton.setEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (arrayList.isEmpty())
+        {
+            textViewEmpty.setVisibility(View.VISIBLE);
+        }
+        else{
+            textViewEmpty.setVisibility(View.INVISIBLE);
         }
     }
 }
