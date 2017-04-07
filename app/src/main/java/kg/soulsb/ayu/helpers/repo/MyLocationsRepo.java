@@ -16,7 +16,7 @@ import kg.soulsb.ayu.models.MyLocation;
 public class MyLocationsRepo {
 
     public MyLocation myLocation;
-
+    Cursor cursor;
     public MyLocationsRepo() {
         myLocation = new MyLocation();
     }
@@ -64,7 +64,14 @@ public class MyLocationsRepo {
                 + ", "+MyLocation.KEY_agent
                 + " FROM " + MyLocation.TABLE;
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

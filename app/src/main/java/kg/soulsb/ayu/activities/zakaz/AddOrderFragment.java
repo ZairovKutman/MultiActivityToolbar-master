@@ -256,25 +256,46 @@ public class AddOrderFragment extends Fragment {
                 d.setTitle("Выгрузка документа");
                 d.setMessage("Подождите...");
                 d.setView(dialogView);
+                d.setCancelable(false);
                 alertDialog = d.create();
-                alertDialog.show();
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Готово", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        alertDialog.dismiss();
+                        getActivity().finish();
+                    }
+                });
 
+                alertDialog.show();
+                alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
                 AddOrderFragment.GrpcTask grpcTask = new AddOrderFragment.GrpcTask(ManagedChannelBuilder.forAddress(mHost,mPort)
                         .usePlaintext(true).build(),CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
                 grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
-
-                saveDocument(true);
             }
         });
         createDocButton.setEnabled(true);
         if (parentActivity.order != null) {
             fillFields();
+            if (parentActivity.isDelivered.equals("true"))
+            {
+                disableButtons();
+            }
         }
         return v;
     }
 
+    private void disableButtons() {
+        editText.setEnabled(false);
+        editText_client.setEnabled(false);
+        editText_organization.setEnabled(false);
+        spinner_contract.setEnabled(false);
+        spinner_pricetype.setEnabled(false);
+        spinner_warehouse.setEnabled(false);
+        createDocButton.setEnabled(false);
+        saveDocButton.setEnabled(false);
+    }
+
     public boolean documentIsReady() {
-        // TODO: Проверить на заполненность всех полей
 
         // Дата
         if (TextUtils.isEmpty(editText.getText())) {
@@ -481,7 +502,12 @@ public class AddOrderFragment extends Fragment {
 
             docPurch.lines = purchDocLines;
             OperationStatus bl = blockingStub.createDoc(docPurch);
-            System.out.println(bl.status+" "+bl.comment);
+            System.out.println(bl.status+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            if (bl.status == 0)
+            {
+            }
+            else
+                return null;
 
             return new Points();
         }
@@ -509,17 +535,22 @@ public class AddOrderFragment extends Fragment {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            alertDialog.dismiss();
+            System.out.println(pointIterator+"_______________________________________");
             if (pointIterator == null)
             {
-                Toast.makeText(getContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
+                saveDocument(false);
+                alertDialog.setTitle("Ошибка");
+                alertDialog.setMessage("Произошла ошибка, попробуйте еще раз.");
+                //Toast.makeText(getContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
             }
             else {
-
                 saveDocument(true);
-                Toast.makeText(getContext(),"Успех! Документ выгружен. =)",Toast.LENGTH_SHORT).show();
+                alertDialog.setTitle("Успех");
+                alertDialog.setMessage("Документ выгружен =)");
+                Toast.makeText(getContext(), "Успех! Документ выгружен. =)", Toast.LENGTH_SHORT).show();
             }
-            getActivity().finish();
+            progressBar.setVisibility(View.INVISIBLE);
+            alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
         }
     }
     public void saveDocument(boolean b) {

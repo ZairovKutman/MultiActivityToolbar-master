@@ -1,6 +1,7 @@
 package kg.soulsb.ayu.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -94,15 +95,14 @@ public class SavedDocumentsActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (orderArrayList.get(i).isDelivered())
-                {
-                    Toast.makeText(SavedDocumentsActivity.this,"Документ уже выгружен, редактирование запрещено.",Toast.LENGTH_SHORT).show();
-                }
-                else{
                 Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
                 intent.putExtra("doctype",orderArrayList.get(i).getDoctype());
                 intent.putExtra("savedobj", orderArrayList.get(i));
-                startActivity(intent);}
+                if (orderArrayList.get(i).isDelivered())
+                {
+                    intent.putExtra("isDelivered","true");
+                }
+                startActivity(intent);
             }
         });
 
@@ -116,6 +116,15 @@ public class SavedDocumentsActivity extends BaseActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
     @Override

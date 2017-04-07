@@ -41,6 +41,7 @@ public class OrderAddActivity extends BaseActivity {
     String clientLong="0";
     Location clientLocation = new Location("");
     Order order = null;
+    String isDelivered = "false";
     Fragment addOrder = new AddOrderFragment();
     float distance=0;
     public Location getLocation() {
@@ -87,6 +88,11 @@ public void locationUpdate(){
     }
 
     private void createDialog() {
+        if (isDelivered.equals("true"))
+        {
+            OrderAddActivity.super.onBackPressed();
+            return;
+        }
 
         AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
         alertDlg.setMessage("Сохранить документ перед выходом?");
@@ -146,13 +152,13 @@ public void locationUpdate(){
                 viewPager.setCurrentItem(tab.getPosition());
                 switch (tab.getPosition()) {
                     case 0:
-                        Toast.makeText(getApplicationContext(),"Клиент",Toast.LENGTH_LONG).show();
+
                         break;
                     case 1:
-                        Toast.makeText(getApplicationContext(),"Товары",Toast.LENGTH_LONG).show();
+
                         break;
                     case 2:
-                        Toast.makeText(getApplicationContext(),"Прочее",Toast.LENGTH_LONG).show();
+
                         break;
                 }
             }
@@ -183,6 +189,12 @@ public void locationUpdate(){
         }
 
         order = (Order) getIntent().getSerializableExtra("savedobj");
+
+        if (getIntent().getStringExtra("isDelivered")!=null)
+        {
+            isDelivered = getIntent().getStringExtra("isDelivered");
+            Toast.makeText(this, "Документ выгружен, редактирование запрещено", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

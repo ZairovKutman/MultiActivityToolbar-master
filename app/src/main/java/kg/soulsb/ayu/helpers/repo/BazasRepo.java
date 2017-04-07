@@ -17,7 +17,7 @@ import kg.soulsb.ayu.models.PriceType;
 public class BazasRepo {
 
     public Baza baza;
-
+    Cursor cursor;
     public BazasRepo() {
         baza = new Baza();
     }
@@ -78,7 +78,14 @@ public class BazasRepo {
                 + ", "+Baza.KEY_port
                 + ", "+Baza.KEY_Agent
                 + " FROM " + Baza.TABLE;
-
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         Cursor cursor = db.rawQuery(selectQuery, null);
         // looping through all rows and adding to list
 

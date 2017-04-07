@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.activities.zakaz.ChooseClientTableActivity;
+import kg.soulsb.ayu.adapters.BazaAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
@@ -40,7 +41,7 @@ public class SettingsBasesActivity extends BaseActivity {
     ArrayList<Baza> arrayList = new ArrayList<>();
     Intent dateintent;
     ListView listView;
-    ArrayAdapter<Baza> arrayAdapter;
+    BazaAdapter arrayAdapter;
     Button addButton;
     String currentBaseString;
     AlertDialog.Builder d;
@@ -69,6 +70,7 @@ public class SettingsBasesActivity extends BaseActivity {
                 d.setTitle("Страница защищена");
                 d.setMessage("Введите пароль:");
                 d.setView(dialogView);
+                d.setCancelable(false);
                 d.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -145,7 +147,7 @@ public class SettingsBasesActivity extends BaseActivity {
     private void updateListView() {
 
         arrayList = new BazasRepo().getBazasObject();
-        arrayAdapter = new ArrayAdapter<Baza>(this,android.R.layout.simple_list_item_1,arrayList);
+        arrayAdapter = new BazaAdapter(this,R.layout.baza_layout_adapter,arrayList);
         listView.setAdapter(arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
     }
@@ -155,6 +157,15 @@ public class SettingsBasesActivity extends BaseActivity {
     {
         super.onResume();
         updateListView();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
 }

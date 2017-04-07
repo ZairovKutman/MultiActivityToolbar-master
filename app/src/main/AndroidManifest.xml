@@ -103,6 +103,7 @@
         <activity android:name="kg.soulsb.ayu.activities.SavedDocumentsActivity"
             android:label="Журнал документов"
             android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
 
         <service android:name="kg.soulsb.ayu.services.MyService"/>

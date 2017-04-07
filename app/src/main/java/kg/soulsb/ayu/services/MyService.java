@@ -56,6 +56,7 @@ public class MyService extends Service {
     Baza baza;
     private Timer mTimer = null;
     boolean isSending = false;
+    ArrayList<MyLocation> arrayList = new ArrayList<>();
 
     private class LocationListener implements android.location.LocationListener {
         private Baza baza;
@@ -69,10 +70,9 @@ public class MyService extends Service {
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
 
-            if (location.getAccuracy() < 50){
+            if (location.getAccuracy() < 100){
                 mLastLocation.set(location);
-                CurrentLocationClass.getInstance().setCurrentLocation(mLastLocation);
-                Toast.makeText(getBaseContext(), "lat=" + location.getLatitude() + ", long=" + location.getLongitude() + ", accur=" + location.getAccuracy(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), "lat=" + location.getLatitude() + ", long=" + location.getLongitude() + ", accur=" + location.getAccuracy(), Toast.LENGTH_SHORT).show();
                 CurrentLocationClass.getInstance().setCurrentLocation(mLastLocation);
             }
         }
@@ -102,7 +102,6 @@ public class MyService extends Service {
             return;
         }
 
-        System.out.println("currentbase: "+currentBaseString+" lat="+mLastLocation.getLatitude()+" long="+mLastLocation.getLongitude());
         if (mLastLocation.getLatitude() == 0 && mLastLocation.getLongitude() == 0) return;
         baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
         String mHost = baza.getHost();
@@ -228,7 +227,7 @@ public class MyService extends Service {
         }
 
         private Points sendLocation(ManagedChannel mChannel) {
-            ArrayList<MyLocation> arrayList = new ArrayList<>();
+            arrayList = new ArrayList<>();
             AyuServiceGrpc.AyuServiceBlockingStub blockingStub = AyuServiceGrpc.newBlockingStub(mChannel);
             kg.soulsb.ayu.grpctest.nano.Location request = new kg.soulsb.ayu.grpctest.nano.Location();
 
@@ -236,7 +235,6 @@ public class MyService extends Service {
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             String formattedDate = df.format(c.getTime());
 
-            System.out.println(formattedDate);
             Agent agent = new Agent();
             agent.name = name;
             request.agent = agent;
@@ -251,9 +249,7 @@ public class MyService extends Service {
             OperationStatus bl = blockingStub.sendLocation(request);
             if (bl.status == 1) {
                 myLocationsRepo.insert(new MyLocation(Double.toString(mLastLocation.getLatitude()), Double.toString(mLastLocation.getLongitude()), name, formattedDate));
-                System.out.println("status 1 ДОБАВИЛ В БАЗУ ДАННЫХ");
             }
-            System.out.println(bl.status+" "+bl.comment);
             if (!isSending) {
                 isSending = true;
                 arrayList = myLocationsRepo.getMyLocationsObject();
@@ -301,7 +297,6 @@ public class MyService extends Service {
                 myLocation.setFormattedDate(formattedDate);
 
                 myLocationsRepo.insert(myLocation);
-                System.out.println("ДОБАВИЛ В БАЗУ ДАННЫХ");
                 return
                         // Возвращает пустой итератор
                         null;

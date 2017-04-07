@@ -18,7 +18,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class SavedReportsRepo {
 
     public Report report;
-
+    Cursor cursor;
     public SavedReportsRepo() {
         report = new Report();
     }
@@ -83,7 +83,14 @@ public class SavedReportsRepo {
                 + " FROM " + Report.TABLE_SAVED
                 + " WHERE "+ Report.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

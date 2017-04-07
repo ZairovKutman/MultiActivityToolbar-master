@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:orientation="vertical">
-<TextView
+    android:orientation="horizontal"
+    android:background="?attr/colorAccent">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Администратор"
-    android:background="?attr/colorAccent"
-    android:textColor="@android:color/white"
-    android:id="@+id/main_agentName"
-    android:paddingTop="30dp"
-    android:paddingLeft="30dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Администратор"
+            android:background="?attr/colorAccent"
+            android:textColor="@android:color/white"
+            android:id="@+id/main_agentName"
+            android:paddingTop="30dp"
+            android:paddingLeft="30dp" />
 
-<TextView
-
-android:layout_width="match_parent"
-android:layout_height="wrap_content"
-android:text="Имя базы"
-
-android:background="?attr/colorAccent"
-    android:id="@+id/main_BaseName"
-    android:textAppearance="@android:style/TextAppearance.Material.Medium.Inverse"
-    android:textStyle="normal|bold"
-    android:paddingLeft="30dp"
-    android:textColor="@color/cardview_light_background" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Имя базы"
+            android:background="?attr/colorAccent"
+            android:id="@+id/main_BaseName"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium.Inverse"
+            android:textStyle="normal|bold"
+            android:paddingLeft="30dp"
+            android:textColor="@color/cardview_light_background" />
+    </LinearLayout>
 </LinearLayout>

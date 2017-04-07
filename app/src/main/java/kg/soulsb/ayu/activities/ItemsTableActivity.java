@@ -1,5 +1,6 @@
 package kg.soulsb.ayu.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -22,7 +23,7 @@ public class ItemsTableActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_tovar_fragment);
+        setContentView(R.layout.tovar_table_activity);
 
         listViewTovary = (ListView) findViewById(R.id.list_view_tovary);
         DBHelper dbHelper = new DBHelper(getBaseContext());
@@ -62,5 +63,14 @@ public class ItemsTableActivity extends BaseActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 }

@@ -29,6 +29,7 @@ public class BaseActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
     private int selectedNavItemId;
+    SharedPreferences sharedPreferences = null;
     Intent intent;
 
     @Override
@@ -195,39 +196,55 @@ public class BaseActivity extends AppCompatActivity implements
         switch (id)
         {
             case R.id.nav_main:
-                startActivity(new Intent(this,MainActivity.class));
+                intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
 
             case R.id.nav_orders:
                 intent = new Intent(this, OrderAddActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("doctype","0");
                 startActivity(intent);
                 return true;
 
             case R.id.nav_orders_real:
                 intent = new Intent(this, OrderAddActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.putExtra("doctype","1");
                 startActivity(intent);
                 return true;
 
             case R.id.nav_journal :
-                startActivity(new Intent(this, SavedDocumentsActivity.class));
+                intent = new Intent(this, SavedDocumentsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
 
             case R.id.nav_catalog :
-                startActivity(new Intent(this, ItemsTableActivity.class));
+                intent = new Intent(this, ItemsTableActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
             case R.id.nav_clients :
-                startActivity(new Intent(this, ClientsTableActivity.class));
+                intent = new Intent(this, ClientsTableActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
             case R.id.nav_reports :
-                startActivity(new Intent(this, ReportsActivity.class));
+                intent = new Intent(this, ReportsActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
             case R.id.nav_settings:
-                startActivity(new Intent(this, SettingsBasesActivity.class));
+                intent = new Intent(this, SettingsBasesActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
             case R.id.nav_settings_obmen :
-                startActivity(new Intent(this, SettingsObmenActivity.class));
+                intent = new Intent(this, SettingsObmenActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
                 return true;
         }
 
@@ -235,14 +252,14 @@ public class BaseActivity extends AppCompatActivity implements
     }
 
     public void setBaseAgentName() {
+            sharedPreferences = getSharedPreferences("DefaultBase", MODE_PRIVATE);
+            String currentBaseString = "нет базы";
+            String currentAgentString = "Анонимный пользователь";
+            if (sharedPreferences.contains("default_name")) {
+                currentBaseString = sharedPreferences.getString("default_name", null);
+                currentAgentString = sharedPreferences.getString("default_agent", null);
+            }
 
-        SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
-        String currentBaseString = "нет базы";
-        String currentAgentString = "Анонимный пользователь";
-        if (sharedPreferences.contains("default_name")) {
-            currentBaseString = sharedPreferences.getString("default_name", null);
-            currentAgentString = sharedPreferences.getString("default_agent", null);
-        }
 
         NavigationView navigationView = (NavigationView) super.findViewById(R.id.navigationView);
         View headerLayout = navigationView.getHeaderView(0);

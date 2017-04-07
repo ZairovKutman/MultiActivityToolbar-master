@@ -565,4 +565,13 @@ public class SettingsObmenActivity extends BaseActivity {
             textViewEmpty.setVisibility(View.INVISIBLE);
         }
     }
+
+    @Override
+    public void onBackPressed()
+    {
+        intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
 }

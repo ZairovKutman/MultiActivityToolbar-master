@@ -168,6 +168,10 @@ public class AddTovarFragment extends Fragment {
                     parentActivity.orderedItemsArrayList.put(item,item.getQuantity());
                 }
             }
+            if (parentActivity.isDelivered.equals("true"))
+            {
+                disableButtons();
+            }
         }
 
         arrayAdapter = new TovarAdapter(this.getActivity(),R.layout.list_tovary_layout,arrayList);
@@ -175,6 +179,24 @@ public class AddTovarFragment extends Fragment {
 
         setHasOptionsMenu(true);
         return v;
+    }
+
+    private void disableButtons() {
+        listView.setEnabled(false);
+
+        otborSpinner.setSelection(1);
+
+        ArrayList<Item> arrayList2 = new ArrayList<Item>();
+        for (Item item: arrayList)
+        {
+            if (item.getQuantity()>0)
+            {
+                arrayList2.add(item);
+            }
+        }
+        arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList2);
+        listView.setAdapter(arrayAdapter);
+        arrayAdapter.notifyDataSetChanged();
     }
 
     @Override

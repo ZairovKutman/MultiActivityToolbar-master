@@ -18,7 +18,8 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class ContractsRepo {
 
     public Contract contract;
-
+    Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public ContractsRepo() {
         contract = new Contract();
     }
@@ -34,14 +35,22 @@ public class ContractsRepo {
 
     public int insert(Contract contract) {
         int contractId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
         ContentValues values = new ContentValues();
         values.put(Contract.KEY_Guid, contract.getGuid());
         values.put(Contract.KEY_Name, contract.getName());
         values.put(Contract.KEY_Base, contract.getBase());
         values.put(Contract.KEY_ClientGuid, contract.getClientGuid());
         // Inserting Row
-        contractId=(int)db.insert(Contract.TABLE, null, values);
+        if (db.isOpen()) {
+            contractId=(int)db.insert(Contract.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            contractId=(int)db.insert(Contract.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return contractId;
@@ -65,7 +74,14 @@ public class ContractsRepo {
                 + " FROM " + Contract.TABLE
                 + " WHERE ClientGuid = '"+client_guid+"' AND "+Contract.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase() +"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

@@ -42,6 +42,7 @@ public class OthersFragment extends Fragment {
     int mYear, mMonth, mDay;
     EditText editText;
     EditText comments;
+    OrderAddActivity parentActivity;
 
     @Nullable
     @Override
@@ -114,13 +115,25 @@ public class OthersFragment extends Fragment {
             }
         });
 
+        if (parentActivity.order != null){
 
+            if (parentActivity.isDelivered.equals("true"))
+            {
+                disableButtons();
+            }
+        }
         return v;
+    }
+
+    private void disableButtons() {
+        editText.setEnabled(false);
+        comments.setEnabled(false);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        parentActivity = ((OrderAddActivity)getActivity());
     }
 }
 

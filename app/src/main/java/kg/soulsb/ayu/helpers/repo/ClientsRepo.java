@@ -7,6 +7,7 @@ import android.location.Location;
 import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Client;
+import kg.soulsb.ayu.models.Stock;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 /**
@@ -18,7 +19,7 @@ public class ClientsRepo {
     public ClientsRepo() {
         client = new Client();
     }
-
+    Cursor cursor;
     public static String createTable(){
         return "CREATE TABLE IF NOT EXISTS " + Client.TABLE  + "("
                 + Client.KEY_ClientId  + "   PRIMARY KEY    ,"
@@ -44,8 +45,17 @@ public class ClientsRepo {
         values.put(Client.KEY_Longitude, client.getLongitude());
         values.put(Client.KEY_Debt, client.getDebt());
         values.put(Client.KEY_Base, client.getBase());
+
         // Inserting Row
-        courseId=(int)db.insert(Client.TABLE, null, values);
+        if (db.isOpen()) {
+            courseId=(int)db.insert(Client.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            courseId=(int)db.insert(Client.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return courseId;
@@ -67,7 +77,6 @@ public class ClientsRepo {
                 + " FROM " + Client.TABLE
                 + " WHERE "+Client.KEY_Guid+"='"+guid+"' AND "+Client.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor;
         if (db.isOpen()) {
             cursor = db.rawQuery(selectQuery, null);
         }

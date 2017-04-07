@@ -17,7 +17,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class PricesRepo {
 
     public Price price;
-
+    Cursor cursor;
     public PricesRepo() {
         price = new Price();
     }
@@ -41,7 +41,15 @@ public class PricesRepo {
         values.put(Price.KEY_PriceTypeGuid, price.getPriceTypeGuid());
 
         // Inserting Row
-        priceId=(int)db.insert(Price.TABLE, null, values);
+        if (db.isOpen()) {
+            priceId=(int)db.insert(Price.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            priceId=(int)db.insert(Price.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return priceId;
@@ -63,7 +71,14 @@ public class PricesRepo {
                 + " FROM " + Price.TABLE
                 + " WHERE "+Price.KEY_Guid+"= '"+itemGuid+"' AND "+Price.KEY_PriceTypeGuid+" = '"+priceTypeGuid+"'" + " AND "+Price.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

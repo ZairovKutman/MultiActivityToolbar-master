@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Client;
+import kg.soulsb.ayu.models.Contract;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
@@ -18,7 +19,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class ItemsRepo {
 
     public Item tovar;
-
+    Cursor cursor;
     public ItemsRepo() {
         tovar = new Item();
     }
@@ -46,7 +47,15 @@ public class ItemsRepo {
         values.put(Item.KEY_Base, tovar.getBase());
 
         // Inserting Row
-        courseId=(int)db.insert(Item.TABLE, null, values);
+        if (db.isOpen()) {
+            courseId=(int)db.insert(Item.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            courseId=(int)db.insert(Item.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return courseId;
@@ -74,7 +83,14 @@ public class ItemsRepo {
                 + " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'"
                 + " ORDER BY "+Client.KEY_Name+" ASC;";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

@@ -67,7 +67,6 @@ public class MainActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         updateListView();
-        updateCurrentBaseOnSpinner();
         updateMainMenu();
         setUpNavView();
     }
@@ -79,10 +78,10 @@ public class MainActivity extends BaseActivity {
         String myDate = sharedPreferences.getString("LAST_OBMEN",null);
 
         if (myDate!=null)
-            textView.setText("Последняя загрузка: "+myDate);
+            textView.setText("Последний обмен: "+myDate);
         else
         {
-            textView.setText("Последняя загрузка: никогда");
+            textView.setText("Последний обмен: никогда");
         }
     }
 
@@ -90,11 +89,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // set default base
-        SharedPreferences sharedPreferences1 = getSharedPreferences("DefaultBase",MODE_PRIVATE);
-        CurrentBaseClass.getInstance().setCurrentBase(sharedPreferences1.getString("default_name",""));
-        CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(sharedPreferences1.getString("default_host",""),Integer.parseInt(sharedPreferences1.getString("default_port","0000")),sharedPreferences1.getString("default_name",""),sharedPreferences1.getString("default_agent","")));
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CALL_PHONE},
@@ -121,6 +115,8 @@ public class MainActivity extends BaseActivity {
                 CurrentBaseClass.getInstance().setCurrentBase(baza1.getName());
                 CurrentBaseClass.getInstance().setCurrentBaseObject(baza1);
                 baza.setSelection(position);
+                MainActivity.super.setBaseAgentName();
+                updateDocuments();
             }
 
             @Override
@@ -129,7 +125,6 @@ public class MainActivity extends BaseActivity {
             }
         });
         updateListView();
-        updateCurrentBaseOnSpinner();
         setUpNavView();
 
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
@@ -150,17 +145,8 @@ public class MainActivity extends BaseActivity {
                 intent.putExtra("savedobj", orderArrayList.get(i));
                 startActivity(intent);}
         });
-    }
 
-    private void updateCurrentBaseOnSpinner() {
-        String myString = CurrentBaseClass.getInstance().getCurrentBase();
-
-        for (int i=0; i<arrayList.size();i++) {
-            if (arrayList.get(i).getName().equals(myString))
-            {
-                baza.setSelection(i);
-            }
-        }
+        updateMainMenu();
     }
 
     @Override
@@ -191,6 +177,26 @@ public class MainActivity extends BaseActivity {
         arrayAdapter = new ArrayAdapter<Baza>(this, R.layout.baza_spinner_item,arrayList);
         baza.setAdapter(arrayAdapter);
         arrayAdapter.notifyDataSetChanged();
+        SharedPreferences sharedPreferences = getSharedPreferences("DefaultBase",MODE_PRIVATE);
+
+        if (sharedPreferences.contains("default_name")) {
+            String myString = sharedPreferences.getString("default_name", null);
+        for (int i=0; i<arrayList.size();i++) {
+            if (arrayList.get(i).getName().equals(myString))
+            {
+                baza.setSelection(i);
+                CurrentBaseClass.getInstance().setCurrentBase(myString);
+                CurrentBaseClass.getInstance().setCurrentBaseObject(arrayList.get(i));
+            }
+        }
+        }
+        else
+        {
+            // set default base
+            SharedPreferences sharedPreferences1 = getSharedPreferences("DefaultBase",MODE_PRIVATE);
+            CurrentBaseClass.getInstance().setCurrentBase(sharedPreferences1.getString("default_name",""));
+            CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(sharedPreferences1.getString("default_host",""),Integer.parseInt(sharedPreferences1.getString("default_port","0000")),sharedPreferences1.getString("default_name",""),sharedPreferences1.getString("default_agent","")));
+        }
     }
 
     @Override

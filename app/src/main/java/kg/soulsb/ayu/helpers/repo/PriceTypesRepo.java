@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Client;
+import kg.soulsb.ayu.models.Contract;
 import kg.soulsb.ayu.models.Price;
 import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
@@ -17,7 +18,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class PriceTypesRepo {
 
     public PriceType pricetype;
-
+    Cursor cursor;
     public PriceTypesRepo() {
         pricetype = new PriceType();
     }
@@ -39,7 +40,15 @@ public class PriceTypesRepo {
         values.put(PriceType.KEY_Name, pricetype.getName());
 
         // Inserting Row
-        priceTypeId=(int)db.insert(PriceType.TABLE, null, values);
+        if (db.isOpen()) {
+            priceTypeId=(int)db.insert(PriceType.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            priceTypeId=(int)db.insert(PriceType.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return priceTypeId;
@@ -63,7 +72,14 @@ public class PriceTypesRepo {
                 + " FROM " + PriceType.TABLE
                 + " WHERE "+ PriceType.KEY_Base + " = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

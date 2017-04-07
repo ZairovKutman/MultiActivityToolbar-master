@@ -19,7 +19,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class OrdersRepo {
 
     public Order order;
-
+    Cursor cursor;
     public OrdersRepo() {
         order = new Order();
     }
@@ -130,7 +130,14 @@ public class OrdersRepo {
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {
@@ -220,7 +227,14 @@ public class OrdersRepo {
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"' AND "+Order.KEY_isDelivered+" = 'false'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

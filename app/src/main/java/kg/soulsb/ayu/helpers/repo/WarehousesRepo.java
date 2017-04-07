@@ -18,7 +18,7 @@ import kg.soulsb.ayu.singletons.CurrentBaseClass;
 public class WarehousesRepo {
 
     public Warehouse warehouse;
-
+    Cursor cursor;
     public WarehousesRepo() {
         warehouse = new Warehouse();
     }
@@ -40,7 +40,15 @@ public class WarehousesRepo {
         values.put(Warehouse.KEY_Name, warehouse.getName());
 
         // Inserting Row
-        warehouseId=(int)db.insert(Warehouse.TABLE, null, values);
+        if (db.isOpen()) {
+            warehouseId=(int)db.insert(Warehouse.TABLE, null, values);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            warehouseId=(int)db.insert(Warehouse.TABLE, null, values);
+        }
+
         DatabaseManager.getInstance().closeDatabase();
 
         return warehouseId;
@@ -63,7 +71,14 @@ public class WarehousesRepo {
                 + " FROM " + Warehouse.TABLE
                 + " WHERE "+Warehouse.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
         // looping through all rows and adding to list
 
         if (cursor.moveToFirst()) {

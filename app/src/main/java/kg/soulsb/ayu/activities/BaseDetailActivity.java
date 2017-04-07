@@ -63,6 +63,7 @@ public class BaseDetailActivity extends BaseActivity {
                     ipText.setEnabled(false);
                     portText.setEnabled(false);
                     new BazasRepo().updateIpAndPort(nameText.getText().toString(),ipText.getText().toString(), portText.getText().toString(),agentText.getText().toString());
+                    finish();
                 }
                 else {
                     buttonEdit.setText("Сохранить");
