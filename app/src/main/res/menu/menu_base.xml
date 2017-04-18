@@ -16,6 +16,12 @@
             android:id="@+id/nav_orders_real"
             android:icon="@drawable/ic_order"
             android:title="Создать продажу" />
+
+        <item
+            android:id="@+id/nav_pay"
+            android:icon="@android:drawable/ic_menu_set_as"
+            android:title="Оплата" />
+
         <item
             android:id="@+id/nav_journal"
             android:icon="@drawable/ic_journal"

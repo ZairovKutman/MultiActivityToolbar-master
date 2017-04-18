@@ -57,7 +57,7 @@ public class ContractsRepo {
     }
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Contract.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -65,7 +65,7 @@ public class ContractsRepo {
     public ArrayList<Contract> getContractsObject(String client_guid) {
         ArrayList<Contract> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Contract.KEY_Name
                 + ", "+Contract.KEY_ContractId
                 + ", "+Contract.KEY_Guid
@@ -107,7 +107,7 @@ public class ContractsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Contract.KEY_Base+" = '"+bazaString+"'";

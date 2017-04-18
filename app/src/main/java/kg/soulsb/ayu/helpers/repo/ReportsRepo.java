@@ -19,6 +19,7 @@ public class ReportsRepo {
 
     public Report report;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public ReportsRepo() {
         report = new Report();
     }
@@ -33,7 +34,7 @@ public class ReportsRepo {
 
     public int insert(Report report) {
         int reportId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Report.KEY_Guid, report.getGuid());
         values.put(Report.KEY_Name, report.getName());
@@ -46,41 +47,8 @@ public class ReportsRepo {
         return reportId;
     }
 
-    public ArrayList<String> getReportsName()
-    {
-        ArrayList<String> arrayList = new ArrayList<>();
-
-
-
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + Report.KEY_Name
-                + " FROM " + Report.TABLE
-                + " WHERE " + Report.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
-
-
-        if (db.isOpen()) {
-            cursor = db.rawQuery(selectQuery, null);
-        }
-        else
-        {
-            db = DatabaseManager.getInstance().openDatabase();
-            cursor = db.rawQuery(selectQuery, null);
-        }
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-                arrayList.add(cursor.getString(cursor.getColumnIndexOrThrow(Report.KEY_Name)));
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
-        return arrayList;
-    }
-
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Report.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -88,7 +56,7 @@ public class ReportsRepo {
     public ArrayList<Report> getReportsObject() {
         ArrayList<Report> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Report.KEY_Name
                 + ", "+Report.KEY_ReportId
                 + ", "+Report.KEY_Guid
@@ -130,7 +98,7 @@ public class ReportsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Report.KEY_Base+" = '"+bazaString+"'";

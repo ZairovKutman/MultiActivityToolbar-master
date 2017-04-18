@@ -23,7 +23,7 @@ public class OrdersRepo {
     public OrdersRepo() {
         order = new Order();
     }
-
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public static String createTable(){
         return "CREATE TABLE IF NOT EXISTS " + Order.TABLE  + " ("
                 + Order.KEY_OrderID  + "   PRIMARY KEY    ,"
@@ -54,7 +54,7 @@ public class OrdersRepo {
 
     public void delete(Order order)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Order.KEY_OrderID+" = '"+order.getOrderID()+"'";
@@ -68,7 +68,7 @@ public class OrdersRepo {
 
     public int insert(Order order) {
         int orderId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Order.KEY_OrderID, order.getOrderID());
         values.put(Order.KEY_BAZA, order.getBaza());
@@ -104,7 +104,7 @@ public class OrdersRepo {
     }
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Order.TABLE,null,null);
         db.delete(Order.TABLE_ITEM,null,null);
         DatabaseManager.getInstance().closeDatabase();
@@ -196,7 +196,7 @@ public class OrdersRepo {
     }
 
     public void setDocDelivered(String orderID, boolean b) {
-            SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+            db = DatabaseManager.getInstance().openDatabase();
             ContentValues values = new ContentValues();
 
             values.put(Order.KEY_isDelivered, Boolean.toString(b));
@@ -287,15 +287,14 @@ public class OrdersRepo {
         }
 
         cursor.close();
-        DatabaseManager.getInstance().closeDatabase();
-
+        db.close();
         return arrayList;
     }
 
     public void deleteDocDelivered() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String whereClause = Order.KEY_isDelivered + " = '"+"true"+"' AND "+Order.KEY_BAZA+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
         db.delete(Order.TABLE,whereClause,null);
-        DatabaseManager.getInstance().closeDatabase();
+        db.close();
     }
 }

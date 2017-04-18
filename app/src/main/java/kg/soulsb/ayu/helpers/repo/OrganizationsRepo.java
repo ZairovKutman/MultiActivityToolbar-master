@@ -3,6 +3,7 @@ package kg.soulsb.ayu.helpers.repo;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.ContactsContract;
 
 import java.util.ArrayList;
 
@@ -19,6 +20,7 @@ public class OrganizationsRepo {
 
     public Organization organization;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public OrganizationsRepo() {
         organization = new Organization();
     }
@@ -33,7 +35,7 @@ public class OrganizationsRepo {
 
     public int insert(Organization organization) {
         int priceTypeId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Organization.KEY_Guid, organization.getGuid());
         values.put(Organization.KEY_Name, organization.getName());
@@ -55,7 +57,7 @@ public class OrganizationsRepo {
     }
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Organization.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -104,7 +106,8 @@ public class OrganizationsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Organization.KEY_Base+" = '"+bazaString+"'";

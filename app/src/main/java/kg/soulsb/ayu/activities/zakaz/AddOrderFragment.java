@@ -5,9 +5,6 @@ import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -22,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -30,22 +26,18 @@ import android.widget.Toast;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.R;
-import kg.soulsb.ayu.activities.MainActivity;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
 import kg.soulsb.ayu.grpctest.nano.Device;
 import kg.soulsb.ayu.grpctest.nano.DeviceStatus;
 import kg.soulsb.ayu.grpctest.nano.DocPurch;
 import kg.soulsb.ayu.grpctest.nano.OperationStatus;
-import kg.soulsb.ayu.grpctest.nano.Point;
 import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
-import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
@@ -60,18 +52,14 @@ import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.models.Warehouse;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.DataHolderClass;
-import kg.soulsb.ayu.singletons.MyServiceActivatorClass;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static android.app.Activity.RESULT_OK;
-import static android.content.Context.MODE_PRIVATE;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 /**
@@ -483,18 +471,18 @@ public class AddOrderFragment extends Fragment {
             docPurch.docType = Integer.parseInt(parentActivity.doctype);
             docPurch.docId = docId;
 
-            Map<Item,Integer> orderedItemsArrayList;
+            ArrayList<Item> orderedItemsArrayList;
             orderedItemsArrayList = parentActivity.getSelectedItems();
 
             PurchDocLine[] purchDocLines = new PurchDocLine[orderedItemsArrayList.size()];
             int counter = 0;
-            for (Item item: orderedItemsArrayList.keySet())
+            for (Item item: orderedItemsArrayList)
             {
                 PurchDocLine line = new PurchDocLine();
-                line.amount = orderedItemsArrayList.get(item) * item.getPrice();
+                line.amount = item.getQuantity() * item.getPrice();
                 line.itemGuid  = item.getGuid();
                 line.price = item.getPrice();
-                line.quantity = orderedItemsArrayList.get(item);
+                line.quantity = item.getQuantity();
 
                 purchDocLines[counter]=line;
                 counter++;
@@ -502,12 +490,11 @@ public class AddOrderFragment extends Fragment {
 
             docPurch.lines = purchDocLines;
             OperationStatus bl = blockingStub.createDoc(docPurch);
-            System.out.println(bl.status+"+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            if (bl.status == 0)
+
+            if (bl.status != 0)
             {
-            }
-            else
                 return null;
+            }
 
             return new Points();
         }
@@ -541,7 +528,6 @@ public class AddOrderFragment extends Fragment {
                 saveDocument(false);
                 alertDialog.setTitle("Ошибка");
                 alertDialog.setMessage("Произошла ошибка, попробуйте еще раз.");
-                //Toast.makeText(getContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
             }
             else {
                 saveDocument(true);
@@ -569,14 +555,13 @@ public class AddOrderFragment extends Fragment {
         order.setPriceType(arrayListPriceType.get(spinner_pricetype.getSelectedItemPosition()).getGuid());
         order.setWarehouse(arrayListWarehouse.get(spinner_warehouse.getSelectedItemPosition()).getGuid());
         order.setOrganization(arrayListOrganization.get(editText_organization.getSelectedItemPosition()).getGuid());
-        ArrayList<Item> itemArrayList = new ArrayList<Item>();
-        Map<Item,Integer> orderedItemsArrayList;
-        orderedItemsArrayList = parentActivity.getSelectedItems();
+        ArrayList<Item> itemArrayList;
+
+        itemArrayList = parentActivity.getSelectedItems();
         double total = 0;
-        for (Item item: orderedItemsArrayList.keySet())
+        for (Item item: itemArrayList)
         {
-            itemArrayList.add(item);
-            total = total + orderedItemsArrayList.get(item) * item.getPrice();
+            total = total + item.getQuantity() * item.getPrice();
         }
         order.setTotalSum(total);
         order.setArraylistTovar(itemArrayList);

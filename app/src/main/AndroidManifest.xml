@@ -16,11 +16,14 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:screenOrientation="portrait">
+
         <activity
             android:name="kg.soulsb.ayu.activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -30,80 +33,114 @@
         <activity
             android:name="kg.soulsb.ayu.activities.BaseActivity"
             android:label="@string/title_activity_base"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name="kg.soulsb.ayu.activities.OtherActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name="kg.soulsb.ayu.activities.NoHamburger"
                   android:label="@string/app_name"
-                  android:theme="@style/AppTheme.NoActionBar">
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
         </activity>
         <activity android:name="kg.soulsb.ayu.activities.NoToolbar"
                   android:label="@string/app_name"
-                  android:theme="@style/AppTheme.NoActionBar">
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.ReportsActivity"
                   android:label="Отчеты"
-                  android:theme="@style/AppTheme.NoActionBar">
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name="kg.soulsb.ayu.activities.zakaz.OrderAddActivity"
+        <activity
+            android:name="kg.soulsb.ayu.activities.zakaz.OrderAddActivity"
             android:label="Создать заказ"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.zakaz.ChooseClientTableActivity"
             android:label="Выбрать клиента"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.SettingsObmenActivity"
             android:label="Обмен данными"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.SettingsBasesActivity"
             android:label="Базы данных"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.SettingsBasesAddEditActivity"
             android:label="Добавить базу данных"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.ClientsTableActivity"
             android:label="Клиенты"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.ClientDetailActivity"
             android:label="Данные клиента"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name="kg.soulsb.ayu.activities.ItemsTableActivity"
             android:label="Товары"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.BaseDetailActivity"
             android:label="Изменить базу данных"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.ReportsDetailActivity"
             android:label="Сформированный отчет"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="kg.soulsb.ayu.activities.SavedDocumentsActivity"
             android:label="Журнал документов"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
 
+        <activity android:name="kg.soulsb.ayu.activities.MessagesActivity"
+            android:label="Сообщения"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.ItemDetailActivity"
+            android:label="Товар"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name="kg.soulsb.ayu.activities.PayActivity"
+            android:label="Оплата"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
         </activity>
 
         <service android:name="kg.soulsb.ayu.services.MyService"/>

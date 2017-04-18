@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +27,6 @@ import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.MyServiceActivatorClass;
-import kg.soulsb.ayu.singletons.UserSettings;
 
 import java.util.ArrayList;
 
@@ -39,6 +37,7 @@ public class MainActivity extends BaseActivity {
     ListView listViewDocuments;
     ArrayList<Order> orderArrayList = new ArrayList<>();
     OrderAdapter orderArrayAdapter;
+    DBHelper dbHelper;
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -133,6 +132,8 @@ public class MainActivity extends BaseActivity {
 
     private void updateDocuments()
     {
+        dbHelper = new DBHelper(getBaseContext());
+        DatabaseManager.initializeInstance(dbHelper);
         orderArrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
         orderArrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, orderArrayList);
         listViewDocuments.setAdapter(orderArrayAdapter);
@@ -171,7 +172,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void updateListView() {
-        DBHelper dbHelper = new DBHelper(getBaseContext());
+        dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
         arrayList = new BazasRepo().getBazasObject();
         arrayAdapter = new ArrayAdapter<Baza>(this, R.layout.baza_spinner_item,arrayList);
@@ -195,7 +196,7 @@ public class MainActivity extends BaseActivity {
             // set default base
             SharedPreferences sharedPreferences1 = getSharedPreferences("DefaultBase",MODE_PRIVATE);
             CurrentBaseClass.getInstance().setCurrentBase(sharedPreferences1.getString("default_name",""));
-            CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(sharedPreferences1.getString("default_host",""),Integer.parseInt(sharedPreferences1.getString("default_port","0000")),sharedPreferences1.getString("default_name",""),sharedPreferences1.getString("default_agent","")));
+            CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(sharedPreferences1.getString("default_host",""),Integer.parseInt(sharedPreferences1.getString("default_port","0000")),sharedPreferences1.getString("default_name",""),sharedPreferences1.getString("default_agent",""), sharedPreferences1.getString("default_bazaId","")));
         }
     }
 

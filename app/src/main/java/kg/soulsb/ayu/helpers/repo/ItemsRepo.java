@@ -20,6 +20,7 @@ public class ItemsRepo {
 
     public Item tovar;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public ItemsRepo() {
         tovar = new Item();
     }
@@ -37,7 +38,7 @@ public class ItemsRepo {
 
     public int insert(Item tovar) {
         int courseId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Item.KEY_Guid, tovar.getGuid());
         values.put(Item.KEY_Name, tovar.getName());
@@ -63,7 +64,7 @@ public class ItemsRepo {
 
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Item.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -71,7 +72,7 @@ public class ItemsRepo {
     public ArrayList<Item> getItemsObject() {
         ArrayList<Item> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Item.KEY_Name
                 + ", "+Item.KEY_ItemId
                 + ", "+Item.KEY_Unit
@@ -119,7 +120,7 @@ public class ItemsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Item.KEY_Base+" = '"+bazaString+"'";

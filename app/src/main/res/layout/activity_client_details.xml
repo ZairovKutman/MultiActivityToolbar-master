@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient">
+    android:background="@drawable/gradient"
+    android:weightSum="1">
 
     <TextView
         android:text="Наименование клиента"
@@ -40,6 +41,18 @@
         android:textColor="@android:color/holo_blue_dark" />
 
     <TextView
+        android:text="Комментарий"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientCommentText" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ClientComment"
+        android:paddingLeft="20dp"
+        android:textColor="@android:color/holo_blue_dark" />
+
+    <TextView
         android:text="Телефоны"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,18 +65,19 @@
         android:paddingLeft="20dp"
         android:textColor="@android:color/holo_blue_dark" />
 
-    <TextView
-        android:text="Комментарий"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/ClientCall"
+        android:text="Позвонить"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/ClientCommentText" />
+        />
 
-    <TextView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/ClientComment"
-        android:paddingLeft="20dp"
-        android:textColor="@android:color/holo_blue_dark" />
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -93,6 +107,7 @@
                 android:paddingRight="20dp"
                 android:text="Точность"
                 android:textColor="@color/colorPrimary" />
+
         </LinearLayout>
 
         <Space
@@ -109,32 +124,25 @@
                 android:id="@+id/Client_saveLocation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:minHeight="1dp"
                 android:text="Снять координаты" />
 
-        <Button
-            android:text="Проложить путь"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/ClientMap"
-            android:minHeight="1dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp" />
+            <Button
+                android:text="Проложить путь"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ClientMap"
+                android:minHeight="1dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp" />
         </LinearLayout>
 
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/ClientCall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_margin="10dp"
-        android:background="@android:drawable/ic_menu_call"
-        android:backgroundTint="@android:color/holo_green_light"
-        android:textAlignment="center" />
+
+
 
 </LinearLayout>

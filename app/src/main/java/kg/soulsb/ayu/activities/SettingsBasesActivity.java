@@ -106,6 +106,7 @@ public class SettingsBasesActivity extends BaseActivity {
                 intent.putExtra("host", str.getHost());
                 intent.putExtra("agent", str.getAgent());
                 intent.putExtra("port", Integer.toString(str.getPort()));
+                intent.putExtra("bazaId", str.getBazaId());
                 startActivity(intent);
             }
         });
@@ -145,7 +146,8 @@ public class SettingsBasesActivity extends BaseActivity {
     }
 
     private void updateListView() {
-
+        DBHelper dbHelper = new DBHelper(getApplicationContext());
+        DatabaseManager.initializeInstance(dbHelper);
         arrayList = new BazasRepo().getBazasObject();
         arrayAdapter = new BazaAdapter(this,R.layout.baza_layout_adapter,arrayList);
         listView.setAdapter(arrayAdapter);

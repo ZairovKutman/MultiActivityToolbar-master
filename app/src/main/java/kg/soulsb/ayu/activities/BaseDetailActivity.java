@@ -9,6 +9,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.helpers.DBHelper;
+import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
@@ -19,8 +21,6 @@ import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
 import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.models.Baza;
-import kg.soulsb.ayu.models.Price;
-import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
@@ -29,7 +29,8 @@ public class BaseDetailActivity extends BaseActivity {
     TextView nameText;
     EditText ipText;
     EditText portText;
-    TextView agentText;
+    EditText agentText;
+    EditText bazaIdText;
     Button buttonDelete;
     Button buttonEdit;
     Button buttonSetDefault;
@@ -42,18 +43,22 @@ public class BaseDetailActivity extends BaseActivity {
         nameText = (TextView) findViewById(R.id.bazaName);
         ipText = (EditText) findViewById(R.id.bazaHost);
         portText = (EditText) findViewById(R.id.bazaPort);
-        agentText = (TextView) findViewById(R.id.bazaAgent);
+        agentText = (EditText) findViewById(R.id.bazaAgent);
+        bazaIdText = (EditText) findViewById(R.id.bazaId);
         buttonDelete = (Button) findViewById(R.id.button_delete_baza);
         buttonSetDefault = (Button) findViewById(R.id.buttton_set_default);
         buttonEdit = (Button) findViewById(R.id.buttton_edit);
+
+        ipText.setEnabled(false);
+        agentText.setEnabled(false);
+        portText.setEnabled(false);
+        bazaIdText.setEnabled(false);
 
         nameText.setText(getIntent().getStringExtra("name"));
         ipText.setText(getIntent().getStringExtra("host"));
         portText.setText(getIntent().getStringExtra("port"));
         agentText.setText(getIntent().getStringExtra("agent"));
-
-        ipText.setEnabled(false);
-        portText.setEnabled(false);
+        bazaIdText.setText(getIntent().getStringExtra("bazaId"));
 
         buttonEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,15 +66,20 @@ public class BaseDetailActivity extends BaseActivity {
                 if (ipText.isEnabled()) {
                     buttonEdit.setText("Изменить");
                     ipText.setEnabled(false);
+                    agentText.setEnabled(false);
                     portText.setEnabled(false);
-                    new BazasRepo().updateIpAndPort(nameText.getText().toString(),ipText.getText().toString(), portText.getText().toString(),agentText.getText().toString());
+                    DBHelper dbHelper = new DBHelper(getApplicationContext());
+                    DatabaseManager.initializeInstance(dbHelper);
+                    new BazasRepo().updateIpAndPortAndAgent(nameText.getText().toString(),ipText.getText().toString(), portText.getText().toString(),agentText.getText().toString(),getIntent().getStringExtra("bazaId"));
                     finish();
                 }
                 else {
                     buttonEdit.setText("Сохранить");
+
                     ipText.setEnabled(true);
                     portText.setEnabled(true);
-                    ipText.requestFocus();
+                    agentText.setEnabled(true);
+
                 }
             }
         });
@@ -78,7 +88,7 @@ public class BaseDetailActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 BazasRepo bazaRepo = new BazasRepo();
-                bazaRepo.delete(new Baza(ipText.getText().toString(),Integer.parseInt(portText.getText().toString()),nameText.getText().toString(),agentText.getText().toString()));
+                bazaRepo.delete(new Baza(ipText.getText().toString(),Integer.parseInt(portText.getText().toString()),nameText.getText().toString(),agentText.getText().toString(), getIntent().getStringExtra("bazaId")));
                 SharedPreferences sharedPreferences = getSharedPreferences(getIntent().getStringExtra("name"),MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.remove("using");
@@ -114,7 +124,7 @@ public class BaseDetailActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 CurrentBaseClass.getInstance().setCurrentBase(getIntent().getStringExtra("name"));
-                CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(getIntent().getStringExtra("host"),Integer.parseInt(getIntent().getStringExtra("port")),getIntent().getStringExtra("name"),getIntent().getStringExtra("agent")));
+                CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza(getIntent().getStringExtra("host"),Integer.parseInt(getIntent().getStringExtra("port")),getIntent().getStringExtra("name"),getIntent().getStringExtra("agent"), getIntent().getStringExtra("bazaId")));
 
                 SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -122,6 +132,7 @@ public class BaseDetailActivity extends BaseActivity {
                 editor.putString("default_host", CurrentBaseClass.getInstance().getCurrentBaseObject().getHost());
                 editor.putString("default_port", Integer.toString(CurrentBaseClass.getInstance().getCurrentBaseObject().getPort()));
                 editor.putString("default_agent", CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
+                editor.putString("default_bazaId", CurrentBaseClass.getInstance().getCurrentBaseObject().getBazaId());
                 editor.apply();
 
                 SharedPreferences sharedPreferences1 = getSharedPreferences("DefaultBase",MODE_PRIVATE);
@@ -130,6 +141,7 @@ public class BaseDetailActivity extends BaseActivity {
                 editor1.putString("default_host",getIntent().getStringExtra("host"));
                 editor1.putString("default_port",getIntent().getStringExtra("port"));
                 editor1.putString("default_agent",getIntent().getStringExtra("agent"));
+                editor1.putString("default_bazaId",getIntent().getStringExtra("bazaId"));
                 editor1.apply();
                 finish();
             }

@@ -4,19 +4,16 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -30,7 +27,6 @@ import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.ReportOutput;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
 import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.models.Baza;
@@ -252,7 +248,6 @@ public class ReportsActivity extends BaseActivity {
         ReportsActivity.GrpcTask grpcTask = new ReportsActivity.GrpcTask(ManagedChannelBuilder.forAddress(mHost, mPort)
                 .usePlaintext(true).build(), CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent(), reports.get(position).getGuid());
         grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
-        Toast.makeText(getApplicationContext(), "Position: " + position, Toast.LENGTH_LONG).show();
     }
 
     @Override

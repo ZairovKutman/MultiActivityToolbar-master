@@ -19,6 +19,7 @@ public class PriceTypesRepo {
 
     public PriceType pricetype;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public PriceTypesRepo() {
         pricetype = new PriceType();
     }
@@ -33,7 +34,7 @@ public class PriceTypesRepo {
 
     public int insert(PriceType pricetype) {
         int priceTypeId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(PriceType.KEY_Guid, pricetype.getGuid());
         values.put(PriceType.KEY_Base, pricetype.getBase());
@@ -56,7 +57,7 @@ public class PriceTypesRepo {
 
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(PriceType.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -64,7 +65,7 @@ public class PriceTypesRepo {
     public ArrayList<PriceType> getPricetypesObject() {
         ArrayList<PriceType> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + PriceType.KEY_Name
                 + ", "+PriceType.KEY_PricetypeId
                 + ", "+PriceType.KEY_Guid
@@ -105,7 +106,7 @@ public class PriceTypesRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = PriceType.KEY_Base+" = '"+bazaString+"'";

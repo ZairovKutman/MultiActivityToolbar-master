@@ -19,6 +19,7 @@ public class WarehousesRepo {
 
     public Warehouse warehouse;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public WarehousesRepo() {
         warehouse = new Warehouse();
     }
@@ -33,7 +34,7 @@ public class WarehousesRepo {
 
     public int insert(Warehouse warehouse) {
         int warehouseId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Warehouse.KEY_Guid, warehouse.getGuid());
         values.put(Warehouse.KEY_Base, warehouse.getBase());
@@ -55,7 +56,7 @@ public class WarehousesRepo {
     }
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Warehouse.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -63,7 +64,7 @@ public class WarehousesRepo {
     public ArrayList<Warehouse> getWarehousesObject() {
         ArrayList<Warehouse> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Warehouse.KEY_Name
                 + ", "+Warehouse.KEY_WarehouseId
                 + ", "+Warehouse.KEY_Guid
@@ -103,7 +104,7 @@ public class WarehousesRepo {
     }
 
     public void deleteByBase(String bazaString) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Warehouse.KEY_Base+" = '"+bazaString+"'";

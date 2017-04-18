@@ -17,6 +17,7 @@ public class MyLocationsRepo {
 
     public MyLocation myLocation;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public MyLocationsRepo() {
         myLocation = new MyLocation();
     }
@@ -32,7 +33,7 @@ public class MyLocationsRepo {
 
     public int insert(MyLocation myLocation) {
         int myLocationId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(MyLocation.KEY_agent, myLocation.getAgent());
         values.put(MyLocation.KEY_formattedDate, myLocation.getFormattedDate());
@@ -56,7 +57,7 @@ public class MyLocationsRepo {
     public ArrayList<MyLocation> getMyLocationsObject() {
         ArrayList<MyLocation> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + MyLocation.KEY_longitude
                 + ", "+MyLocation.KEY_MyLocationId
                 + ", "+MyLocation.KEY_latitude
@@ -97,7 +98,7 @@ public class MyLocationsRepo {
 
     public void delete(MyLocation myLocation)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(MyLocation.KEY_formattedDate, myLocation.getFormattedDate());
         values.put(MyLocation.KEY_agent, myLocation.getAgent());

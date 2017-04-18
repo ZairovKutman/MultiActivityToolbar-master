@@ -2,12 +2,9 @@ package kg.soulsb.ayu.activities.zakaz;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,7 +18,7 @@ import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
-
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -36,13 +33,13 @@ import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.adapters.TovarAdapter;
 
-
 /**
  * Created by Sultanbek Baibagyshev on 1/10/17.
  */
 
 public class AddTovarFragment extends Fragment {
     ArrayList<Item> arrayList = new ArrayList<Item>();
+    ArrayList<Item> originalArrayList = new ArrayList<Item>();
     EditText editText;
     OrderAddActivity parentActivity;
     TovarAdapter arrayAdapter;
@@ -71,22 +68,21 @@ public class AddTovarFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (otborSpinner.getItemAtPosition(position).equals("Показать выбранные товары"))
                 {
-                    ArrayList<Item> arrayList2 = new ArrayList<Item>();
+                    ArrayList<Item> itemArrayList2 = new ArrayList<>();
                     for (Item item: arrayList)
                     {
-                        if (item.getQuantity()>0)
+                        if (item.getQuantity()<=0)
                         {
-                            arrayList2.add(item);
+                            itemArrayList2.add(item);
                         }
                     }
-                    arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList2);
-                    listView.setAdapter(arrayAdapter);
+                    arrayList.removeAll(itemArrayList2);
                     arrayAdapter.notifyDataSetChanged();
                 }
                 else
                 {
-                    arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList);
-                    listView.setAdapter(arrayAdapter);
+                    arrayList.clear();
+                    arrayList.addAll(originalArrayList);
                     arrayAdapter.notifyDataSetChanged();
                 }
             }
@@ -112,7 +108,7 @@ public class AddTovarFragment extends Fragment {
                 d.setView(dialogView);
                 final NumberPicker numberPicker = (NumberPicker) dialogView.findViewById(R.id.numberPicker);
                 numberPicker.setMaxValue(1000);
-                numberPicker.setMinValue(1);
+                numberPicker.setMinValue(0);
                 numberPicker.setWrapSelectorWheel(false);
                 numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                     @Override
@@ -123,23 +119,31 @@ public class AddTovarFragment extends Fragment {
                 d.setPositiveButton("Выбрать", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        String quantity = String.valueOf(editText.getText());
+                        if (quantity.equals("")) quantity="0";
+                        if (arrayList.get(position).getStock()<Integer.parseInt(quantity))
+                        {
+                            Toast.makeText(getContext(),"Количество не может быть больше остатка",Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         // Если этот товар уже был, то удаляем его
                         parentActivity.checkItem(arrayList.get(position));
                         // Заново добавим товар
-                        String quantity = String.valueOf(editText.getText());
-                        if (quantity.equals("")) quantity="0";
+
                         if (Integer.parseInt(quantity) > 0) {
-                            parentActivity.addItem(arrayList.get(position), Integer.parseInt(String.valueOf(editText.getText())));
                             arrayList.get(position).setQuantity(Integer.parseInt(quantity));
                             arrayList.get(position).setSum(arrayList.get(position).getQuantity() * arrayList.get(position).getPrice());
+                            parentActivity.addItem(arrayList.get(position));
                             System.out.println(arrayList.get(position));
                             arrayAdapter.notifyDataSetChanged();
                         }
                         else {
-                            arrayList.get(position).setQuantity(Integer.parseInt(quantity));
-                            arrayList.get(position).setSum(arrayList.get(position).getQuantity() * arrayList.get(position).getPrice());
+                            arrayList.get(position).setQuantity(0);
+                            arrayList.get(position).setSum(0);
                             System.out.println(arrayList.get(position));
                             arrayAdapter.notifyDataSetChanged();
+
                         }
 
                     }
@@ -155,7 +159,9 @@ public class AddTovarFragment extends Fragment {
         });
         DBHelper dbHelper = new DBHelper(getContext());
         DatabaseManager.initializeInstance(dbHelper);
-        arrayList = new ItemsRepo().getItemsObject();
+
+        originalArrayList = new ItemsRepo().getItemsObject();
+        arrayList.addAll(originalArrayList);
         pricesRepo = new PricesRepo();
         stocksRepo = new StocksRepo();
         activityMy = (OrderAddActivity) getActivity();
@@ -165,7 +171,7 @@ public class AddTovarFragment extends Fragment {
             {
                 if (arrayList.indexOf(item) != -1) {
                     arrayList.get(arrayList.indexOf(item)).setQuantity(item.getQuantity());
-                    parentActivity.orderedItemsArrayList.put(item,item.getQuantity());
+                    parentActivity.orderedItemsArrayList.add(item);
                 }
             }
             if (parentActivity.isDelivered.equals("true"))
@@ -173,8 +179,6 @@ public class AddTovarFragment extends Fragment {
                 disableButtons();
             }
         }
-
-        arrayAdapter = new TovarAdapter(this.getActivity(),R.layout.list_tovary_layout,arrayList);
         listView.setAdapter(arrayAdapter);
 
         setHasOptionsMenu(true);
@@ -185,17 +189,15 @@ public class AddTovarFragment extends Fragment {
         listView.setEnabled(false);
 
         otborSpinner.setSelection(1);
-
-        ArrayList<Item> arrayList2 = new ArrayList<Item>();
+        ArrayList<Item> arrayList2 = new ArrayList<>();
         for (Item item: arrayList)
         {
-            if (item.getQuantity()>0)
+            if (item.getQuantity()<=0)
             {
                 arrayList2.add(item);
             }
         }
-        arrayAdapter = new TovarAdapter(getActivity(),R.layout.list_tovary_layout,arrayList2);
-        listView.setAdapter(arrayAdapter);
+        arrayList.removeAll(arrayList2);
         arrayAdapter.notifyDataSetChanged();
     }
 
@@ -227,23 +229,34 @@ public class AddTovarFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         parentActivity = ((OrderAddActivity)getActivity());
+        arrayAdapter = new TovarAdapter(this.getActivity(),R.layout.list_tovary_layout,arrayList);
     }
 
     public void updatePrices()
     {
-        for (Item item: arrayList)
+        for (Item item: originalArrayList)
         {
             item.setPrice(pricesRepo.getItemPriceByPriceType(item.getGuid(),activityMy.getPriceType()));
         }
+        arrayList.clear();
+        arrayList.addAll(originalArrayList);
         arrayAdapter.notifyDataSetChanged();
     }
 
     public void updateStock()
     {
-        for (Item item: arrayList)
+        arrayList.clear();
+        arrayList.addAll(originalArrayList);
+        for (Item item: originalArrayList)
         {
             item.setStock(stocksRepo.getItemStockByWarehouse(item.getGuid(),activityMy.getWarehouse()));
         }
-        arrayAdapter.notifyDataSetChanged();
+        try {
+            arrayAdapter.notifyDataSetChanged();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

@@ -89,6 +89,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS " + Order.TABLE);
         db.execSQL(OrdersRepo.createTable());
+
         db.execSQL("DROP TABLE IF EXISTS " + Order.TABLE_ITEM);
         db.execSQL(OrdersRepo.createItemTable());
     }

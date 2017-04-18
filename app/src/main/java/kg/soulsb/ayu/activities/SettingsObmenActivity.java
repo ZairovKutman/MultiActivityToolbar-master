@@ -100,7 +100,8 @@ public class SettingsObmenActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_obmen);
-
+        DBHelper dbHelper = new DBHelper(getApplicationContext());
+        DatabaseManager.initializeInstance(dbHelper);
         progressBar =(ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         loadingComment = (TextView) findViewById(R.id.loading_comment);
@@ -189,7 +190,6 @@ public class SettingsObmenActivity extends BaseActivity {
 
         textView = (TextView) findViewById(R.id.usingBase);
     }
-
     /**
      * Метод делает полный обмен с сервером и загружает в базу
      */
@@ -363,9 +363,8 @@ public class SettingsObmenActivity extends BaseActivity {
             ArrayList<kg.soulsb.ayu.models.Stock> stocksArray = new ArrayList<>();
             ArrayList<kg.soulsb.ayu.models.Report> reportsArray = new ArrayList<>();
             ArrayList<kg.soulsb.ayu.models.Organization> organizationsArray = new ArrayList<>();
-            DBHelper dbHelper = new DBHelper(getBaseContext());
+            DBHelper dbHelper = new DBHelper(getApplicationContext());
             DatabaseManager.initializeInstance(dbHelper);
-
 
             // getting clients
             ClientsRepo clientsRepo = new ClientsRepo();
@@ -381,6 +380,7 @@ public class SettingsObmenActivity extends BaseActivity {
 
             publishProgress("Загрузка товаров... 30%");
             // getting tovar
+
             Items items = exchangeData.items;
             ItemsRepo itemsRepo = new ItemsRepo();
             itemsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
@@ -550,6 +550,14 @@ public class SettingsObmenActivity extends BaseActivity {
             arrayAdapter.notifyDataSetChanged();
             loadButton.setEnabled(true);
             loadOnlyDocButton.setEnabled(true);
+
+            if (arrayList.isEmpty())
+            {
+                textViewEmpty.setVisibility(View.VISIBLE);
+            }
+            else{
+                textViewEmpty.setVisibility(View.INVISIBLE);
+            }
         }
     }
 

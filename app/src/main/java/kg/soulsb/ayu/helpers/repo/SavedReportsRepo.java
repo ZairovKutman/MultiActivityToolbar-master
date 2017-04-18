@@ -19,6 +19,7 @@ public class SavedReportsRepo {
 
     public Report report;
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public SavedReportsRepo() {
         report = new Report();
     }
@@ -36,7 +37,7 @@ public class SavedReportsRepo {
 
     public int insert(Report report) {
         int reportId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Report.KEY_Guid, report.getGuid());
         values.put(Report.KEY_Name, report.getName());
@@ -54,14 +55,14 @@ public class SavedReportsRepo {
 
 
     public void deleteTable() {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Report.TABLE_SAVED,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
 
     public void delete(Report report)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Report.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"' AND "+Report.KEY_Guid+" = '"+report.getGuid()+"' AND "+Report.KEY_Datestart+" = '"+report.getDateStart()+"' AND "+Report.KEY_Dateend+" = '"+report.getDateEnd()+"'";
@@ -72,7 +73,7 @@ public class SavedReportsRepo {
     public ArrayList<Report> getReportsObject() {
         ArrayList<Report> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Report.KEY_Name
                 + ", "+Report.KEY_ReportId
                 + ", "+Report.KEY_Guid
@@ -118,7 +119,7 @@ public class SavedReportsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Report.KEY_Base+" = '"+bazaString+"'";

@@ -107,33 +107,37 @@ public class BaseActivity extends AppCompatActivity implements
                     .getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha));
         }
 
+        Menu menuNav=navigationView.getMenu();
+        MenuItem nav_item2 = menuNav.findItem(R.id.nav_messages);
+        nav_item2.setEnabled(false);
+
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
 
         if (sharedPreferences.contains("default_name")) {
 
             if (sharedPreferences.getString(UserSettings.can_create_orders,"true").equals("false"))
             {
-                Menu menuNav=navigationView.getMenu();
-                MenuItem nav_item2 = menuNav.findItem(R.id.nav_orders);
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_orders);
                 nav_item2.setEnabled(false);
             }
             else
             {
-                Menu menuNav=navigationView.getMenu();
-                MenuItem nav_item2 = menuNav.findItem(R.id.nav_orders);
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_orders);
                 nav_item2.setEnabled(true);
             }
 
             if (sharedPreferences.getString(UserSettings.can_create_sales,"true").equals("false"))
             {
-                Menu menuNav=navigationView.getMenu();
-                MenuItem nav_item2 = menuNav.findItem(R.id.nav_orders_real);
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_orders_real);
                 nav_item2.setEnabled(false);
             }
             else
             {
-                Menu menuNav=navigationView.getMenu();
-                MenuItem nav_item2 = menuNav.findItem(R.id.nav_orders);
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_orders);
                 nav_item2.setEnabled(true);
             }
         }
@@ -153,7 +157,7 @@ public class BaseActivity extends AppCompatActivity implements
 
                     if (newTime - oldTime > 12*3600*1000) {
                         //
-                        Toast.makeText(getBaseContext(),"Сделайте обмен!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(),"Необходимо сделать обмен!",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getBaseContext(),SettingsObmenActivity.class);
                         startActivity(intent);
                         return true;
@@ -243,6 +247,16 @@ public class BaseActivity extends AppCompatActivity implements
                 return true;
             case R.id.nav_settings_obmen :
                 intent = new Intent(this, SettingsObmenActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.nav_messages :
+                intent = new Intent(this, MessagesActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+            case R.id.nav_pay :
+                intent = new Intent(this, PayActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

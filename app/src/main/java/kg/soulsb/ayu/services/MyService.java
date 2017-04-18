@@ -8,19 +8,15 @@ import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +33,6 @@ import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.MyLocationsRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.MyLocation;
@@ -72,7 +67,6 @@ public class MyService extends Service {
 
             if (location.getAccuracy() < 100){
                 mLastLocation.set(location);
-                //Toast.makeText(getBaseContext(), "lat=" + location.getLatitude() + ", long=" + location.getLongitude() + ", accur=" + location.getAccuracy(), Toast.LENGTH_SHORT).show();
                 CurrentLocationClass.getInstance().setCurrentLocation(mLastLocation);
             }
         }

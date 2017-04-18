@@ -211,8 +211,10 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -220,14 +222,18 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
     @Override
     public void onLocationChanged(Location location) {
         if (location.getAccuracy()>=20)
+        {
             clientAccuracy.setTextColor(Color.RED);
+            clientSaveLocationButton.setEnabled(false);
+        }
         else
+        {
             clientAccuracy.setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
+            clientSaveLocationButton.setEnabled(true);
+        }
 
         clientAccuracy.setText("Точность: "+location.getAccuracy()+" м.");
-        if (location.getAccuracy()<=20) {
-            currentLocation = location;
-        }
+        currentLocation = location;
 
     }
 

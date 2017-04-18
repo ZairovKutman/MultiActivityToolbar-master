@@ -13,8 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,7 +28,7 @@ import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 public class OrderAddActivity extends BaseActivity {
-    public Map<Item,Integer> orderedItemsArrayList = new HashMap<>();
+    public ArrayList<Item> orderedItemsArrayList = new ArrayList<>();
     private String priceTypeGUID = "";
     private String warehouseGUID = "";
     ViewPagerAdapter adapter;
@@ -113,6 +112,13 @@ public void locationUpdate(){
                 OrderAddActivity.super.onBackPressed();
             }
         });
+        alertDlg.setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
         alertDlg.create().show();
     }
 
@@ -214,11 +220,11 @@ public void locationUpdate(){
         return super.onOptionsItemSelected(item);
     }
 
-    public void addItem(Item item, int quantity)
+    public void addItem(Item item)
     {
-        orderedItemsArrayList.put(item,quantity);
+        orderedItemsArrayList.add(item);
     }
-    public Map<Item, Integer> getSelectedItems()
+    public ArrayList<Item> getSelectedItems()
     {
         return orderedItemsArrayList;
     }
@@ -234,10 +240,16 @@ public void locationUpdate(){
     }
 
     public void checkItem(Item item) {
-        if (orderedItemsArrayList.containsKey(item))
+        ArrayList<Item> itemArrayList2 = new ArrayList<>();
+
+        for (Item item2: orderedItemsArrayList)
         {
-            orderedItemsArrayList.remove(item);
+            if (item.getGuid().equals(item2.getGuid()))
+            {
+                itemArrayList2.add(item2);
+            }
         }
+        orderedItemsArrayList.removeAll(itemArrayList2);
     }
 
     public String getPriceType()
@@ -287,5 +299,4 @@ public void locationUpdate(){
              mTimer.cancel();
          }
      }
-
 }

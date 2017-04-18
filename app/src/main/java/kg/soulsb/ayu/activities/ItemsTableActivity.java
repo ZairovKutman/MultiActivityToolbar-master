@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import java.util.ArrayList;
 import kg.soulsb.ayu.R;
@@ -32,6 +34,15 @@ public class ItemsTableActivity extends BaseActivity {
         arrayList = new ItemsRepo().getItemsObject();
         arrayAdapter = new TovarAdapter(this,R.layout.list_tovary_layout, arrayList);
         listViewTovary.setAdapter(arrayAdapter);
+
+        listViewTovary.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getBaseContext(),ItemDetailActivity.class);
+                intent.putExtra("item",arrayList.get(position));
+                startActivity(intent);
+            }
+        });
 
     }
 

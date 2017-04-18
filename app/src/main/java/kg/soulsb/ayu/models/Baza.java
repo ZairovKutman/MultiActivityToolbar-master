@@ -22,17 +22,19 @@ public class Baza {
     private String name;
     private boolean isDefault;
     private String agent;
+    private String bazaId;
 
     public Baza() {
         isDefault = false;
     }
 
-    public Baza (String host, int port, String name, String agent)
+    public Baza(String host, int port, String name, String agent, String bazaId)
     {
         this.host = host;
         this.port = port;
         this.name = name;
         this.agent = agent;
+        this.bazaId = bazaId;
         isDefault = false;
     }
 
@@ -80,5 +82,13 @@ public class Baza {
 
     public void setAgent(String agent) {
         this.agent = agent;
+    }
+
+    public String getBazaId() {
+        return bazaId;
+    }
+
+    public void setBazaId(String bazaId) {
+        this.bazaId = bazaId;
     }
 }

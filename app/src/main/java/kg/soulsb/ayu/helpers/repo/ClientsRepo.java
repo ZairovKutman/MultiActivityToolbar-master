@@ -20,6 +20,7 @@ public class ClientsRepo {
         client = new Client();
     }
     Cursor cursor;
+    SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
     public static String createTable(){
         return "CREATE TABLE IF NOT EXISTS " + Client.TABLE  + "("
                 + Client.KEY_ClientId  + "   PRIMARY KEY    ,"
@@ -35,7 +36,7 @@ public class ClientsRepo {
 
     public int insert(Client client) {
         int courseId;
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
         values.put(Client.KEY_Guid, client.getGuid());
         values.put(Client.KEY_Name, client.getName());
@@ -63,7 +64,7 @@ public class ClientsRepo {
 
     public Client getClientObjectByGuid(String guid)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         Client myClient = new Client();
         String selectQuery =  " SELECT " + Client.KEY_Name
                 + ", "+Client.KEY_ClientId
@@ -108,7 +109,7 @@ public class ClientsRepo {
     }
 
     public void deleteTable( ) {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         db.delete(Client.TABLE,null,null);
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -116,7 +117,7 @@ public class ClientsRepo {
     public ArrayList<Client> getClientsObject() {
         ArrayList<Client> arrayList = new ArrayList<>();
 
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         String selectQuery =  " SELECT " + Client.KEY_Name
                 + ", "+Client.KEY_ClientId
                 + ", "+Client.KEY_Address
@@ -156,7 +157,7 @@ public class ClientsRepo {
 
     public void setClientLocation(String guid,Location location)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
 
         values.put(Client.KEY_Latitude, location.getLatitude());
@@ -171,7 +172,7 @@ public class ClientsRepo {
 
     public void deleteByBase(String bazaString)
     {
-        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        db = DatabaseManager.getInstance().openDatabase();
 
         // deleting Row
         String whereClause = Client.KEY_Base+" = '"+bazaString+"'";

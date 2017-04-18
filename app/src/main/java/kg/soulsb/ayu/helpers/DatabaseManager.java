@@ -29,11 +29,10 @@ public class DatabaseManager {
     }
 
     public synchronized SQLiteDatabase openDatabase() {
-        mOpenCounter+=1;
-        if(mOpenCounter == 1) {
+
             // Opening new database
             mDatabase = mDatabaseHelper.getWritableDatabase();
-        }
+
         return mDatabase;
     }
 

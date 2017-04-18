@@ -8,7 +8,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_margin="5dp">
+        <TextView
+            android:text="ID базы"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/bazaIdText"
+            android:minWidth="80dp" />
+
+        <EditText
+            android:text="TextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bazaId"
+            android:textStyle="normal|bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="5dp">
     <TextView
         android:text="Имя базы"
         android:layout_width="wrap_content"
@@ -29,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_margin="5dp">
         <TextView
             android:text="IP: "
             android:layout_width="wrap_content"
@@ -52,7 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_margin="5dp">
         <TextView
             android:text="Порт: "
             android:layout_width="wrap_content"
@@ -75,7 +95,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_margin="20dp">
+        android:layout_margin="5dp">
         <TextView
             android:text="Код агента: "
             android:layout_width="wrap_content"
@@ -83,7 +103,7 @@
             android:id="@+id/bazaAgentText"
             android:minWidth="80dp" />
 
-        <TextView
+        <EditText
             android:text="TextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -103,7 +123,7 @@
         android:text="Изменить"
         android:textAlignment="center"
         android:textColor="@color/cardview_light_background"
-        android:layout_margin="20dp" />
+        android:layout_margin="7dp" />
 
 
     <Button
@@ -115,7 +135,7 @@
         android:layout_gravity="center"
         android:background="@android:color/holo_blue_dark"
         android:textColor="@color/cardview_light_background"
-        android:layout_margin="20dp" />
+        android:layout_margin="7dp" />
 
 
     <Button
@@ -127,5 +147,5 @@
         android:textAlignment="center"
         android:layout_gravity="center"
         android:textColor="@color/cardview_light_background"
-        android:layout_margin="20dp" />
+        android:layout_margin="7dp" />
 </LinearLayout>

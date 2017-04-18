@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextUtils;
+import android.text.format.Time;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -87,6 +88,7 @@ public class SettingsBasesAddEditActivity extends BaseActivity {
                 baza.setHost(baseIP.getText().toString());
                 baza.setName(baseName.getText().toString());
                 baza.setAgent(baseAgent.getText().toString());
+                baza.setBazaId(Double.toString(System.currentTimeMillis()));
 
                 bazasRepo.insert(baza);
                 setResult(RESULT_OK,intent);
@@ -98,6 +100,7 @@ public class SettingsBasesAddEditActivity extends BaseActivity {
                 editor.putString("default_host", CurrentBaseClass.getInstance().getCurrentBaseObject().getHost());
                 editor.putString("default_port", Integer.toString(CurrentBaseClass.getInstance().getCurrentBaseObject().getPort()));
                 editor.putString("default_agent", CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
+                editor.putString("default_bazaId", CurrentBaseClass.getInstance().getCurrentBaseObject().getBazaId());
                 editor.apply();
 
                 SharedPreferences sharedPreferences1 = getSharedPreferences("DefaultBase",MODE_PRIVATE);
@@ -106,6 +109,7 @@ public class SettingsBasesAddEditActivity extends BaseActivity {
                 editor1.putString("default_host",baza.getHost());
                 editor1.putString("default_port",Integer.toString(baza.getPort()));
                 editor1.putString("default_agent",baza.getAgent());
+                editor1.putString("default_bazaId",baza.getBazaId());
                 editor1.apply();
                 finish();
             }
