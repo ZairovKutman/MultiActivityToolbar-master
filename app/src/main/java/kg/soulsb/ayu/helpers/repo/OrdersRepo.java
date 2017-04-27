@@ -85,21 +85,23 @@ public class OrdersRepo {
         values.put(Order.KEY_Organization,order.getOrganization());
 
         // Inserting Row
-        orderId=(int)db.insert(Order.TABLE, null, values);
+        orderId = (int) db.insert(Order.TABLE, null, values);
 
-        for (Item item: order.getArraylistTovar()) {
-            values = new ContentValues();
-            values.put(Order.KEY_OrderID, order.getOrderID());
-            values.put(Item.KEY_Guid, item.getGuid());
-            values.put(Item.KEY_Name, item.getName());
-            values.put(Item.KEY_Price, item.getPrice());
-            values.put(Item.KEY_Quantity, item.getQuantity());
-            values.put(Item.KEY_ItemId, item.getItemId());
-            // Inserting Row
-            orderId=(int)db.insert(Order.TABLE_ITEM, null, values);
+        if (!order.getDoctype().equals("2")) {
+            for (Item item : order.getArraylistTovar()) {
+                values = new ContentValues();
+                values.put(Order.KEY_OrderID, order.getOrderID());
+                values.put(Item.KEY_Guid, item.getGuid());
+                values.put(Item.KEY_Name, item.getName());
+                values.put(Item.KEY_Price, item.getPrice());
+                values.put(Item.KEY_Quantity, item.getQuantity());
+                values.put(Item.KEY_ItemId, item.getItemId());
+                // Inserting Row
+                orderId = (int) db.insert(Order.TABLE_ITEM, null, values);
+            }
+
+            DatabaseManager.getInstance().closeDatabase();
         }
-        DatabaseManager.getInstance().closeDatabase();
-
         return orderId;
     }
 

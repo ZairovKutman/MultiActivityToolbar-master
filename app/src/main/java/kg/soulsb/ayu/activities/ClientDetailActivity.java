@@ -332,8 +332,8 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
             }
             else {
                 new ClientsRepo().setClientLocation(getIntent().getStringExtra("guid"),currentLocation);
-                clientLatitudeTextView.setText("Широта: "+currentLocation.getLatitude());
-                clientLongitudeTextView.setText("Долгота: "+currentLocation.getLongitude());
+                clientLatitudeTextView.setText("Широта: "+Double.toString(currentLocation.getLatitude()));
+                clientLongitudeTextView.setText("Долгота: "+Double.toString(currentLocation.getLongitude()));
                 Toast.makeText(getBaseContext(),"Успех! геолокация отправлена. =)",Toast.LENGTH_SHORT).show();
             }
         }

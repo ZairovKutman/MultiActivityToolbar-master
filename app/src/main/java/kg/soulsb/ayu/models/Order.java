@@ -3,6 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
+import kg.soulsb.ayu.helpers.repo.ContractsRepo;
 
 /**
  * Created by Sultanbek Baibagyshev on 1/30/17.
@@ -28,17 +29,17 @@ public class Order implements Serializable {
     public static String KEY_totalSum     = "totalSum";
     public static String KEY_Organization = "Organization";
 
-    private String orderID;
-    private String priceType;
-    private String warehouse;
-    private String dogovor;
-    private String client;
-    private ArrayList<Item> arraylistTovar;
-    private String date;
-    private String comment;
-    private String dateSend;
-    private String doctype;
-    private String organization;
+    private String orderID = "";
+    private String priceType = "";
+    private String warehouse = "";
+    private String dogovor = "";
+    private String client = "";
+    private ArrayList<Item> arraylistTovar = new ArrayList<>();
+    private String date = "";
+    private String comment = "";
+    private String dateSend = "";
+    private String doctype = "";
+    private String organization = "";
     private double totalSum;
     private boolean isDelivered;
     private Baza baza;
@@ -115,7 +116,10 @@ public class Order implements Serializable {
     }
 
     public String getComment() {
-        return comment;
+        if (comment == null)
+            return "";
+        else
+            return comment;
     }
 
     public void setComment(String comment) {
@@ -168,5 +172,11 @@ public class Order implements Serializable {
 
     public void setOrganization(String organization) {
         this.organization = organization;
+    }
+
+    public Contract getDogovorObject() {
+        ContractsRepo aa = new ContractsRepo();
+
+        return aa.getObjectByGuid(getDogovor());
     }
 }

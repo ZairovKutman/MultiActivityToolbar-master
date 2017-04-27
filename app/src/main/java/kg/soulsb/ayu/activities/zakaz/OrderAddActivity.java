@@ -42,7 +42,9 @@ public class OrderAddActivity extends BaseActivity {
     Order order = null;
     String isDelivered = "false";
     Fragment addOrder = new AddOrderFragment();
+    String category = "";
     float distance=0;
+    AddTovarFragment addTovarFragment;
     public Location getLocation() {
         System.out.println(" I GOT A LOCATION: lat="+CurrentLocationClass.getInstance().getCurrentLocation().getLatitude()
                 +" long="+CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
@@ -139,6 +141,7 @@ public void locationUpdate(){
             mTimer.scheduleAtFixedRate(new OrderAddActivity.TimeDisplay(), 2000, 2000);
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -178,6 +181,7 @@ public void locationUpdate(){
         });
 
         if (getIntent().getStringExtra("doctype").equals("1")) {
+
             doctype = "1";
             if (getIntent().getSerializableExtra("savedobj")!=null)
                 setTitle("Сохраненный документ - Продажа");
@@ -263,9 +267,9 @@ public void locationUpdate(){
 
     public void updatePrices()
     {
-        AddTovarFragment fragment = (AddTovarFragment) adapter.getItem(1);
-        if (fragment != null)
-            fragment.updatePrices();
+        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
+        if (addTovarFragment != null)
+            addTovarFragment.updatePrices();
     }
 
     public String getWarehouse() {
@@ -278,9 +282,9 @@ public void locationUpdate(){
 
     public void updateStock()
     {
-        AddTovarFragment fragment = (AddTovarFragment) adapter.getItem(1);
-        if (fragment != null)
-            fragment.updateStock();
+        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
+        if (addTovarFragment != null)
+            addTovarFragment.updateStock();
     }
 
      @Override

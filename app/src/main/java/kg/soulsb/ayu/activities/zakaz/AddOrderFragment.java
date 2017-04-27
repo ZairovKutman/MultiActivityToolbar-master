@@ -38,6 +38,7 @@ import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
+import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
@@ -94,6 +95,9 @@ public class AddOrderFragment extends Fragment {
     ProgressBar progressBar;
     AlertDialog alertDialog;
     String docId;
+    Contract previous=new Contract();
+    Contract current=null;
+    boolean firstLaunch = true;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -180,6 +184,8 @@ public class AddOrderFragment extends Fragment {
             arrayListContract = new ContractsRepo().getContractsObject(clientGUID);
             arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
             spinner_contract.setAdapter(arrayAdapterContract);
+            parentActivity.category = arrayListContract.get(0).getCategory();
+            current = arrayListContract.get(0);
         }
         else
         {
@@ -188,6 +194,24 @@ public class AddOrderFragment extends Fragment {
             arrayAdapterContractNull = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, newArray);
             spinner_contract.setAdapter(arrayAdapterContractNull);
         }
+
+        spinner_contract.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                if (arrayListContract != null && current != null)
+                {
+                    current = (Contract) spinner_contract.getSelectedItem();
+                    updateTovarListByContract();
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
         // PRICE TYPE
         spinner_pricetype = (Spinner) v.findViewById(R.id.order_spinner_tipcen);
         arrayListPriceType = new PriceTypesRepo().getPricetypesObject();
@@ -263,6 +287,7 @@ public class AddOrderFragment extends Fragment {
         });
         createDocButton.setEnabled(true);
         if (parentActivity.order != null) {
+
             fillFields();
             if (parentActivity.isDelivered.equals("true"))
             {
@@ -270,6 +295,27 @@ public class AddOrderFragment extends Fragment {
             }
         }
         return v;
+    }
+
+    private void updateTovarListByContract() {
+
+        if (previous.equals(current)) {return;}
+
+
+        previous = current;
+
+        parentActivity.category = current.getCategory();
+        parentActivity.addTovarFragment.originalArrayList.clear();
+
+        parentActivity.addTovarFragment.originalArrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+        parentActivity.addTovarFragment.arrayList.clear();
+        parentActivity.addTovarFragment.arrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+
+        parentActivity.orderedItemsArrayList.clear();
+
+        parentActivity.addTovarFragment.updatePrices();
+        parentActivity.addTovarFragment.updateStock();
+        parentActivity.addTovarFragment.arrayAdapter.notifyDataSetChanged();
     }
 
     private void disableButtons() {
@@ -343,6 +389,8 @@ public class AddOrderFragment extends Fragment {
         {
             if (contract.getGuid().equals(parentActivity.order.getDogovor()))
             {
+                current = contract;
+                previous = contract;
                 spinner_contract.setSelection(arrayListContract.indexOf(contract));
                 break;
             }
@@ -420,6 +468,8 @@ public class AddOrderFragment extends Fragment {
                 arrayListContract = new ContractsRepo().getContractsObject(clientGUID);
                 arrayAdapterContract = new ArrayAdapter<>(this.getActivity(), R.layout.baza_spinner_item, arrayListContract);
                 spinner_contract.setAdapter(arrayAdapterContract);
+                current = arrayListContract.get(0);
+                updateTovarListByContract();
             }
         }
     }
@@ -555,6 +605,7 @@ public class AddOrderFragment extends Fragment {
         order.setPriceType(arrayListPriceType.get(spinner_pricetype.getSelectedItemPosition()).getGuid());
         order.setWarehouse(arrayListWarehouse.get(spinner_warehouse.getSelectedItemPosition()).getGuid());
         order.setOrganization(arrayListOrganization.get(editText_organization.getSelectedItemPosition()).getGuid());
+
         ArrayList<Item> itemArrayList;
 
         itemArrayList = parentActivity.getSelectedItems();

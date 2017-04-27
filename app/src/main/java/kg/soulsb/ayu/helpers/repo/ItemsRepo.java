@@ -33,6 +33,7 @@ public class ItemsRepo {
                 + Item.KEY_Price  + "   TEXT    ,"
                 + Item.KEY_Stock  + "   TEXT    ,"
                 + Item.KEY_Base  + "   TEXT    ,"
+                + Item.KEY_Category  + "   TEXT    ,"
                 + Item.KEY_Unit  + "   TEXT    )";
     }
 
@@ -46,6 +47,7 @@ public class ItemsRepo {
         values.put(Item.KEY_Stock, tovar.getStock());
         values.put(Item.KEY_Unit, tovar.getUnit());
         values.put(Item.KEY_Base, tovar.getBase());
+        values.put(Item.KEY_Category, tovar.getCategory());
 
         // Inserting Row
         if (db.isOpen()) {
@@ -79,6 +81,7 @@ public class ItemsRepo {
                 + ", "+Item.KEY_Guid
                 + ", "+Item.KEY_Price
                 + ", "+Item.KEY_Stock
+                + ", "+Item.KEY_Category
                 + ", "+Item.KEY_Base
                 + " FROM " + Item.TABLE
                 + " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'"
@@ -102,6 +105,7 @@ public class ItemsRepo {
                 item.setName(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Name)));
                 item.setUnit(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Unit)));
                 item.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Base)));
+                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
                 item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
                 item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
 
@@ -126,5 +130,62 @@ public class ItemsRepo {
         String whereClause = Item.KEY_Base+" = '"+bazaString+"'";
         db.delete(Item.TABLE,whereClause,null);
         DatabaseManager.getInstance().closeDatabase();
+    }
+
+    public ArrayList<Item> getItemsObjectByCategory(String category) {
+        ArrayList<Item> arrayList = new ArrayList<>();
+        String whereClause;
+
+        if (category.equals(""))
+            whereClause = " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
+        else
+            whereClause = " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"' AND "+Item.KEY_Category+" = '"+category+"'";
+
+        db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT " + Item.KEY_Name
+                + ", "+Item.KEY_ItemId
+                + ", "+Item.KEY_Unit
+                + ", "+Item.KEY_Guid
+                + ", "+Item.KEY_Price
+                + ", "+Item.KEY_Stock
+                + ", "+Item.KEY_Category
+                + ", "+Item.KEY_Base
+                + " FROM " + Item.TABLE
+                + whereClause
+                + " ORDER BY "+Client.KEY_Name+" ASC;";
+
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        // looping through all rows and adding to list
+
+        if (cursor.moveToFirst()) {
+            do {
+                Item item = new Item();
+                item.setItemId(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_ItemId)));
+                item.setGuid(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Guid)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Name)));
+                item.setUnit(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Unit)));
+                item.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Base)));
+                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
+                item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
+                item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
+
+                arrayList.add(item);
+            } while (cursor.moveToNext());
+        }
+
+        if (!cursor.isClosed())
+        {
+            cursor.close();
+        }
+        DatabaseManager.getInstance().closeDatabase();
+
+        return arrayList;
     }
 }

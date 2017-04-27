@@ -141,10 +141,23 @@ public class MainActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
-                intent.putExtra("doctype",orderArrayList.get(i).getDoctype());
-                intent.putExtra("savedobj", orderArrayList.get(i));
-                startActivity(intent);}
+
+                if (!orderArrayList.get(i).getDoctype().equals("2")) {
+                    Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
+                    intent.putExtra("savedobj", orderArrayList.get(i));
+                    startActivity(intent);
+                }
+                else
+                {
+                    Intent intent = new Intent(getBaseContext(), PayActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
+                    intent.putExtra("savedobj", orderArrayList.get(i));
+                    startActivity(intent);
+                }
+            }
         });
 
         updateMainMenu();

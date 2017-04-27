@@ -69,8 +69,12 @@ public class OrderAdapter extends ArrayAdapter<Order> {
         if (order.getDoctype().equals("1")){
             holder.txtDetail.setText("Реализация от "+order.getDate()+", сумма = "+order.getTotalSum());
         }
-        else
-            holder.txtDetail.setText("Заказ от "+order.getDate()+", сумма = "+order.getTotalSum());
+        else if (order.getDoctype().equals("0")) {
+            holder.txtDetail.setText("Заказ от " + order.getDate() + ", сумма = " + order.getTotalSum());
+        }
+        else if (order.getDoctype().equals("2")) {
+            holder.txtDetail.setText("Оплата от " + order.getDate() + ", сумма = " + order.getTotalSum());
+        }
 
         if (order.isDelivered())
         {

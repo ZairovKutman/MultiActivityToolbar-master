@@ -160,8 +160,8 @@ public class ClientsRepo {
         db = DatabaseManager.getInstance().openDatabase();
         ContentValues values = new ContentValues();
 
-        values.put(Client.KEY_Latitude, location.getLatitude());
-        values.put(Client.KEY_Longitude, location.getLongitude());
+        values.put(Client.KEY_Latitude, Double.toString(location.getLatitude()));
+        values.put(Client.KEY_Longitude, Double.toString(location.getLongitude()));
 
         String whereClause = Client.KEY_Guid + " = '"+guid+"'";
         // Inserting Row

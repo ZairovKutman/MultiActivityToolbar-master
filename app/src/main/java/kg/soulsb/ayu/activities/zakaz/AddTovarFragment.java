@@ -159,8 +159,14 @@ public class AddTovarFragment extends Fragment {
         });
         DBHelper dbHelper = new DBHelper(getContext());
         DatabaseManager.initializeInstance(dbHelper);
+        if (parentActivity.order == null) {
+            originalArrayList = new ItemsRepo().getItemsObjectByCategory(parentActivity.category);
+        }
+        else
+        {
+            originalArrayList = new ItemsRepo().getItemsObjectByCategory(parentActivity.order.getDogovorObject().getCategory());
+        }
 
-        originalArrayList = new ItemsRepo().getItemsObject();
         arrayList.addAll(originalArrayList);
         pricesRepo = new PricesRepo();
         stocksRepo = new StocksRepo();
@@ -189,6 +195,7 @@ public class AddTovarFragment extends Fragment {
         listView.setEnabled(false);
 
         otborSpinner.setSelection(1);
+
         ArrayList<Item> arrayList2 = new ArrayList<>();
         for (Item item: arrayList)
         {
@@ -197,6 +204,7 @@ public class AddTovarFragment extends Fragment {
                 arrayList2.add(item);
             }
         }
+
         arrayList.removeAll(arrayList2);
         arrayAdapter.notifyDataSetChanged();
     }

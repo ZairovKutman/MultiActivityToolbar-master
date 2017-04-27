@@ -18,11 +18,13 @@ public class Item implements Serializable {
     public static String KEY_Quantity    = "quantity";
     public static String KEY_Stock    = "Stock";
     public static String KEY_Base    = "Base";
+    public static String KEY_Category    = "Category";
 
     private String itemId;
     private String guid;
     private String name;
     private String unit;
+    private String category;
     private double price;
     private double stock;
     private int quantity;
@@ -33,12 +35,13 @@ public class Item implements Serializable {
     {
 
     }
-    public Item(String guid, String name, String unit, double price, double stock) {
+    public Item(String guid, String name, String unit, double price, double stock, String category) {
         this.guid = guid;
         this.name = name;
         this.unit = unit;
         this.price = price;
         this.stock = stock;
+        this.category = category;
     }
 
     public String getName() {
@@ -129,4 +132,16 @@ public class Item implements Serializable {
     public void setBase(String base) {
         this.base = base;
     }
+
+    public String getCategory() {
+        if (category.equals("00000000-0000-0000-0000-000000000000"))
+                return "";
+        else
+            return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
 }

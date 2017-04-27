@@ -16,5 +16,6 @@ public class UserSettings {
     public static String create_sales_at_clients_coordinates = "create_sales_at_clients_coordinates";
     public static String password_for_app_settings = "password_for_app_settings";
     public static String status = "status";
+    public static String can_create_payment = "can_create_payment";
     public static String error_message = "error_message";
 }

@@ -116,9 +116,17 @@ public class SettingsObmenActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
+                if (arrayList.get(i).getDoctype().equals("2")) {
+                    Intent intent = new Intent(getBaseContext(), PayActivity.class);
+                }
+                else
+                {
+                    Intent intent = new Intent(getBaseContext(), OrderAddActivity.class);
+                }
+
                 intent.putExtra("doctype",arrayList.get(i).getDoctype());
                 intent.putExtra("savedobj", arrayList.get(i));
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);}
         });
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
@@ -246,7 +254,7 @@ public class SettingsObmenActivity extends BaseActivity {
          */
         @Override
         protected void onPreExecute() {
-            loadingComment.setText("Идет загрузка... "+1+"%");
+            loadingComment.setText("Идет загрузка...");
         }
 
         private Points getClients(ManagedChannel mChannel) {
@@ -258,16 +266,16 @@ public class SettingsObmenActivity extends BaseActivity {
             Device device = new Device();
             device.agent = name;
             device.deviceId = android_id;
-            publishProgress("Проверка устройства в базе данных... 0%");
+            publishProgress("Проверка устройства в базе данных...");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
             if (!deviceStatus.active) {
-                publishProgress("Ошибка, доступ с этого телефона запрещен");
+                publishProgress("Ошибка, доступ с этого телефона запрещен.");
                 return null;
             }
 
             //
-            publishProgress("Выгрузка документов... 2%");
+            publishProgress("Выгрузка документов...");
 
             //Выгружаю документы
             DocPurch docPurchArray[] = new DocPurch[arrayList.size()];
@@ -284,7 +292,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 docPurch.priceTypeGuid = order.getPriceType();
                 docPurch.docType = Integer.parseInt(order.getDoctype());
                 docPurch.docId = order.getOrderID();
-
+                docPurch.amount = order.getTotalSum();
                 ArrayList<Item> itemsList = order.getArraylistTovar();
 
                 PurchDocLine[] purchDocLines = new PurchDocLine[itemsList.size()];
@@ -325,11 +333,11 @@ public class SettingsObmenActivity extends BaseActivity {
 
             new OrdersRepo().deleteDocDelivered();
 
-            publishProgress("Загружаю данные из сервера... 7%");
+            publishProgress("Загружаю данные из сервера...");
 
             ExchangeData exchangeData = blockingStub.getAllData(request);
 
-            publishProgress("Загрузка настроек... 10%");
+            publishProgress("Загрузка настроек...");
             Settings settings = exchangeData.settings;
 
             if (!settings.status) {
@@ -348,9 +356,10 @@ public class SettingsObmenActivity extends BaseActivity {
             editor.putString(UserSettings.create_order_at_clients_coordinates, Boolean.toString(settings.createOrderAtClientsCoordinates));
             editor.putString(UserSettings.create_sales_at_clients_coordinates, Boolean.toString(settings.createSalesAtClientsCoordinates));
             editor.putString(UserSettings.password_for_app_settings, settings.passwordForAppSettings);
+            editor.putString(UserSettings.can_create_payment, Boolean.toString(settings.canCreatePayment));
             editor.putString(UserSettings.status, Boolean.toString(settings.status));
             editor.apply();
-            publishProgress("Загрузка клиентов... 20%");
+            publishProgress("Загрузка клиентов...");
             Points pointIterator = exchangeData.points;
             globalCounter = 10;
 
@@ -371,6 +380,7 @@ public class SettingsObmenActivity extends BaseActivity {
             clientsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Point point: pointIterator.point)
             {
+                System.out.println(point.latitude+" "+point.longitude);
                 Client client = new Client(point.guid,point.description,point.address, point.phoneNumber,point.latitude,point.longitude,point.debt);
                 client.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 clientsArray.add(client);
@@ -378,7 +388,7 @@ public class SettingsObmenActivity extends BaseActivity {
            }
             System.out.println("Clients: Done");
 
-            publishProgress("Загрузка товаров... 30%");
+            publishProgress("Загрузка товаров...");
             // getting tovar
 
             Items items = exchangeData.items;
@@ -386,13 +396,13 @@ public class SettingsObmenActivity extends BaseActivity {
             itemsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (kg.soulsb.ayu.grpctest.nano.Item item: items.item)
             {
-                Item item1 = new Item(item.guid,item.description,item.unit, item.price,item.stock);
+                Item item1 = new Item(item.guid,item.description,item.unit, item.price,item.stock,item.category);
                 item1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 itemsArray.add(item1);
                 itemsRepo.insert(item1);
             }
             System.out.println("Items: Done");
-            publishProgress("Загрузка складов... 40%");
+            publishProgress("Загрузка складов...");
             // getting warehouses
             Warehouses warehouses = exchangeData.warehouses;
             WarehousesRepo warehousesRepo = new WarehousesRepo();
@@ -405,21 +415,21 @@ public class SettingsObmenActivity extends BaseActivity {
                 warehousesRepo.insert(warehouse1);
             }
             System.out.println("Warehouses: Done");
-            publishProgress("Загрузка договоров... 50%");
+            publishProgress("Загрузка договоров...");
             // getting contracts
             Contracts contracts = exchangeData.contracts;
             ContractsRepo contractsRepo = new ContractsRepo();
             contractsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Contract contract: contracts.contract)
             {
-                kg.soulsb.ayu.models.Contract contract1 = new kg.soulsb.ayu.models.Contract(contract.guid,contract.description,contract.pointGuid);
+                kg.soulsb.ayu.models.Contract contract1 = new kg.soulsb.ayu.models.Contract(contract.guid,contract.description,contract.pointGuid,contract.itemCategory);
                 contract1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 contractsArray.add(contract1);
                 contractsRepo.insert(contract1);
             }
             System.out.println("Contracts: Done");
 
-            publishProgress("Загрузка организации... 60%");
+            publishProgress("Загрузка организации...");
             // getting Organization
             Organizations organizations = exchangeData.organizations;
             OrganizationsRepo organizationsRepo = new OrganizationsRepo();
@@ -432,7 +442,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 organizationsRepo.insert(organization1);
             }
             System.out.println("Organization: Done");
-            publishProgress("Загрузка типов цен... 70%");
+            publishProgress("Загрузка типов цен...");
             // getting price types
             PriceTypes priceTypes = exchangeData.priceTypes;
             PriceTypesRepo priceTypesRepo = new PriceTypesRepo();
@@ -445,7 +455,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 priceTypesRepo.insert(priceType1);
             }
             System.out.println("Price types: Done");
-            publishProgress("Загрузка цен... 80%");
+            publishProgress("Загрузка цен...");
             // getting prices
             Prices prices = exchangeData.prices;
             PricesRepo pricesRepo = new PricesRepo();
@@ -458,7 +468,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 pricesRepo.insert(price1);
             }
             System.out.println("Price: Done");
-            publishProgress("Загрузка остатков... 90%");
+            publishProgress("Загрузка остатков...");
             // getting Stocks
             Stocks stocks = exchangeData.stocks;
             StocksRepo stocksRepo = new StocksRepo();
@@ -471,7 +481,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 stocksRepo.insert(stock1);
             }
             System.out.println("Stock: Done");
-            publishProgress("Загрузка отчетов... 97%");
+            publishProgress("Загрузка отчетов...");
             //getting reports
             Reports reports = exchangeData.reports;
             ReportsRepo reportsRepo = new ReportsRepo();
@@ -523,7 +533,7 @@ public class SettingsObmenActivity extends BaseActivity {
             }
 
             if (pointIterator != null){
-                loadingComment.setText("Загружено... " + 100 + "%");
+                loadingComment.setText("Загружено!");
                 // Сохранить дату последнего обмена
                 SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();

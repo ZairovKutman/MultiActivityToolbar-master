@@ -140,6 +140,19 @@ public class BaseActivity extends AppCompatActivity implements
                 nav_item2 = menuNav.findItem(R.id.nav_orders);
                 nav_item2.setEnabled(true);
             }
+
+            if (sharedPreferences.getString(UserSettings.can_create_payment,"true").equals("false"))
+            {
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_pay);
+                nav_item2.setEnabled(false);
+            }
+            else
+            {
+                menuNav=navigationView.getMenu();
+                nav_item2 = menuNav.findItem(R.id.nav_pay);
+                nav_item2.setEnabled(true);
+            }
         }
         setBaseAgentName();
     }

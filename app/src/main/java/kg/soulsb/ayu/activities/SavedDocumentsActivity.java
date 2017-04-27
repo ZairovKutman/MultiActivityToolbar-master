@@ -1,12 +1,16 @@
 package kg.soulsb.ayu.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -19,11 +23,12 @@ import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 public class SavedDocumentsActivity extends BaseActivity {
-
+    AlertDialog.Builder d;
     ListView listViewDocuments;
     ArrayList<Order> orderArrayList;
     ArrayAdapter<Order> arrayAdapter;
     Spinner otborSpinner;
+    AlertDialog alertDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,14 +97,56 @@ public class SavedDocumentsActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getBaseContext(),OrderAddActivity.class);
-                intent.putExtra("doctype",orderArrayList.get(i).getDoctype());
-                intent.putExtra("savedobj", orderArrayList.get(i));
-                if (orderArrayList.get(i).isDelivered())
-                {
-                    intent.putExtra("isDelivered","true");
+
+                if (!orderArrayList.get(i).getDoctype().equals("2")) {
+                    Intent intent = new Intent(SavedDocumentsActivity.this, OrderAddActivity.class);
+                    intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
+                    intent.putExtra("savedobj", orderArrayList.get(i));
+                    if (orderArrayList.get(i).isDelivered()) {
+                        intent.putExtra("isDelivered", "true");
+                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 }
-                startActivity(intent);
+                else
+                {
+                    Intent intent = new Intent(SavedDocumentsActivity.this, PayActivity.class);
+                    intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
+                    intent.putExtra("savedobj", orderArrayList.get(i));
+                    if (orderArrayList.get(i).isDelivered()) {
+                        intent.putExtra("isDelivered", "true");
+                    }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            }
+        });
+
+        listViewDocuments.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                d = new AlertDialog.Builder(SavedDocumentsActivity.this);
+
+                d.setTitle("Подтвердите удаление");
+                d.setMessage("Вы действительно хотите удалить данный документ?");
+                d.setCancelable(false);
+                alertDialog = d.create();
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.out.println("yo yes!");
+                    }
+                });
+
+                alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.out.println("yo no!");
+                    }
+                });
+
+                alertDialog.show();
+                return true;
             }
         });
 
