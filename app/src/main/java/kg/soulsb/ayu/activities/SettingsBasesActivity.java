@@ -50,6 +50,11 @@ public class SettingsBasesActivity extends BaseActivity {
     SharedPreferences sharedPreferences;
 
     @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_bases);
@@ -123,10 +128,9 @@ public class SettingsBasesActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_settings:
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 

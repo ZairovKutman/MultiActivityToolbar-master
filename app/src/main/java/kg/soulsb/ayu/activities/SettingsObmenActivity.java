@@ -43,6 +43,7 @@ import kg.soulsb.ayu.grpctest.nano.Reports;
 import kg.soulsb.ayu.grpctest.nano.Settings;
 import kg.soulsb.ayu.grpctest.nano.Stock;
 import kg.soulsb.ayu.grpctest.nano.Stocks;
+import kg.soulsb.ayu.grpctest.nano.Units;
 import kg.soulsb.ayu.grpctest.nano.Warehouse;
 import kg.soulsb.ayu.grpctest.nano.Warehouses;
 import kg.soulsb.ayu.helpers.DBHelper;
@@ -58,6 +59,7 @@ import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
 import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
+import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
@@ -71,6 +73,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.grpctest.nano.Price;
 import kg.soulsb.ayu.models.Order;
+import kg.soulsb.ayu.models.Unit;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
@@ -88,7 +91,7 @@ public class SettingsObmenActivity extends BaseActivity {
     TextView loadingComment;
     TextView lastObmenText;
     TextView textViewEmpty;
-    Button loadButton,loadOnlyDocButton;
+    Button loadButton,loadOnlyDocButton,loadStockButton;
     int globalCounter = 0;
     Baza baza = null;
     String currentBaseString;
@@ -96,6 +99,15 @@ public class SettingsObmenActivity extends BaseActivity {
     ArrayAdapter<Order> arrayAdapter;
     ArrayList<Order> arrayList = new ArrayList<>();
     boolean fullObmen = false;
+    boolean onlyOstatki = false;
+    boolean onlyDocs = false;
+    String errorMessage="";
+
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +119,7 @@ public class SettingsObmenActivity extends BaseActivity {
         loadingComment = (TextView) findViewById(R.id.loading_comment);
         lastObmenText = (TextView) findViewById(R.id.last_obmen_text);
         loadButton = (Button) findViewById(R.id.button);
+        loadStockButton = (Button) findViewById(R.id.button_update_stocks);
         loadOnlyDocButton = (Button) findViewById(R.id.button_only_documents);
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
         textViewEmpty = (TextView) findViewById(R.id.textViewEmpty);
@@ -160,6 +173,28 @@ public class SettingsObmenActivity extends BaseActivity {
         else
             textView.setText("Используемая база: Создайте базу данных");
 
+        // BUTTON STOCKS
+        loadStockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (baza!= null) {
+                    loadingComment.setText("Подключение... "+"5%");
+                    try {
+                        fullObmen = false;
+                        onlyOstatki = true;
+                        onlyDocs = false;
+                        loadButton.setEnabled(false);
+                        loadOnlyDocButton.setEnabled(false);
+                        loadStockButton.setEnabled(false);
+                        doFullObmen();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }}
+                else{
+                    Toast.makeText(getBaseContext(),"Создайте базу данных",Toast.LENGTH_SHORT).show();}
+            }
+        });
+
         loadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -167,8 +202,11 @@ public class SettingsObmenActivity extends BaseActivity {
                 loadingComment.setText("Подключение... "+"5%");
                 try {
                     fullObmen = true;
+                    onlyOstatki = false;
+                    onlyDocs = false;
                     loadButton.setEnabled(false);
                     loadOnlyDocButton.setEnabled(false);
+                    loadStockButton.setEnabled(false);
                     doFullObmen();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -185,8 +223,11 @@ public class SettingsObmenActivity extends BaseActivity {
                     loadingComment.setText("Подключение... "+"5%");
                     try {
                         fullObmen = false;
+                        onlyOstatki = true;
+                        onlyDocs = true;
                         loadButton.setEnabled(false);
                         loadOnlyDocButton.setEnabled(false);
+                        loadStockButton.setEnabled(false);
                         doFullObmen();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -233,10 +274,10 @@ public class SettingsObmenActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_settings_obmen:
-                return true;
-        }
+
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -269,11 +310,13 @@ public class SettingsObmenActivity extends BaseActivity {
             publishProgress("Проверка устройства в базе данных...");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
+
             if (!deviceStatus.active) {
                 publishProgress("Ошибка, доступ с этого телефона запрещен.");
                 return null;
             }
 
+            if (onlyDocs || fullObmen) {
             //
             publishProgress("Выгрузка документов...");
 
@@ -299,10 +342,11 @@ public class SettingsObmenActivity extends BaseActivity {
                 int counter = 0;
                 for (Item item : itemsList) {
                     PurchDocLine line = new PurchDocLine();
-                    line.amount = item.getQuantity() * item.getPrice();
+                    line.amount = item.getQuantity() * item.getPrice() * item.getMyUnit().getCoefficient();
                     line.itemGuid = item.getGuid();
-                    line.price = item.getPrice();
+                    line.price = item.getPrice() * item.getMyUnit().getCoefficient();
                     line.quantity = item.getQuantity();
+                    line.unit = item.getMyUnit().getUnitGuid();
 
                     purchDocLines[counter] = line;
                     counter++;
@@ -312,20 +356,42 @@ public class SettingsObmenActivity extends BaseActivity {
 
                 docPurchArray[arrayList.indexOf(order)] = docPurch;
             }
-            if (arrayList.size() > 0){
+            if (arrayList.size() > 0) {
                 Docs docs = new Docs();
                 docs.doc = docPurchArray;
                 DocsStatus docsStatus = blockingStub.getDocuments(docs);
 
-                for (int i=0;i<docsStatus.docsStatus.length;i++) {
-                    if (docsStatus.docsStatus[i].operationStatus.status == 0)
-                    {
+                for (int i = 0; i < docsStatus.docsStatus.length; i++) {
+                    if (docsStatus.docsStatus[i].operationStatus.status == 0) {
                         new OrdersRepo().setDocDelivered(docsStatus.docsStatus[i].docId, true);
-                        System.out.println("DOCUMENTS DELIVERED: "+docsStatus.docsStatus[i].operationStatus.status+"$"+docsStatus.docsStatus[i].operationStatus.comment);
+                        System.out.println("DOCUMENTS DELIVERED: " + docsStatus.docsStatus[i].operationStatus.status + "$" + docsStatus.docsStatus[i].operationStatus.comment);
+                    }
+                    else
+                    {
+                      errorMessage=errorMessage+"\n"+ docsStatus.docsStatus[i].operationStatus.comment;
                     }
                 }
             }
             //Конец выгрузки документов
+            }
+
+            if (onlyOstatki) {
+                ArrayList<kg.soulsb.ayu.models.Stock> stocksArray = new ArrayList<>();
+                publishProgress("Загрузка остатков...");
+                // getting Stocks
+                Stocks stocks = blockingStub.getStock(request);
+                StocksRepo stocksRepo = new StocksRepo();
+                stocksRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+                for (Stock stock : stocks.stock) {
+                    kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item, stock.warehouse, stock.stock);
+                    stock1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
+                    stocksArray.add(stock1);
+                    stocksRepo.insert(stock1);
+                }
+                System.out.println("Stock: Done");
+                return new Points();
+            }
+
             if (!fullObmen)
             {
                 return new Points();
@@ -365,6 +431,7 @@ public class SettingsObmenActivity extends BaseActivity {
 
             ArrayList<Client> clientsArray = new ArrayList<>();
             ArrayList<Item> itemsArray = new ArrayList<>();
+            ArrayList<Unit> unitsArray = new ArrayList<>();
             ArrayList<kg.soulsb.ayu.models.Warehouse> warehousesArray = new ArrayList<>();
             ArrayList<kg.soulsb.ayu.models.Contract> contractsArray = new ArrayList<>();
             ArrayList<kg.soulsb.ayu.models.PriceType> pricetypesArray = new ArrayList<>();
@@ -402,6 +469,24 @@ public class SettingsObmenActivity extends BaseActivity {
                 itemsRepo.insert(item1);
             }
             System.out.println("Items: Done");
+
+
+            publishProgress("Загрузка единиц измерения...");
+            // getting units
+
+            Units units = exchangeData.units;
+            UnitsRepo unitsRepo = new UnitsRepo();
+            unitsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+
+            for (kg.soulsb.ayu.grpctest.nano.Unit unit: units.unit)
+            {
+                Unit unit1 = new Unit(unit.guid,unit.item,unit.coefficient,unit.description,unit.default_);
+                unit1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
+                unitsArray.add(unit1);
+                unitsRepo.insert(unit1);
+            }
+            System.out.println("Units: Done");
+
             publishProgress("Загрузка складов...");
             // getting warehouses
             Warehouses warehouses = exchangeData.warehouses;
@@ -560,6 +645,7 @@ public class SettingsObmenActivity extends BaseActivity {
             arrayAdapter.notifyDataSetChanged();
             loadButton.setEnabled(true);
             loadOnlyDocButton.setEnabled(true);
+            loadStockButton.setEnabled(true);
 
             if (arrayList.isEmpty())
             {
@@ -568,6 +654,11 @@ public class SettingsObmenActivity extends BaseActivity {
             else{
                 textViewEmpty.setVisibility(View.INVISIBLE);
             }
+            if (!errorMessage.equals(""))
+            {
+                loadingComment.setText(errorMessage);
+            }
+            errorMessage="";
         }
     }
 

@@ -58,6 +58,8 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
         }
 
         Item Tovar = data.get(position);
+        if (Tovar == null)
+            return null;
         holder.txtTitle.setText(Tovar.getName());
 
         if (Tovar.getPrice() != 0)
@@ -66,11 +68,13 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
             holder.txtPrice.setText("");
 
         holder.txtStock.setText("ост: "+Double.toString(Tovar.getStock())+" "+Tovar.getUnit());
+
         if (Tovar.getQuantity() == 0)
             holder.txtQuantity.setText("");
-        else
-            holder.txtQuantity.setText("кол-во: "+Tovar.getQuantity()+" "+Tovar.getUnit());
-
+        else {
+            holder.txtQuantity.setText("кол-во: " + Tovar.getQuantity() + " " + Tovar.getMyUnit().getName());
+            holder.txtPrice.setText("Цена: "+Double.toString(Tovar.getPrice()*Tovar.getMyUnit().getCoefficient())+" сом");
+        }
         if (Tovar.getSum() == 0)
             holder.txtSum.setText("");
         else
@@ -97,6 +101,8 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
                         Item item=data.get(i);
                         //do whatever you wanna do here
                         //adding result set output array
+                        if (item == null) break;
+
                         if (item.toString().toLowerCase().contains(constraint.toString().toLowerCase()))
                             tempList.add(item);
                         i++;
@@ -112,8 +118,18 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence contraint, FilterResults results) {
+
+
                 data.clear();
-                data.addAll((ArrayList<Item>) results.values);
+                try {
+                    data.addAll((ArrayList<Item>) results.values);
+                }
+                catch (Exception E)
+                {
+                    E.printStackTrace();
+                    notifyDataSetInvalidated();
+                }
+
                 if (results.count > 0) {
                     notifyDataSetChanged();
                 } else {
@@ -134,4 +150,10 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
         TextView txtSum;
     }
 
+    @Override
+    public void notifyDataSetChanged() {
+        originalData.clear();
+        originalData.addAll(data);
+        super.notifyDataSetChanged();
+    }
 }

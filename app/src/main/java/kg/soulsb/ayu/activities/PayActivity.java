@@ -53,12 +53,10 @@ import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.models.Contract;
-import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.models.Organization;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.CurrentLocationClass;
-import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
@@ -319,6 +317,9 @@ public class PayActivity extends BaseActivity {
         }
 
         docId = order1.getOrderID();
+        if (order1.isDelivered())
+            disableButtons();
+
     }
 
 
@@ -396,6 +397,9 @@ public class PayActivity extends BaseActivity {
     }
 
     private void disableButtons() {
+        Toast.makeText(PayActivity.this,"Документ выгружен, редактрование запрещено.",Toast.LENGTH_SHORT).show();
+
+        editTextSum.setFocusable(false);
         editTextDate.setEnabled(false);
         editText_client.setEnabled(false);
         editText_organization.setEnabled(false);
@@ -428,12 +432,17 @@ public class PayActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_pay:
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
 
 
     private class GrpcTask extends AsyncTask<Void, Void, Points> {
@@ -536,7 +545,6 @@ public class PayActivity extends BaseActivity {
         order.setOrderID(docId);
         order.setBaza(CurrentBaseClass.getInstance().getCurrentBaseObject());
         order.setClient(clientGUID);
-        order.setComment(DataHolderClass.getInstance().getAddOrderComments());
         order.setDate(editTextDate.getText().toString());
         order.setDoctype(Integer.toString(docType));
         order.setDogovor(arrayListContract.get(spinner_contract.getSelectedItemPosition()).getGuid());

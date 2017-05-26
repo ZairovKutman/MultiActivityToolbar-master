@@ -156,8 +156,6 @@ public class BaseDetailActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == R.id.nav)
-//            return true;
 
         if (item.getItemId() == android.R.id.home)
             onBackPressed();

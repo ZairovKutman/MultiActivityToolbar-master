@@ -3,10 +3,10 @@
     style="?android:attr/spinnerItemStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
+    android:layout_margin="2dp"
     android:ellipsize="marquee"
-    android:singleLine="true"
-    android:textSize="16sp"
-    android:textAlignment="inherit"
+    android:gravity="center_vertical"
     android:padding="5dp"
-    />
+    android:singleLine="true"
+    android:textAlignment="inherit"
+    android:textSize="16sp" />

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
-import kg.soulsb.ayu.models.Report;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 /**
@@ -43,12 +42,17 @@ public class OrdersRepo {
 
     public static String createItemTable(){
 
-        return"CREATE TABLE IF NOT EXISTS " + Order.TABLE_ITEM  + " ("
+        return "CREATE TABLE IF NOT EXISTS " + Order.TABLE_ITEM  + " ("
                 + Item.KEY_ItemId + "   PRIMARY KEY    ,"
                 + Item.KEY_Guid  + "   TEXT    ,"
+                + Item.KEY_Unit  + "   TEXT    ,"
+                + Item.KEY_UnitGUID  + "   TEXT    ,"
+                + Item.KEY_isDelivered  + "   TEXT    ,"
                 + Item.KEY_Name  + "   TEXT    ,"
                 + Item.KEY_Price  + "   TEXT    ,"
                 + Item.KEY_Quantity  + "   TEXT    ,"
+                + Order.KEY_warehouse  + "   TEXT    ,"
+                + Item.KEY_Sum  + "   TEXT    ,"
                 + Order.KEY_OrderID  + "   TEXT);";
     }
 
@@ -92,10 +96,14 @@ public class OrdersRepo {
                 values = new ContentValues();
                 values.put(Order.KEY_OrderID, order.getOrderID());
                 values.put(Item.KEY_Guid, item.getGuid());
+                values.put(Item.KEY_isDelivered, Boolean.toString(order.isDelivered()));
                 values.put(Item.KEY_Name, item.getName());
                 values.put(Item.KEY_Price, item.getPrice());
                 values.put(Item.KEY_Quantity, item.getQuantity());
                 values.put(Item.KEY_ItemId, item.getItemId());
+                values.put(Item.KEY_Sum, item.getSum());
+                values.put(Order.KEY_warehouse,order.getWarehouse());
+                values.put(Item.KEY_UnitGUID,item.getMyUnit().getUnitGuid());
                 // Inserting Row
                 orderId = (int) db.insert(Order.TABLE_ITEM, null, values);
             }
@@ -168,6 +176,9 @@ public class OrdersRepo {
                         + ", "+Item.KEY_Price
                         + ", "+Item.KEY_Quantity
                         + ", "+Item.KEY_ItemId
+                        + ", "+Item.KEY_Sum
+                        + ", "+Item.KEY_Unit
+                        + ", "+Item.KEY_UnitGUID
                         + " FROM " + Order.TABLE_ITEM
                         + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
 
@@ -180,7 +191,9 @@ public class OrdersRepo {
                         item.setName(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Name)));
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
+                        item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
                         item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
                 }
@@ -200,12 +213,16 @@ public class OrdersRepo {
     public void setDocDelivered(String orderID, boolean b) {
             db = DatabaseManager.getInstance().openDatabase();
             ContentValues values = new ContentValues();
+            ContentValues values2 = new ContentValues();
 
             values.put(Order.KEY_isDelivered, Boolean.toString(b));
+            values2.put(Item.KEY_isDelivered, Boolean.toString(b));
 
             String whereClause = Order.KEY_OrderID + " = '"+orderID+"'";
+            String whereClause2 = Order.KEY_OrderID + " = '"+orderID+"'";
             // Inserting Row
             db.update(Order.TABLE, values, whereClause, null);
+            db.update(Order.TABLE_ITEM, values2, whereClause2, null);
             DatabaseManager.getInstance().closeDatabase();
     }
 
@@ -265,6 +282,9 @@ public class OrdersRepo {
                         + ", "+Item.KEY_Price
                         + ", "+Item.KEY_Quantity
                         + ", "+Item.KEY_ItemId
+                        + ", "+Item.KEY_Unit
+                        + ", "+Item.KEY_UnitGUID
+                        + ", "+Item.KEY_Sum
                         + " FROM " + Order.TABLE_ITEM
                         + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
 
@@ -277,7 +297,9 @@ public class OrdersRepo {
                         item.setName(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Name)));
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
+                        item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
                         item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
                 }
@@ -296,7 +318,11 @@ public class OrdersRepo {
     public void deleteDocDelivered() {
         db = DatabaseManager.getInstance().openDatabase();
         String whereClause = Order.KEY_isDelivered + " = '"+"true"+"' AND "+Order.KEY_BAZA+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
+        String whereClause2 = Item.KEY_isDelivered + " = '"+"true'";
+
         db.delete(Order.TABLE,whereClause,null);
+        db.delete(Order.TABLE_ITEM,whereClause2,null);
+
         db.close();
     }
 }

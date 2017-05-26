@@ -55,6 +55,11 @@ public class ReportsActivity extends BaseActivity {
     ProgressBar progressBar;
     AlertDialog alertDialog;
 
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,10 +258,9 @@ public class ReportsActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_reports:
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 

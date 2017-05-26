@@ -69,11 +69,15 @@ public class ItemsTableActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_catalog:
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
     }
 
     @Override

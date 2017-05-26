@@ -18,19 +18,4 @@ public class DataHolderClass {
     }
     private String addOrderComments;
     private String addOrderDateOtgruzki;
-    public String getAddOrderComments() {
-        return addOrderComments;
-    }
-
-    public void setAddOrderComments(String addOrderComments) {
-        this.addOrderComments = addOrderComments;
-    }
-
-    public String getAddOrderDateOtgruzki() {
-        return addOrderDateOtgruzki;
-    }
-
-    public void setAddOrderDateOtgruzki(String addOrderDateOtgruzki) {
-        this.addOrderDateOtgruzki = addOrderDateOtgruzki;
-    }
 }

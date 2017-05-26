@@ -3,6 +3,7 @@ package kg.soulsb.ayu.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -29,11 +31,25 @@ public class SavedDocumentsActivity extends BaseActivity {
     ArrayAdapter<Order> arrayAdapter;
     Spinner otborSpinner;
     AlertDialog alertDialog;
+    TextView totalSumDelivered_textView;
+    TextView totalSumNotDelivered_textView;
+    TextView totalSum_textView;
+    double totalSumDelivered = 0;
+    double totalSumNotDelivered = 0;
+    double totalSum = 0;
+
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_documents);
-
+        totalSumDelivered_textView = (TextView) findViewById(R.id.totalDelivered_listview);
+        totalSumNotDelivered_textView = (TextView) findViewById(R.id.totalNotDelivered_listview);
+        totalSum_textView = (TextView) findViewById(R.id.total_listview);
 
         // Создаем отбор
         otborSpinner = (Spinner) findViewById(R.id.spinner_otbor);
@@ -41,46 +57,16 @@ public class SavedDocumentsActivity extends BaseActivity {
         otborArrayList.add("Все документы");
         otborArrayList.add("Выгруженные документы");
         otborArrayList.add("Невыгруженные документы");
-        ArrayAdapter<String> otborAdapter = new ArrayAdapter<String>(this,R.layout.baza_spinner_item,otborArrayList);
+        otborArrayList.add("Заказы");
+        otborArrayList.add("Продажи");
+        otborArrayList.add("Оплаты");
+        final ArrayAdapter<String> otborAdapter = new ArrayAdapter<String>(this,R.layout.baza_spinner_item,otborArrayList);
         otborSpinner.setAdapter(otborAdapter);
 
         otborSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (otborSpinner.getItemAtPosition(position).equals("Выгруженные документы"))
-                {
-                    ArrayList<Order> arrayList2 = new ArrayList<>();
-                    for (Order item: orderArrayList)
-                    {
-                        if (item.isDelivered())
-                        {
-                            arrayList2.add(item);
-                        }
-                    }
-                    arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, arrayList2);
-                    listViewDocuments.setAdapter(arrayAdapter);
-                    arrayAdapter.notifyDataSetChanged();
-                }
-                else if (otborSpinner.getItemAtPosition(position).equals("Невыгруженные документы"))
-                {
-                    ArrayList<Order> arrayList2 = new ArrayList<>();
-                    for (Order item: orderArrayList)
-                    {
-                        if (!item.isDelivered())
-                        {
-                            arrayList2.add(item);
-                        }
-                    }
-                    arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, arrayList2);
-                    listViewDocuments.setAdapter(arrayAdapter);
-                    arrayAdapter.notifyDataSetChanged();
-                }
-                else
-                {
-                    arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, orderArrayList);
-                    listViewDocuments.setAdapter(arrayAdapter);
-                    arrayAdapter.notifyDataSetChanged();
-                }
+                showContentUpdates(position);
             }
 
             @Override
@@ -124,17 +110,23 @@ public class SavedDocumentsActivity extends BaseActivity {
 
         listViewDocuments.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 d = new AlertDialog.Builder(SavedDocumentsActivity.this);
 
                 d.setTitle("Подтвердите удаление");
                 d.setMessage("Вы действительно хотите удалить данный документ?");
+
                 d.setCancelable(false);
                 alertDialog = d.create();
                 alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Да", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        System.out.println("yo yes!");
+                        OrdersRepo ordersRepo = new OrdersRepo();
+                        ordersRepo.delete(orderArrayList.get(position));
+                        orderArrayList.remove(position);
+                        arrayAdapter.notifyDataSetChanged();
+                        showContentUpdates(otborSpinner.getSelectedItemPosition());
+
                     }
                 });
 
@@ -145,6 +137,12 @@ public class SavedDocumentsActivity extends BaseActivity {
                     }
                 });
 
+                alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.RED);
+                    }
+                });
                 alertDialog.show();
                 return true;
             }
@@ -152,13 +150,157 @@ public class SavedDocumentsActivity extends BaseActivity {
 
     }
 
+    private void showContentUpdates(int position) {
+        totalSum = 0;
+        totalSumDelivered = 0;
+        totalSumNotDelivered = 0;
+        totalSumDelivered_textView.setVisibility(View.VISIBLE);
+        totalSumNotDelivered_textView.setVisibility(View.VISIBLE);
+        if (otborSpinner.getItemAtPosition(position).equals("Выгруженные документы"))
+        {
+            ArrayList<Order> arrayList2 = new ArrayList<>();
+            for (Order item: orderArrayList)
+            {
+                if (item.isDelivered())
+                {
+                    arrayList2.add(item);
+                    totalSum = totalSum + item.getTotalSum();
+                }
+            }
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, arrayList2);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSum_textView.setText("Итого: "+totalSum);
+            totalSumDelivered_textView.setVisibility(View.INVISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.INVISIBLE);
+        }
+        else if (otborSpinner.getItemAtPosition(position).equals("Невыгруженные документы"))
+        {
+            ArrayList<Order> arrayList2 = new ArrayList<>();
+            for (Order item: orderArrayList)
+            {
+
+                if (!item.isDelivered())
+                {
+                    arrayList2.add(item);
+                    totalSum = totalSum + item.getTotalSum();
+                }
+            }
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, arrayList2);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSumDelivered_textView.setVisibility(View.INVISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.INVISIBLE);
+            totalSum_textView.setText("Итого: "+totalSum);
+        }
+        else if (otborSpinner.getItemAtPosition(position).equals("Заказы")) {
+            ArrayList<Order> arrayList2 = new ArrayList<>();
+            for (Order item : orderArrayList) {
+                if (item.getDoctype().equals("0")) {
+                    arrayList2.add(item);
+
+                    totalSum = totalSum + item.getTotalSum();
+                    if (item.isDelivered())
+                    {
+                        totalSumDelivered = totalSumDelivered + item.getTotalSum();
+                    }
+                    else
+                    {
+                        totalSumNotDelivered = totalSumNotDelivered + item.getTotalSum();
+                    }
+                }
+            }
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this, R.layout.list_docs_layout, arrayList2);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSumDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumDelivered_textView.setText("Итого выгруженных: "+totalSumDelivered);
+            totalSumNotDelivered_textView.setText("Итого невыгруженных: "+totalSumNotDelivered);
+            totalSum_textView.setText("Общий итог: "+totalSum);
+        }
+        else if (otborSpinner.getItemAtPosition(position).equals("Продажи")) {
+            ArrayList<Order> arrayList2 = new ArrayList<>();
+            for (Order item : orderArrayList) {
+                if (item.getDoctype().equals("1")) {
+                    arrayList2.add(item);
+                    totalSum = totalSum + item.getTotalSum();
+                    if (item.isDelivered())
+                    {
+                        totalSumDelivered = totalSumDelivered + item.getTotalSum();
+                    }
+                    else
+                    {
+                        totalSumNotDelivered = totalSumNotDelivered + item.getTotalSum();
+                    }
+                }
+            }
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this, R.layout.list_docs_layout, arrayList2);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSumDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumDelivered_textView.setText("Итого выгруженных: "+totalSumDelivered);
+            totalSumNotDelivered_textView.setText("Итого невыгруженных: "+totalSumNotDelivered);
+            totalSum_textView.setText("Общий итог: "+totalSum);
+        }
+        else if (otborSpinner.getItemAtPosition(position).equals("Оплаты")) {
+            ArrayList<Order> arrayList2 = new ArrayList<>();
+            for (Order item : orderArrayList) {
+                if (item.getDoctype().equals("2")) {
+                    arrayList2.add(item);
+                    totalSum = totalSum + item.getTotalSum();
+                    if (item.isDelivered())
+                    {
+                        totalSumDelivered = totalSumDelivered + item.getTotalSum();
+                    }
+                    else
+                    {
+                        totalSumNotDelivered = totalSumNotDelivered + item.getTotalSum();
+                    }
+                }
+            }
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this, R.layout.list_docs_layout, arrayList2);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSumDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumDelivered_textView.setText("Итого выгруженных: "+totalSumDelivered);
+            totalSumNotDelivered_textView.setText("Итого невыгруженных: "+totalSumNotDelivered);
+            totalSum_textView.setText("Общий итог: "+totalSum);
+        }
+        else
+        {
+            for (Order item: orderArrayList)
+            {
+                totalSum = totalSum + item.getTotalSum();
+                if (item.isDelivered())
+                {
+                    totalSumDelivered = totalSumDelivered + item.getTotalSum();
+                }
+                else
+                {
+                    totalSumNotDelivered = totalSumNotDelivered + item.getTotalSum();
+                }
+            }
+
+            arrayAdapter = new OrderAdapter(SavedDocumentsActivity.this,R.layout.list_docs_layout, orderArrayList);
+            listViewDocuments.setAdapter(arrayAdapter);
+            arrayAdapter.notifyDataSetChanged();
+            totalSumDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumNotDelivered_textView.setVisibility(View.VISIBLE);
+            totalSumDelivered_textView.setText("Итого выгруженных: "+totalSumDelivered);
+            totalSumNotDelivered_textView.setText("Итого невыгруженных: "+totalSumNotDelivered);
+            totalSum_textView.setText("Общий итог: "+totalSum);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
-            case R.id.nav_journal:
-                return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 

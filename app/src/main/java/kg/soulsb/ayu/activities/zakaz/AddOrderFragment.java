@@ -34,6 +34,8 @@ import kg.soulsb.ayu.grpctest.nano.DocPurch;
 import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
+import kg.soulsb.ayu.grpctest.nano.Stock;
+import kg.soulsb.ayu.grpctest.nano.Stocks;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
@@ -42,6 +44,7 @@ import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
+import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
@@ -83,6 +86,7 @@ public class AddOrderFragment extends Fragment {
     String clientLong="0";
     ArrayList<Contract> arrayListContract;
     EditText editText;
+    EditText editTextDostavka;
     ArrayAdapter<Contract> arrayAdapterContract;
     ArrayAdapter<String> arrayAdapterContractNull;
     ArrayList<Warehouse> arrayListWarehouse;
@@ -97,7 +101,7 @@ public class AddOrderFragment extends Fragment {
     String docId;
     Contract previous=new Contract();
     Contract current=null;
-    boolean firstLaunch = true;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -113,6 +117,41 @@ public class AddOrderFragment extends Fragment {
                 startActivityForResult(dateintent, REQUEST_CODE);
             }
         });
+
+
+        editTextDostavka = (EditText) v.findViewById(R.id.delivery_date);
+        editTextDostavka.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar mcurrentDate = Calendar.getInstance();
+                mYear = mcurrentDate.get(Calendar.YEAR);
+                mMonth = mcurrentDate.get(Calendar.MONTH);
+                mDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog mDatePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
+                        Calendar myCalendar = Calendar.getInstance();
+                        myCalendar.set(Calendar.YEAR, selectedyear);
+                        myCalendar.set(Calendar.MONTH, selectedmonth);
+                        myCalendar.set(Calendar.DAY_OF_MONTH, selectedday);
+                        String myFormat = "dd/MM/yyyy";
+                        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+                        editTextDostavka.setText(sdf.format(myCalendar.getTime()));
+
+                        mDay = selectedday;
+                        mMonth = selectedmonth;
+                        mYear = selectedyear;
+                    }
+                }, mYear, mMonth, mDay);
+                mDatePicker.setTitle("Выберите дату");
+                mDatePicker.show();
+            }
+        });
+        Calendar myCalendar = Calendar.getInstance();
+        String myFormat = "dd/MM/yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+        myCalendar.setTimeInMillis(myCalendar.getTimeInMillis()+86400000);
+        editTextDostavka.setText(sdf.format(myCalendar.getTime()));
 
         editText = (EditText) v.findViewById(R.id.order_date);
         // Set default Date
@@ -320,6 +359,7 @@ public class AddOrderFragment extends Fragment {
 
     private void disableButtons() {
         editText.setEnabled(false);
+        editTextDostavka.setEnabled(false);
         editText_client.setEnabled(false);
         editText_organization.setEnabled(false);
         spinner_contract.setEnabled(false);
@@ -382,8 +422,8 @@ public class AddOrderFragment extends Fragment {
         spinner_contract.setAdapter(arrayAdapterContract);
         docId = parentActivity.order.getOrderID();
         editText.setText(parentActivity.order.getDate());
-        DataHolderClass.getInstance().setAddOrderDateOtgruzki(parentActivity.order.getDateSend());
-        DataHolderClass.getInstance().setAddOrderComments(parentActivity.order.getComment());
+        editTextDostavka.setText(parentActivity.order.getDateSend());
+        parentActivity.othersFragment.comments.setText(parentActivity.order.getComment());
 
         for (Contract contract: arrayListContract)
         {
@@ -476,7 +516,7 @@ public class AddOrderFragment extends Fragment {
 
 
 
-    private class GrpcTask extends AsyncTask<Void, Void, Points> {
+    private class GrpcTask extends AsyncTask<Void, String, Points> {
         private ManagedChannel mChannel;
         private String name;
 
@@ -505,6 +545,7 @@ public class AddOrderFragment extends Fragment {
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
             if (!deviceStatus.active) {
+                publishProgress("Доступ с телефона запрещен");
                 return null;
             }
 
@@ -512,8 +553,8 @@ public class AddOrderFragment extends Fragment {
             docPurch.organizationGuid = arrayListOrganization.get(editText_organization.getSelectedItemPosition()).getGuid();
             docPurch.agent = name;
             docPurch.clientGuid = clientGUID;
-            docPurch.comment = DataHolderClass.getInstance().getAddOrderComments();
-            docPurch.deliveryDate = DataHolderClass.getInstance().getAddOrderDateOtgruzki();
+            docPurch.comment = parentActivity.othersFragment.comments.getText().toString();
+            docPurch.deliveryDate = editTextDostavka.getText().toString();
             docPurch.contractGuid = arrayListContract.get(spinner_contract.getSelectedItemPosition()).getGuid();
             docPurch.date = editText.getText().toString();
             docPurch.warehouseGuid = arrayListWarehouse.get(spinner_warehouse.getSelectedItemPosition()).getGuid();
@@ -529,11 +570,11 @@ public class AddOrderFragment extends Fragment {
             for (Item item: orderedItemsArrayList)
             {
                 PurchDocLine line = new PurchDocLine();
-                line.amount = item.getQuantity() * item.getPrice();
+                line.amount = item.getQuantity() * item.getPrice() * item.getMyUnit().getCoefficient();
                 line.itemGuid  = item.getGuid();
-                line.price = item.getPrice();
+                line.price = item.getPrice() * item.getMyUnit().getCoefficient();
                 line.quantity = item.getQuantity();
-
+                line.unit = item.getMyUnit().getUnitGuid();
                 purchDocLines[counter]=line;
                 counter++;
             }
@@ -543,9 +584,22 @@ public class AddOrderFragment extends Fragment {
 
             if (bl.status != 0)
             {
+                publishProgress("Ошибка:"+bl.comment);
                 return null;
             }
 
+            ArrayList<kg.soulsb.ayu.models.Stock> stocksArray = new ArrayList<>();
+            // getting Stocks
+            Stocks stocks = blockingStub.getStock(request);
+            StocksRepo stocksRepo = new StocksRepo();
+            stocksRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+            for (Stock stock : stocks.stock) {
+                kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item, stock.warehouse, stock.stock);
+                stock1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
+                stocksArray.add(stock1);
+                stocksRepo.insert(stock1);
+            }
+            System.out.println("Stock: Done");
             return new Points();
         }
 
@@ -566,18 +620,23 @@ public class AddOrderFragment extends Fragment {
         }
 
         @Override
+        protected void onProgressUpdate(String... values) {
+
+            alertDialog.setMessage(values[0]);
+        }
+
+        @Override
         protected void onPostExecute(Points pointIterator) {
             try {
                 mChannel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-            System.out.println(pointIterator+"_______________________________________");
+
             if (pointIterator == null)
             {
                 saveDocument(false);
                 alertDialog.setTitle("Ошибка");
-                alertDialog.setMessage("Произошла ошибка, попробуйте еще раз.");
             }
             else {
                 saveDocument(true);
@@ -596,9 +655,9 @@ public class AddOrderFragment extends Fragment {
         order.setOrderID(docId);
         order.setBaza(CurrentBaseClass.getInstance().getCurrentBaseObject());
         order.setClient(clientGUID);
-        order.setComment(DataHolderClass.getInstance().getAddOrderComments());
+        order.setComment(parentActivity.othersFragment.comments.getText().toString());
         order.setDate(editText.getText().toString());
-        order.setDateSend(DataHolderClass.getInstance().getAddOrderDateOtgruzki());
+        order.setDateSend(editTextDostavka.getText().toString());
         order.setDoctype(parentActivity.doctype);
         order.setDogovor(arrayListContract.get(spinner_contract.getSelectedItemPosition()).getGuid());
         order.setDelivered(b);
@@ -612,8 +671,9 @@ public class AddOrderFragment extends Fragment {
         double total = 0;
         for (Item item: itemArrayList)
         {
-            total = total + item.getQuantity() * item.getPrice();
+            total = total + item.getQuantity() * item.getPrice()*item.getMyUnit().getCoefficient();
         }
+
         order.setTotalSum(total);
         order.setArraylistTovar(itemArrayList);
 
@@ -621,10 +681,5 @@ public class AddOrderFragment extends Fragment {
         ordersRepo.delete(order);
         ordersRepo.insert(order);
         Toast.makeText(getContext(),"Сохранено",Toast.LENGTH_SHORT).show();
-    }
-
-    public String getClientGUID()
-    {
-        return clientGUID;
     }
 }

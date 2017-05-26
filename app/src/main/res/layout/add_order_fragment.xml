@@ -35,6 +35,28 @@
         android:layout_height="0dip">
 
         <TextView
+            android:id="@+id/order_text_datedostavka"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Дата доставки"
+            android:textAlignment="textEnd"
+            tools:layout_margin="10dp" />
+
+        <EditText
+            style="@style/spinner_style"
+            android:focusable="false"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="date"
+            android:id="@+id/delivery_date"
+            tools:layout_margin="10dp" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="0dip">
+
+        <TextView
             android:id="@+id/order_text_organization"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -2,7 +2,6 @@ package kg.soulsb.ayu.models;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
 
 /**
@@ -10,7 +9,6 @@ import kg.soulsb.ayu.helpers.repo.ContractsRepo;
  */
 
 public class Order implements Serializable {
-
 
     public static final String TABLE  = "SavedOrders";
     public static final String TABLE_ITEM  = "SavedItems";
@@ -46,7 +44,6 @@ public class Order implements Serializable {
 
     public Order()
     {
-
     }
     public Order(String date, String client, String dogovor, String warehouse, String priceType, ArrayList<Item> arraylistTovar)
     {
@@ -57,7 +54,6 @@ public class Order implements Serializable {
         this.priceType = priceType;
         this.arraylistTovar = arraylistTovar;
     }
-
 
     public String getPriceType() {
         return priceType;

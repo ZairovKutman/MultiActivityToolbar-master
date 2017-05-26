@@ -7,8 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 
 import kg.soulsb.ayu.helpers.DatabaseManager;
+import kg.soulsb.ayu.models.Item;
+import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.models.Price;
 import kg.soulsb.ayu.models.Stock;
+import kg.soulsb.ayu.models.Unit;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 /**
@@ -66,11 +69,40 @@ public class StocksRepo {
 
 
     public double getItemStockByWarehouse(String itemGUID, String warehouse) {
-        double stock=0;
+        double stockFromOrders=0;
         db = DatabaseManager.getInstance().openDatabase();
-        String selectQuery =  " SELECT " + Stock.KEY_Stock
+/*
+        String selectQuery =  " SELECT IFNULL(SUM(" + Stock.KEY_Stock
+                + "),0) AS "+ Stock.KEY_Stock
+                + ", IFNULL(SUM("+Order.TABLE_ITEM +"."+ Item.KEY_Quantity
+                + "),0) AS usedItems, "+ Stock.KEY_ItemGuid
                 + " FROM " + Stock.TABLE
-                + " WHERE "+Stock.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"' AND "+Stock.KEY_ItemGuid+"= '"+itemGUID+"' AND "+Stock.KEY_WarehouseGuid+" = '"+warehouse+"'";
+                + " LEFT JOIN " + Order.TABLE_ITEM
+                + " ON "+Stock.TABLE+"."+Stock.KEY_ItemGuid+" = "+Order.TABLE_ITEM+"."+ Item.KEY_Guid
+                + " WHERE "+Stock.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()
+                +"' AND "+Stock.KEY_ItemGuid+"= '"+itemGUID
+                +"' AND "+Stock.KEY_WarehouseGuid+" = '"+warehouse+"'"
+//                +"' AND "+Order.TABLE_ITEM+"."+Order.KEY_warehouse+" = '"+warehouse+"'"
+                + "GROUP BY "+Stock.KEY_ItemGuid;
+*/
+
+        String selectQuery =  " SELECT " + Stock.KEY_Stock
+                + " AS "+ Stock.KEY_Stock
+                + ", IFNULL(SUM("+Order.TABLE_ITEM +"."+ Item.KEY_Quantity
+                + "),0) AS usedItems, "+ Stock.KEY_ItemGuid
+                + ", "+ Order.TABLE_ITEM+"."+Item.KEY_UnitGUID + " AS unitGuid"
+                + " FROM " + Stock.TABLE
+                + " LEFT JOIN " + Order.TABLE_ITEM
+                + " ON "+Stock.TABLE+"."+Stock.KEY_ItemGuid+" = "+Order.TABLE_ITEM+"."+ Item.KEY_Guid
+                +" AND "+Order.TABLE_ITEM+"." + Item.KEY_isDelivered + "= 'false' "
+                + " WHERE "+Stock.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()
+                +"' AND "+Stock.KEY_ItemGuid+"= '"+itemGUID
+                +"' AND "+Stock.KEY_WarehouseGuid+" = '"+ warehouse +"' "
+//                +"' AND "+Order.TABLE_ITEM+"."+Order.KEY_warehouse+" = '"+warehouse+"'"
+                + "GROUP BY "+Stock.KEY_ItemGuid
+                + ", "+Stock.KEY_Stock
+                + ", "+ Order.TABLE_ITEM+"."+Item.KEY_UnitGUID;
+
 
 
         if (db.isOpen()) {
@@ -82,10 +114,13 @@ public class StocksRepo {
             cursor = db.rawQuery(selectQuery, null);
         }
         // looping through all rows and adding to list
-
+        double originalStock = 0;
+        UnitsRepo unitsRepo = new UnitsRepo();
         if (cursor.moveToFirst()) {
             do {
-                stock = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Stock)));
+                originalStock = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Stock)));
+                Unit unit = unitsRepo.getUnitsObjectByItemGuidAndUnitGuid(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_ItemGuid)),cursor.getString(cursor.getColumnIndexOrThrow("unitGuid")));
+                stockFromOrders =  stockFromOrders+Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("usedItems")))*unit.getCoefficient();
             } while (cursor.moveToNext());
         }
 
@@ -95,7 +130,7 @@ public class StocksRepo {
         }
         DatabaseManager.getInstance().closeDatabase();
 
-        return stock;
+        return originalStock-stockFromOrders;
 
     }
 

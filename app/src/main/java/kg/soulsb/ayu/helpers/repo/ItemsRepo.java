@@ -34,6 +34,7 @@ public class ItemsRepo {
                 + Item.KEY_Stock  + "   TEXT    ,"
                 + Item.KEY_Base  + "   TEXT    ,"
                 + Item.KEY_Category  + "   TEXT    ,"
+                + Item.KEY_Sum  + "   TEXT    ,"
                 + Item.KEY_Unit  + "   TEXT    )";
     }
 
@@ -48,6 +49,7 @@ public class ItemsRepo {
         values.put(Item.KEY_Unit, tovar.getUnit());
         values.put(Item.KEY_Base, tovar.getBase());
         values.put(Item.KEY_Category, tovar.getCategory());
+        values.put(Item.KEY_Sum, tovar.getSum());
 
         // Inserting Row
         if (db.isOpen()) {
@@ -83,6 +85,7 @@ public class ItemsRepo {
                 + ", "+Item.KEY_Stock
                 + ", "+Item.KEY_Category
                 + ", "+Item.KEY_Base
+                + ", "+Item.KEY_Sum
                 + " FROM " + Item.TABLE
                 + " WHERE "+Item.KEY_Base + " = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'"
                 + " ORDER BY "+Client.KEY_Name+" ASC;";
@@ -108,6 +111,7 @@ public class ItemsRepo {
                 item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
                 item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
                 item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
+                item.setSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Sum))));
 
                 arrayList.add(item);
             } while (cursor.moveToNext());
@@ -174,6 +178,7 @@ public class ItemsRepo {
                 item.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Base)));
                 item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
                 item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
+
                 item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
 
                 arrayList.add(item);

@@ -28,6 +28,8 @@ public class ClientsTableActivity extends BaseActivity{
     private ClientAdapter arrayAdapter;
     private ArrayList<Client> arrayList;
     Menu myMenu;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,15 +93,15 @@ public class ClientsTableActivity extends BaseActivity{
 
     @Override
     protected boolean useDrawerToggle() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.nav_clients)
-            return true;
+
         if (item.getItemId() == android.R.id.home)
             onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 

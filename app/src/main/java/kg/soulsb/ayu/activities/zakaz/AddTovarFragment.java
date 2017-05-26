@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -29,9 +28,11 @@ import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 
+import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.adapters.TovarAdapter;
+import kg.soulsb.ayu.models.Unit;
 
 /**
  * Created by Sultanbek Baibagyshev on 1/10/17.
@@ -49,7 +50,11 @@ public class AddTovarFragment extends Fragment {
     Spinner otborSpinner;
     ListView listView;
     SearchView searchView;
-    @Nullable
+    Spinner unitSpinner;
+    ArrayList<Unit> unitArrayList = new ArrayList<>();
+    ArrayAdapter<Unit> unitArrayAdapter;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.add_tovar_fragment,container,false);
@@ -102,26 +107,31 @@ public class AddTovarFragment extends Fragment {
                 final AlertDialog.Builder d = new AlertDialog.Builder(getContext());
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.number_picker_dialog, null);
-                editText = (EditText) dialogView.findViewById(R.id.edit_text_picker);
+                editText = (EditText) dialogView.findViewById(R.id.quantity_picker);
+                unitSpinner = (Spinner) dialogView.findViewById(R.id.unit_spinner);
+                unitArrayList = new UnitsRepo().getUnitsObjectByItemGuid(arrayList.get(position).getGuid());
+                unitArrayAdapter = new ArrayAdapter<Unit>(getContext(),R.layout.baza_spinner_item,unitArrayList);
+                unitSpinner.setAdapter(unitArrayAdapter);
+
+                for (Unit unit: unitArrayList)
+                {
+                    if (unit.isDefault()) {
+                        unitSpinner.setSelection(unitArrayList.indexOf(unit));
+                        break;
+                    }
+
+                }
                 d.setTitle(arrayList.get(position).getName());
                 d.setMessage("Выберите количество");
                 d.setView(dialogView);
-                final NumberPicker numberPicker = (NumberPicker) dialogView.findViewById(R.id.numberPicker);
-                numberPicker.setMaxValue(1000);
-                numberPicker.setMinValue(0);
-                numberPicker.setWrapSelectorWheel(false);
-                numberPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                    @Override
-                    public void onValueChange(NumberPicker numberPicker, int i, int i1) {
-                        editText.setText(String.valueOf(i1));
-                    }
-                });
+
                 d.setPositiveButton("Выбрать", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String quantity = String.valueOf(editText.getText());
+                        Unit selectedUnit = (Unit) unitSpinner.getSelectedItem();
                         if (quantity.equals("")) quantity="0";
-                        if (arrayList.get(position).getStock()<Integer.parseInt(quantity))
+                        if (arrayList.get(position).getStock()<Integer.parseInt(quantity) * selectedUnit.getCoefficient() && arrayList.get(position).getStock()>=0)
                         {
                             Toast.makeText(getContext(),"Количество не может быть больше остатка",Toast.LENGTH_SHORT).show();
                             return;
@@ -133,9 +143,9 @@ public class AddTovarFragment extends Fragment {
 
                         if (Integer.parseInt(quantity) > 0) {
                             arrayList.get(position).setQuantity(Integer.parseInt(quantity));
-                            arrayList.get(position).setSum(arrayList.get(position).getQuantity() * arrayList.get(position).getPrice());
+                            arrayList.get(position).setMyUnit(selectedUnit);
+                            arrayList.get(position).setSum(arrayList.get(position).getQuantity() * arrayList.get(position).getPrice()  * arrayList.get(position).getMyUnit().getCoefficient());
                             parentActivity.addItem(arrayList.get(position));
-                            System.out.println(arrayList.get(position));
                             arrayAdapter.notifyDataSetChanged();
                         }
                         else {
@@ -176,8 +186,11 @@ public class AddTovarFragment extends Fragment {
             for (Item item: parentActivity.order.getArraylistTovar() )
             {
                 if (arrayList.indexOf(item) != -1) {
+                    arrayList.get(arrayList.indexOf(item)).setMyUnit(item.getMyUnit());
                     arrayList.get(arrayList.indexOf(item)).setQuantity(item.getQuantity());
-                    parentActivity.orderedItemsArrayList.add(item);
+                    arrayList.get(arrayList.indexOf(item)).setSum(item.getSum());
+                    arrayList.get(arrayList.indexOf(item)).setPrice(item.getPrice());
+                    parentActivity.addItem(item);
                 }
             }
             if (parentActivity.isDelivered.equals("true"))
@@ -224,12 +237,32 @@ public class AddTovarFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                if (newText.equals(""))
+                {
+                    arrayList.clear();
+                    arrayList.addAll(originalArrayList);
+                    arrayAdapter.notifyDataSetChanged();
+                }
+
                 arrayAdapter.getFilter().filter(newText);
+                arrayList.clear();
+                arrayList.addAll(originalArrayList);
+                arrayAdapter.notifyDataSetChanged();
+
                 System.out.println(newText);
                 return true;
             }
         });
 
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                arrayList.clear();
+                arrayList.addAll(originalArrayList);
+                arrayAdapter.notifyDataSetChanged();
+                return false;
+            }
+        });
     }
 
     @Override

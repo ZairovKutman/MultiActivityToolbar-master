@@ -35,16 +35,18 @@ public class OrderAddActivity extends BaseActivity {
     String doctype = "";
     private Timer mTimer = new Timer();
     Location mLastLocation;
-    AddOrderFragment addOrderFragment;
     String clientLat="0";
     String clientLong="0";
     Location clientLocation = new Location("");
     Order order = null;
     String isDelivered = "false";
-    Fragment addOrder = new AddOrderFragment();
     String category = "";
     float distance=0;
-    AddTovarFragment addTovarFragment;
+    ViewPager viewPager;
+    AddOrderFragment addOrderFragment = new AddOrderFragment();
+    AddTovarFragment addTovarFragment = new AddTovarFragment();
+    OthersFragment  othersFragment = new OthersFragment();
+    double totalSum=0;
     public Location getLocation() {
         System.out.println(" I GOT A LOCATION: lat="+CurrentLocationClass.getInstance().getCurrentLocation().getLatitude()
                 +" long="+CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
@@ -88,6 +90,11 @@ public void locationUpdate(){
         createDialog();
     }
 
+    @Override
+    protected boolean useDrawerToggle() {
+        return false;
+    }
+
     private void createDialog() {
         if (isDelivered.equals("true"))
         {
@@ -97,7 +104,7 @@ public void locationUpdate(){
 
         AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
         alertDlg.setMessage("Сохранить документ перед выходом?");
-        alertDlg.setCancelable(false); // We avoid that the dialong can be cancelled, forcing the user to choose one of the options
+        alertDlg.setCancelable(false); // We avoid that the dialog can be cancelled, forcing the user to choose one of the options
         alertDlg.setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         if (addOrderFragment.documentIsReady()) {
@@ -146,11 +153,9 @@ public void locationUpdate(){
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_add);
-        DataHolderClass.getInstance().setAddOrderComments("");
-        DataHolderClass.getInstance().setAddOrderDateOtgruzki("");
 
-
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setOffscreenPageLimit(3);
         setupViewPager(viewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
@@ -159,17 +164,6 @@ public void locationUpdate(){
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                switch (tab.getPosition()) {
-                    case 0:
-
-                        break;
-                    case 1:
-
-                        break;
-                    case 2:
-
-                        break;
-                }
             }
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
@@ -210,16 +204,8 @@ public void locationUpdate(){
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (doctype.equals("1"))
-        switch (item.getItemId()) {
-            case R.id.nav_orders_real:
-                return true;
-        }
-        else
-            switch (item.getItemId()) {
-                case R.id.nav_orders:
-                    return true;
-        }
+        if (item.getItemId() == android.R.id.home)
+            onBackPressed();
 
         return super.onOptionsItemSelected(item);
     }
@@ -227,6 +213,9 @@ public void locationUpdate(){
     public void addItem(Item item)
     {
         orderedItemsArrayList.add(item);
+        totalSum=totalSum+item.getSum();
+        othersFragment.updateTotalSum(totalSum);
+
     }
     public ArrayList<Item> getSelectedItems()
     {
@@ -236,10 +225,13 @@ public void locationUpdate(){
     public void setupViewPager(ViewPager viewPager) {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFrag(addOrder, "Клиент");
-        adapter.addFrag(new AddTovarFragment(), "Товары");
-        adapter.addFrag(new OthersFragment(), "Прочее");
+        adapter.addFrag(addOrderFragment, "Клиент");
+        adapter.addFrag(addTovarFragment, "Товары");
+        adapter.addFrag(othersFragment, "Прочее");
+
         addOrderFragment = (AddOrderFragment) adapter.getItem(0);
+        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
+        othersFragment = (OthersFragment) adapter.getItem(2);
         viewPager.setAdapter(adapter);
     }
 
@@ -251,9 +243,11 @@ public void locationUpdate(){
             if (item.getGuid().equals(item2.getGuid()))
             {
                 itemArrayList2.add(item2);
+                totalSum = totalSum - item2.getSum();
             }
         }
         orderedItemsArrayList.removeAll(itemArrayList2);
+        othersFragment.updateTotalSum(totalSum);
     }
 
     public String getPriceType()
@@ -267,7 +261,6 @@ public void locationUpdate(){
 
     public void updatePrices()
     {
-        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
         if (addTovarFragment != null)
             addTovarFragment.updatePrices();
     }

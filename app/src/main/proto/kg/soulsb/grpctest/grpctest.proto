@@ -58,6 +58,7 @@ message ExchangeData{
 	Reports reports = 10;
 	bool status = 11;
 	string error_message = 12;
+	Units units = 13;
 }
 
 message Points{
@@ -180,6 +181,7 @@ message PurchDocLine{
 	int32 quantity = 2;
 	double price = 3;
 	double amount = 4;
+	string unit = 5;
 }
 
 message DocPurch {
@@ -260,4 +262,16 @@ message PointLocation{
 	Point point = 2;
 	string latitude = 3;
 	string longitude = 4;
+}
+
+message Units{
+	repeated Unit unit = 1;
+}
+
+message Unit{
+	string description = 1;
+	string guid = 2;
+	double coefficient = 3;
+	string item = 4;
+	bool default = 5;
 }

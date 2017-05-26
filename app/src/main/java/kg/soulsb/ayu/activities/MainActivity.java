@@ -49,7 +49,6 @@ public class MainActivity extends BaseActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     MyServiceActivatorClass.getInstance(this).start();
                     // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.

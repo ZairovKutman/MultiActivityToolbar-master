@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,82 +39,17 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class OthersFragment extends Fragment {
-    View v;
-    int mYear, mMonth, mDay;
-    EditText editText;
+
     EditText comments;
+    TextView totalSumTextView;
     OrderAddActivity parentActivity;
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.others_fragment, container, false);
+        View v = inflater.inflate(R.layout.others_fragment, container, false);
 
-        editText = (EditText) v.findViewById(R.id.editText_data_dostavki);
-
-        editText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar mcurrentDate = Calendar.getInstance();
-                mYear = mcurrentDate.get(Calendar.YEAR);
-                mMonth = mcurrentDate.get(Calendar.MONTH);
-                mDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
-
-                DatePickerDialog mDatePicker = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-                    public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
-                        Calendar myCalendar = Calendar.getInstance();
-                        myCalendar.set(Calendar.YEAR, selectedyear);
-                        myCalendar.set(Calendar.MONTH, selectedmonth);
-                        myCalendar.set(Calendar.DAY_OF_MONTH, selectedday);
-                        String myFormat = "dd/MM/yyyy";
-                        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
-                        editText.setText(sdf.format(myCalendar.getTime()));
-
-                        mDay = selectedday;
-                        mMonth = selectedmonth;
-                        mYear = selectedyear;
-                    }
-                }, mYear, mMonth, mDay);
-                mDatePicker.setTitle("Выберите дату");
-                mDatePicker.show();
-            }
-        });
-
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                DataHolderClass.getInstance().setAddOrderDateOtgruzki(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-
-            }
-        });
 
         comments = (EditText) v.findViewById(R.id.editText_komment);
-        comments.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                DataHolderClass.getInstance().setAddOrderComments(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
 
         if (parentActivity.order != null){
 
@@ -122,11 +58,14 @@ public class OthersFragment extends Fragment {
                 disableButtons();
             }
         }
+        totalSumTextView = (TextView) v.findViewById(R.id.otherFragment_total_sum);
+
+        updateTotalSum(parentActivity.totalSum);
+
         return v;
     }
 
     private void disableButtons() {
-        editText.setEnabled(false);
         comments.setEnabled(false);
     }
 
@@ -134,6 +73,12 @@ public class OthersFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         parentActivity = ((OrderAddActivity)getActivity());
+    }
+
+    public void updateTotalSum(double sum)
+    {
+        if (totalSumTextView != null)
+            totalSumTextView.setText("Сумма документа: "+sum);
     }
 }
 
