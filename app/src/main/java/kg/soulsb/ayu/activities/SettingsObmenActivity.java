@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -180,6 +181,8 @@ public class SettingsObmenActivity extends BaseActivity {
                 if (baza!= null) {
                     loadingComment.setText("Подключение... "+"5%");
                     try {
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         fullObmen = false;
                         onlyOstatki = true;
                         onlyDocs = false;
@@ -201,6 +204,8 @@ public class SettingsObmenActivity extends BaseActivity {
                 if (baza!= null) {
                 loadingComment.setText("Подключение... "+"5%");
                 try {
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     fullObmen = true;
                     onlyOstatki = false;
                     onlyDocs = false;
@@ -222,6 +227,8 @@ public class SettingsObmenActivity extends BaseActivity {
                 if (baza!= null) {
                     loadingComment.setText("Подключение... "+"5%");
                     try {
+                        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         fullObmen = false;
                         onlyOstatki = true;
                         onlyDocs = true;
@@ -447,7 +454,6 @@ public class SettingsObmenActivity extends BaseActivity {
             clientsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Point point: pointIterator.point)
             {
-                System.out.println(point.latitude+" "+point.longitude);
                 Client client = new Client(point.guid,point.description,point.address, point.phoneNumber,point.latitude,point.longitude,point.debt);
                 client.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 clientsArray.add(client);
@@ -646,7 +652,7 @@ public class SettingsObmenActivity extends BaseActivity {
             loadButton.setEnabled(true);
             loadOnlyDocButton.setEnabled(true);
             loadStockButton.setEnabled(true);
-
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             if (arrayList.isEmpty())
             {
                 textViewEmpty.setVisibility(View.VISIBLE);
@@ -678,9 +684,11 @@ public class SettingsObmenActivity extends BaseActivity {
     @Override
     public void onBackPressed()
     {
+        if (loadButton.isEnabled()) {
         intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
     }
 }

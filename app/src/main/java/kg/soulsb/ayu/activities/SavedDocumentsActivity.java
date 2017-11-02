@@ -319,5 +319,11 @@ public class SavedDocumentsActivity extends BaseActivity {
         orderArrayList = new OrdersRepo().getOrdersObject(CurrentBaseClass.getInstance().getCurrentBase());
         arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, orderArrayList);
         arrayAdapter.notifyDataSetChanged();
+        try {
+            listViewDocuments.setAdapter(arrayAdapter);
+        }
+        catch (Exception e) {
+           e.printStackTrace();
+        }
     }
 }

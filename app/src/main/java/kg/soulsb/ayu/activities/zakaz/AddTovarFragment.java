@@ -282,6 +282,10 @@ public class AddTovarFragment extends Fragment {
         arrayList.clear();
         arrayList.addAll(originalArrayList);
         arrayAdapter.notifyDataSetChanged();
+        if (parentActivity.isDelivered.equals("true"))
+        {
+            disableButtons();
+        }
     }
 
     public void updateStock()
@@ -294,10 +298,15 @@ public class AddTovarFragment extends Fragment {
         }
         try {
             arrayAdapter.notifyDataSetChanged();
+            if (parentActivity.isDelivered.equals("true"))
+            {
+                disableButtons();
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+
     }
 }

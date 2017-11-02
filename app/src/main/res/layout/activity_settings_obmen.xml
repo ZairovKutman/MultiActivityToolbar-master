@@ -3,9 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="1"
     android:background="@drawable/gradient">
 
     <LinearLayout
+        android:id="@+id/layout_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -25,9 +27,55 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="5dp"
             android:layout_marginTop="10dp"
             android:background="@android:color/darker_gray" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorAccent"
+            android:elevation="4dp"
+            android:text="Полный обмен"
+            android:textColor="@color/cardview_light_background"
+            android:translationZ="4dp" />
+
+        <Button
+            android:id="@+id/button_update_stocks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorGreen"
+            android:elevation="4dp"
+            android:text="Обновить остатки"
+            android:textColor="@color/cardview_light_background"
+            android:translationZ="4dp" />
+
+        <Button
+            android:id="@+id/button_only_documents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimary"
+            android:elevation="4dp"
+            android:text="Выгрузить документы"
+            android:textColor="@color/cardview_light_background"
+            android:translationZ="4dp" />
+
+
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:padding="1dp" />
+
+        <TextView
+            android:id="@+id/loading_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:textAlignment="center" />
 
         <TextView
             android:id="@+id/textView11"
@@ -42,98 +90,17 @@
             android:id="@+id/textViewEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="3dp"
             android:text="Нет документов для выгрузки"
             android:textAlignment="center" />
 
         <ListView
             android:id="@+id/listView_documents"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:foregroundGravity="center"
-            android:paddingBottom="5dp"
-            android:layout_weight="1"/>
+            android:foregroundGravity="center" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="@style/Widget.AppCompat.ProgressBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minWidth="100dip"
-            android:padding="5dp" />
 
-        <TextView
-            android:id="@+id/loading_comment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:textAlignment="center" />
     </LinearLayout>
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:stretchColumns="0">
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_marginBottom="3dp">
-
-            <Button
-                android:id="@+id/button_only_documents"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:backgroundTint="@color/colorPrimary"
-                android:elevation="8dp"
-                android:text="Выгрузить документы"
-                android:textColor="@color/cardview_light_background"
-                android:translationZ="8dp" />
-
-
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_marginBottom="3dp">
-
-            <Button
-                android:id="@+id/button_update_stocks"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:backgroundTint="@color/colorGreen"
-                android:elevation="8dp"
-                android:text="Обновить остатки"
-                android:textColor="@color/cardview_light_background"
-                android:translationZ="8dp" />
-
-
-
-        </TableRow>
-
-
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_marginBottom="10dp">
-
-            <Button
-                android:id="@+id/button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_column="0"
-                android:backgroundTint="@color/colorAccent"
-                android:elevation="8dp"
-                android:text="Полный обмен"
-                android:textColor="@color/cardview_light_background"
-                android:translationZ="8dp" />
-        </TableRow>
-    </TableLayout>
 </RelativeLayout>

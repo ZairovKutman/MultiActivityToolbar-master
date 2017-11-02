@@ -142,6 +142,12 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name="kg.soulsb.ayu.activities.SvodActivity"
+            android:label="Свод заказов"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+        </activity>
+
         <service android:name="kg.soulsb.ayu.services.MyService"/>
     </application>
 

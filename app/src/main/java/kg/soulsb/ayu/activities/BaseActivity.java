@@ -275,6 +275,11 @@ public class BaseActivity extends AppCompatActivity implements
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
+            case R.id.nav_svod :
+                intent = new Intent(this, SvodActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
