@@ -47,6 +47,8 @@ public class SvodActivity extends BaseActivity {
         itogText = (TextView) findViewById(R.id.textView_itog);
         dateText = (TextView) findViewById(R.id.textView_date);
         Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE,1);
+
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         formattedDate = df.format(c.getTime());
 
@@ -132,11 +134,32 @@ public class SvodActivity extends BaseActivity {
                         }
 
                     }
-                    svodRowList.add(new SvodRow(item.getName(),myUnit,item.getQuantity()*item.getMyUnit().getCoefficient(),item.getPrice()));
 
-                    summa = summa + item.getQuantity()*item.getMyUnit().getCoefficient() * item.getPrice();
-                    upakovka = upakovka + item.getQuantity()*(int)item.getMyUnit().getCoefficient()/(int)myUnit.getCoefficient();
-                    shtuk = shtuk + item.getQuantity()*(int)item.getMyUnit().getCoefficient() % (int)myUnit.getCoefficient();
+                    SvodRow rowToAdd = new SvodRow(item.getGuid(), item.getName(),myUnit,item.getQuantity()*item.getMyUnit().getCoefficient(),item.getPrice());
+
+                    boolean flag = false;
+
+                    for (SvodRow svod: svodRowList)
+                    {
+                        if (svod.equals(rowToAdd))
+                        {
+                            svod.setQuantity(svod.getQuantity() + rowToAdd.getQuantity());
+
+                            summa = summa + item.getQuantity()*item.getMyUnit().getCoefficient() * item.getPrice();
+                            upakovka = upakovka + item.getQuantity()*(int)item.getMyUnit().getCoefficient()/(int)myUnit.getCoefficient();
+                            shtuk = shtuk + item.getQuantity()*(int)item.getMyUnit().getCoefficient() % (int)myUnit.getCoefficient();
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if (!flag) {
+                        svodRowList.add(rowToAdd);
+
+                        summa = summa + item.getQuantity() * item.getMyUnit().getCoefficient() * item.getPrice();
+                        upakovka = upakovka + item.getQuantity() * (int) item.getMyUnit().getCoefficient() / (int) myUnit.getCoefficient();
+                        shtuk = shtuk + item.getQuantity() * (int) item.getMyUnit().getCoefficient() % (int) myUnit.getCoefficient();
+                    }
                 }
             }
         }

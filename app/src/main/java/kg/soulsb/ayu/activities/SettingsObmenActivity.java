@@ -66,8 +66,11 @@ import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.models.Item;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import io.grpc.ManagedChannel;
@@ -130,12 +133,13 @@ public class SettingsObmenActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent;
                 if (arrayList.get(i).getDoctype().equals("2")) {
-                    Intent intent = new Intent(getBaseContext(), PayActivity.class);
+                    intent = new Intent(getApplicationContext(), PayActivity.class);
                 }
                 else
                 {
-                    Intent intent = new Intent(getBaseContext(), OrderAddActivity.class);
+                    intent = new Intent(getApplicationContext(), OrderAddActivity.class);
                 }
 
                 intent.putExtra("doctype",arrayList.get(i).getDoctype());
@@ -553,6 +557,7 @@ public class SettingsObmenActivity extends BaseActivity {
             pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Price price: prices.price)
             {
+                System.out.println(price.item+" - "+price.price);
                 kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
                 price1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 pricesArray.add(price1);
@@ -626,9 +631,14 @@ public class SettingsObmenActivity extends BaseActivity {
             if (pointIterator != null){
                 loadingComment.setText("Загружено!");
                 // Сохранить дату последнего обмена
+                Calendar myCalendar = Calendar.getInstance();
+                String myFormat = "dd/MM/yyyy HH:mm:ss";
+                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+                String formattedDate = sdf.format(myCalendar.getTime());
+
                 SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("LAST_OBMEN", DateFormat.getDateTimeInstance().format(new Date()));
+                editor.putString("LAST_OBMEN", formattedDate);
                 editor.putLong("LAST_OBMEN_MILLI", System.currentTimeMillis());
                 editor.apply();
             }

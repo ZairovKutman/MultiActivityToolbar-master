@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
 import kg.soulsb.ayu.adapters.OrderAdapter;
+import kg.soulsb.ayu.adapters.SvodAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
@@ -37,6 +39,8 @@ public class MainActivity extends BaseActivity {
     ListView listViewDocuments;
     ArrayList<Order> orderArrayList = new ArrayList<>();
     OrderAdapter orderArrayAdapter;
+    Button createButton, obmenButton, svodButton;
+    TextView agentNameText;
     DBHelper dbHelper;
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -72,15 +76,26 @@ public class MainActivity extends BaseActivity {
 
     private void updateMainMenu() {
         TextView textView = (TextView) findViewById(R.id.textView_last_obmen);
+        agentNameText = (TextView) findViewById(R.id.textView_agent_name);
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         String myDate = sharedPreferences.getString("LAST_OBMEN",null);
 
         if (myDate!=null)
-            textView.setText("Последний обмен: "+myDate);
+            textView.setText(myDate);
         else
         {
-            textView.setText("Последний обмен: никогда");
+            textView.setText("Никогда");
         }
+
+        sharedPreferences = getSharedPreferences("DefaultBase", MODE_PRIVATE);
+
+        String currentAgentString = "Анонимный пользователь";
+        if (sharedPreferences.contains("default_name")) {
+
+            currentAgentString = sharedPreferences.getString("default_agent", null);
+        }
+
+        agentNameText.setText(currentAgentString);
     }
 
     @Override
@@ -127,6 +142,38 @@ public class MainActivity extends BaseActivity {
 
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
         updateDocuments();
+
+        createButton = (Button)findViewById(R.id.create_order_button);
+        obmenButton = (Button) findViewById(R.id.obmen_button);
+        svodButton = (Button) findViewById(R.id.svod_button);
+
+        createButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(getApplicationContext(), OrderAddActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("doctype","0");
+                startActivity(intent);
+            }
+        });
+
+        obmenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(getApplicationContext(), SettingsObmenActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+
+        svodButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(getApplicationContext(), SvodActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateDocuments()
