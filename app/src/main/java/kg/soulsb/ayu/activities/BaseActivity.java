@@ -117,41 +117,40 @@ public class BaseActivity extends AppCompatActivity implements
 
             if (sharedPreferences.getString(UserSettings.can_create_orders,"true").equals("false"))
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_orders);
-                nav_item2.setEnabled(false);
+                MenuItem nav_item4 = menuNav.findItem(R.id.nav_orders);
+                nav_item4.setEnabled(false);
             }
             else
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_orders);
-                nav_item2.setEnabled(true);
+
+                MenuItem nav_item4 = menuNav.findItem(R.id.nav_orders);
+                nav_item4.setEnabled(true);
             }
 
             if (sharedPreferences.getString(UserSettings.can_create_sales,"true").equals("false"))
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_orders_real);
-                nav_item2.setEnabled(false);
+
+                MenuItem nav_item5 = menuNav.findItem(R.id.nav_orders_real);
+                nav_item5.setEnabled(false);
             }
             else
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_orders);
-                nav_item2.setEnabled(true);
+
+                MenuItem nav_item5 = menuNav.findItem(R.id.nav_orders_real);
+                nav_item5.setEnabled(true);
             }
 
             if (sharedPreferences.getString(UserSettings.can_create_payment,"true").equals("false"))
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_pay);
-                nav_item2.setEnabled(false);
+
+                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay);
+                nav_item7.setEnabled(false);
             }
             else
             {
-                menuNav=navigationView.getMenu();
-                nav_item2 = menuNav.findItem(R.id.nav_pay);
-                nav_item2.setEnabled(true);
+
+                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay);
+                nav_item7.setEnabled(true);
             }
         }
         setBaseAgentName();

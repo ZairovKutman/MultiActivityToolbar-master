@@ -205,7 +205,12 @@ public class AddTovarFragment extends Fragment {
     }
 
     private void disableButtons() {
-        listView.setEnabled(false);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+        });
 
         otborSpinner.setSelection(1);
 

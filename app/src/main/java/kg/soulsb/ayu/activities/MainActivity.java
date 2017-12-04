@@ -29,6 +29,7 @@ import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.MyServiceActivatorClass;
+import kg.soulsb.ayu.singletons.UserSettings;
 
 import java.util.ArrayList;
 
@@ -147,15 +148,51 @@ public class MainActivity extends BaseActivity {
         obmenButton = (Button) findViewById(R.id.obmen_button);
         svodButton = (Button) findViewById(R.id.svod_button);
 
-        createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                intent = new Intent(getApplicationContext(), OrderAddActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("doctype","0");
-                startActivity(intent);
+        SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
+
+        if (sharedPreferences.getString(UserSettings.can_create_orders,"true").equals("false"))
+        {
+
+            if (sharedPreferences.getString(UserSettings.can_create_sales,"true").equals("true"))
+            {
+                createButton.setText("\nНовая продажа");
+
+
+                createButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        intent = new Intent(getApplicationContext(), OrderAddActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.putExtra("doctype","1");
+                        startActivity(intent);
+                    }
+                });
+
             }
-        });
+            else
+            {
+
+                createButton.setVisibility(View.INVISIBLE);
+            }
+        }
+        else
+        {
+            createButton.setText("\nНовый заказ");
+
+            createButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    intent = new Intent(getApplicationContext(), OrderAddActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("doctype","0");
+                    startActivity(intent);
+                }
+            });
+        }
+
+
+
 
         obmenButton.setOnClickListener(new View.OnClickListener() {
             @Override
