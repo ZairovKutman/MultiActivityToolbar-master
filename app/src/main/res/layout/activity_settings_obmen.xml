@@ -30,23 +30,28 @@
             android:layout_marginBottom="5dp"
             android:layout_marginTop="10dp"
             android:background="@android:color/darker_gray" />
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:backgroundTint="@color/colorAccent"
             android:elevation="4dp"
             android:text="Полный обмен"
+            android:layout_weight="1"
             android:textColor="@color/cardview_light_background"
             android:translationZ="4dp" />
 
         <Button
             android:id="@+id/button_update_stocks"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:backgroundTint="@color/colorGreen"
             android:elevation="4dp"
+            android:layout_weight="1"
             android:text="Обновить остатки"
             android:textColor="@color/cardview_light_background"
             android:translationZ="4dp" />
@@ -57,11 +62,12 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/colorPrimary"
             android:elevation="4dp"
+            android:layout_weight="1"
             android:text="Выгрузить документы"
             android:textColor="@color/cardview_light_background"
             android:translationZ="4dp" />
 
-
+</LinearLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"

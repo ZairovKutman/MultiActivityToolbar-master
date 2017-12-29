@@ -57,9 +57,19 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
             holder = (TovarHolder)row.getTag();
         }
 
-        Item Tovar = data.get(position);
+        Item Tovar;
+
+        try {
+            Tovar = data.get(position);
+        }
+        catch (Exception e) {
+            Tovar = null;
+        }
+
+
         if (Tovar == null)
             return null;
+
         holder.txtTitle.setText(Tovar.getName());
 
         if (Tovar.getPrice() != 0)

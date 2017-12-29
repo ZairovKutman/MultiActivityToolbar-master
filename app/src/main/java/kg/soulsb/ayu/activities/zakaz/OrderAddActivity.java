@@ -41,8 +41,9 @@ public class OrderAddActivity extends BaseActivity {
     Order order = null;
     String isDelivered = "false";
     String category = "";
-    float distance=0;
     ViewPager viewPager;
+    float distance=0;
+
     AddOrderFragment addOrderFragment = new AddOrderFragment();
     AddTovarFragment addTovarFragment = new AddTovarFragment();
     OthersFragment  othersFragment = new OthersFragment();

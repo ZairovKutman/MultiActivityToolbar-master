@@ -129,8 +129,10 @@ public class MainActivity extends BaseActivity {
                 CurrentBaseClass.getInstance().setCurrentBase(baza1.getName());
                 CurrentBaseClass.getInstance().setCurrentBaseObject(baza1);
                 baza.setSelection(position);
-                MainActivity.super.setBaseAgentName();
+                updateMainMenu();
                 updateDocuments();
+                updateFirstButton();
+                setUpNavView();
             }
 
             @Override
@@ -148,6 +150,31 @@ public class MainActivity extends BaseActivity {
         obmenButton = (Button) findViewById(R.id.obmen_button);
         svodButton = (Button) findViewById(R.id.svod_button);
 
+        updateFirstButton();
+
+
+
+
+        obmenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(getApplicationContext(), SettingsObmenActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+
+        svodButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                intent = new Intent(getApplicationContext(), SvodActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void updateFirstButton() {
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
 
         if (sharedPreferences.getString(UserSettings.can_create_orders,"true").equals("false"))
@@ -190,27 +217,6 @@ public class MainActivity extends BaseActivity {
                 }
             });
         }
-
-
-
-
-        obmenButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                intent = new Intent(getApplicationContext(), SettingsObmenActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        });
-
-        svodButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                intent = new Intent(getApplicationContext(), SvodActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            }
-        });
     }
 
     private void updateDocuments()

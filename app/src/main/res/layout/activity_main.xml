@@ -151,9 +151,6 @@
                 android:text="\nОбмен"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/colorAccent" />
-
-
-
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
