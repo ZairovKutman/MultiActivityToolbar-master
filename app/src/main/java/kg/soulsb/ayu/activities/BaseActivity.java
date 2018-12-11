@@ -1,7 +1,11 @@
 package kg.soulsb.ayu.activities;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.LocationManager;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -104,17 +108,19 @@ public class BaseActivity extends AppCompatActivity implements
             // Use home/back button instead
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeAsUpIndicator(getResources()
-                    .getDrawable(R.drawable.abc_ic_ab_back_mtrl_am_alpha));
+                    .getDrawable(R.drawable.ic_action_navigation_arrow_back));
         }
 
         Menu menuNav=navigationView.getMenu();
         MenuItem nav_item2 = menuNav.findItem(R.id.nav_messages);
         nav_item2.setEnabled(false);
 
+        MenuItem nav_itemTasks = menuNav.findItem(R.id.nav_tasks);
+        nav_itemTasks.setEnabled(false);
+
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
 
         if (sharedPreferences.contains("default_name")) {
-
             if (sharedPreferences.getString(UserSettings.can_create_orders,"true").equals("false"))
             {
                 MenuItem nav_item4 = menuNav.findItem(R.id.nav_orders);
@@ -143,14 +149,20 @@ public class BaseActivity extends AppCompatActivity implements
             if (sharedPreferences.getString(UserSettings.can_create_payment,"true").equals("false"))
             {
 
-                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay);
+                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay_svod);
                 nav_item7.setEnabled(false);
+
+                MenuItem nav_item71 = menuNav.findItem(R.id.nav_pay);
+                nav_item71.setEnabled(false);
             }
             else
             {
 
-                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay);
+                MenuItem nav_item7 = menuNav.findItem(R.id.nav_pay_svod);
                 nav_item7.setEnabled(true);
+
+                MenuItem nav_item71 = menuNav.findItem(R.id.nav_pay);
+                nav_item71.setEnabled(false);
             }
         }
         setBaseAgentName();
@@ -167,7 +179,7 @@ public class BaseActivity extends AppCompatActivity implements
                     Long oldTime = sharedPreferences.getLong("LAST_OBMEN_MILLI",0);
                     Long newTime = System.currentTimeMillis();
 
-                    if (newTime - oldTime > 12*3600*1000) {
+                    if (newTime - oldTime > 18*3600*1000) {
                         //
                         Toast.makeText(getBaseContext(),"Необходимо сделать обмен!",Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getBaseContext(),SettingsObmenActivity.class);
@@ -215,6 +227,12 @@ public class BaseActivity extends AppCompatActivity implements
         {
             case R.id.nav_main:
                 intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+
+            case R.id.nav_tasks:
+                intent = new Intent(this, TasksActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
@@ -274,6 +292,11 @@ public class BaseActivity extends AppCompatActivity implements
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;
+            case R.id.nav_pay_svod:
+                intent = new Intent(this, PaySvodActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
             case R.id.nav_svod :
                 intent = new Intent(this, SvodActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -301,6 +324,34 @@ public class BaseActivity extends AppCompatActivity implements
 
         textView.setText("База: "+currentBaseString);
         agentView.setText(currentAgentString);
+    }
+
+    public void checkGps(final Context context) {
+        final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        System.out.println(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(), MODE_PRIVATE);
+
+            if (sharedPreferences.getString(UserSettings.force_gps_turn_on, "false").equals("true")) {
+                final AlertDialog.Builder alertDlg = new AlertDialog.Builder(context);
+                alertDlg.setMessage("Включите GPS !");
+                alertDlg.setCancelable(false); // We avoid that the dialog can be cancelled, forcing the user to choose one of the options
+                alertDlg.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                            checkGps(context);
+                        }
+                    }
+                } );
+
+                alertDlg.setNegativeButton("Обмен данными", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(context,SettingsObmenActivity.class));
+                    }
+                } );
+                alertDlg.create().show();
+            };
+        }
     }
 }
 

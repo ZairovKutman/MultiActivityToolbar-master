@@ -23,7 +23,7 @@ import kg.soulsb.ayu.models.Item;
 public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
     Context context;
     int layoutResourceId;
-    List<Item> data = null;
+    List<Item> data = new ArrayList<>();
     List<Item> originalData = new ArrayList<>();
 
     public TovarAdapter(Context context, int layoutResourceId, List<Item> data) {
@@ -37,7 +37,7 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        TovarHolder holder = null;
+        TovarHolder holder = new TovarHolder();;
 
         if(row == null)
         {
@@ -68,7 +68,7 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
 
 
         if (Tovar == null)
-            return null;
+            return row;
 
         holder.txtTitle.setText(Tovar.getName());
 
@@ -102,8 +102,11 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
                 ArrayList<Item> tempList=new ArrayList<>();
                 //constraint is the result from text you want to filter against.
                 //objects is your data set you will filter from
-                data.clear();
-                data.addAll(originalData);
+                if (data!=null) {
+                    data.clear();
+                    data.addAll(originalData);
+                }
+
                 if(constraint != null && data!=null) {
                     int length=data.size();
                     int i=0;
@@ -122,6 +125,7 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
                     filterResults.values = tempList;
                     filterResults.count = tempList.size();
                 }
+
                 return filterResults;
             }
 
@@ -129,9 +133,8 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
             @Override
             protected void publishResults(CharSequence contraint, FilterResults results) {
 
-
-                data.clear();
                 try {
+                    data.clear();
                     data.addAll((ArrayList<Item>) results.values);
                 }
                 catch (Exception E)

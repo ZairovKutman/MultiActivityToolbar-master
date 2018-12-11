@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
+import kg.soulsb.ayu.models.SvodPay;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 /**
@@ -56,6 +57,17 @@ public class OrdersRepo {
                 + Order.KEY_OrderID  + "   TEXT);";
     }
 
+    public static String createSvodPayTable(){
+
+        return "CREATE TABLE IF NOT EXISTS " + Order.TABLE_SvodPay  + " ("
+                + SvodPay.KEY_ID + "   INTEGER PRIMARY KEY AUTOINCREMENT   ,"
+                + SvodPay.KEY_Guid_Client + "   TEXT    ,"
+                + SvodPay.KEY_Guid_Dogovor  + "   TEXT    ,"
+                + SvodPay.KEY_isDelivered  + "   TEXT    ,"
+                + SvodPay.KEY_Sum  + "   TEXT    ,"
+                + Order.KEY_OrderID  + "   TEXT);";
+    }
+
     public void delete(Order order)
     {
         db = DatabaseManager.getInstance().openDatabase();
@@ -65,6 +77,7 @@ public class OrdersRepo {
 
         db.delete(Order.TABLE,whereClause,null);
         db.delete(Order.TABLE_ITEM,whereClause,null);
+        db.delete(Order.TABLE_SvodPay,whereClause,null);
 
         DatabaseManager.getInstance().closeDatabase();
     }
@@ -91,7 +104,7 @@ public class OrdersRepo {
         // Inserting Row
         orderId = (int) db.insert(Order.TABLE, null, values);
 
-        if (!order.getDoctype().equals("2")) {
+        if (!order.getDoctype().equals("2") && !order.getDoctype().equals("3")) {
             for (Item item : order.getArraylistTovar()) {
                 values = new ContentValues();
                 values.put(Order.KEY_OrderID, order.getOrderID());
@@ -110,6 +123,22 @@ public class OrdersRepo {
 
             DatabaseManager.getInstance().closeDatabase();
         }
+
+        if (order.getDoctype().equals("3")) {
+            for (SvodPay svodPay : order.getArraylistSvodPay()) {
+                values = new ContentValues();
+                values.put(Order.KEY_OrderID, order.getOrderID());
+                values.put(SvodPay.KEY_Guid_Client, svodPay.getClient());
+                values.put(SvodPay.KEY_isDelivered, Boolean.toString(order.isDelivered()));
+                values.put(SvodPay.KEY_Guid_Dogovor, svodPay.getDogovor());
+                values.put(SvodPay.KEY_Sum, svodPay.getSum());
+                // Inserting Row
+                orderId = (int) db.insert(Order.TABLE_SvodPay, null, values);
+            }
+
+            DatabaseManager.getInstance().closeDatabase();
+        }
+
         return orderId;
     }
 
@@ -200,6 +229,34 @@ public class OrdersRepo {
                 myCursor.close();
 
                 order.setArraylistTovar(itemArrayList);
+
+                ////////
+
+                ArrayList<SvodPay> svodPayArrayList = new ArrayList<>();
+
+                String selectSvodPayQuery =  " SELECT " + Order.KEY_OrderID
+                        + ", "+SvodPay.KEY_Guid_Client
+                        + ", "+SvodPay.KEY_Guid_Dogovor
+                        + ", "+SvodPay.KEY_Sum
+                        + " FROM " + Order.TABLE_SvodPay
+                        + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
+
+                Cursor myCursor1 = db.rawQuery(selectSvodPayQuery, null);
+
+                if (myCursor1.moveToFirst()) {
+                    do {
+                        SvodPay svodPay = new SvodPay();
+                        svodPay.setGuid_client(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Client)));
+                        svodPay.setGuid_dogovor(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Dogovor)));
+                        svodPay.setSum(Double.parseDouble(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Sum))));
+                        svodPayArrayList.add(svodPay);
+                    } while (myCursor1.moveToNext());
+                }
+                myCursor1.close();
+                order.setArraylistSvodPay(svodPayArrayList);
+
+
+
                 arrayList.add(order);
             } while (cursor.moveToNext());
         }
@@ -214,15 +271,20 @@ public class OrdersRepo {
             db = DatabaseManager.getInstance().openDatabase();
             ContentValues values = new ContentValues();
             ContentValues values2 = new ContentValues();
+            ContentValues values3 = new ContentValues();
 
             values.put(Order.KEY_isDelivered, Boolean.toString(b));
             values2.put(Item.KEY_isDelivered, Boolean.toString(b));
+            values3.put(SvodPay.KEY_isDelivered, Boolean.toString(b));
 
             String whereClause = Order.KEY_OrderID + " = '"+orderID+"'";
             String whereClause2 = Order.KEY_OrderID + " = '"+orderID+"'";
+            String whereClause3 = Order.KEY_OrderID + " = '"+orderID+"'";
             // Inserting Row
             db.update(Order.TABLE, values, whereClause, null);
             db.update(Order.TABLE_ITEM, values2, whereClause2, null);
+            db.update(Order.TABLE_SvodPay, values3, whereClause3, null);
+
             DatabaseManager.getInstance().closeDatabase();
     }
 
@@ -304,8 +366,32 @@ public class OrdersRepo {
                     } while (myCursor.moveToNext());
                 }
                 myCursor.close();
-
                 order.setArraylistTovar(itemArrayList);
+                ////////
+
+                ArrayList<SvodPay> svodPayArrayList = new ArrayList<>();
+
+                String selectSvodPayQuery =  " SELECT " + Order.KEY_OrderID
+                        + ", "+SvodPay.KEY_Guid_Client
+                        + ", "+SvodPay.KEY_Guid_Dogovor
+                        + ", "+SvodPay.KEY_Sum
+                        + " FROM " + Order.TABLE_SvodPay
+                        + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
+
+                Cursor myCursor1 = db.rawQuery(selectSvodPayQuery, null);
+
+                if (myCursor1.moveToFirst()) {
+                    do {
+                        SvodPay svodPay = new SvodPay();
+                        svodPay.setGuid_client(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Client)));
+                        svodPay.setGuid_dogovor(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Dogovor)));
+                        svodPay.setSum(Double.parseDouble(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Sum))));
+                        svodPayArrayList.add(svodPay);
+                    } while (myCursor1.moveToNext());
+                }
+                myCursor1.close();
+                order.setArraylistSvodPay(svodPayArrayList);
+
                 arrayList.add(order);
             } while (cursor.moveToNext());
         }
@@ -319,9 +405,11 @@ public class OrdersRepo {
         db = DatabaseManager.getInstance().openDatabase();
         String whereClause = Order.KEY_isDelivered + " = '"+"true"+"' AND "+Order.KEY_BAZA+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'";
         String whereClause2 = Item.KEY_isDelivered + " = '"+"true'";
+        String whereClause3 = SvodPay.KEY_isDelivered + " = '"+"true'";
 
         db.delete(Order.TABLE,whereClause,null);
         db.delete(Order.TABLE_ITEM,whereClause2,null);
+        db.delete(Order.TABLE_SvodPay,whereClause3,null);
 
         db.close();
     }

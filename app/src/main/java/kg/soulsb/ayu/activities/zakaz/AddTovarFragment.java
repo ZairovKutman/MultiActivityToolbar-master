@@ -151,7 +151,6 @@ public class AddTovarFragment extends Fragment {
                         else {
                             arrayList.get(position).setQuantity(0);
                             arrayList.get(position).setSum(0);
-                            System.out.println(arrayList.get(position));
                             arrayAdapter.notifyDataSetChanged();
 
                         }
@@ -242,6 +241,8 @@ public class AddTovarFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+
+                try {
                 if (newText.equals(""))
                 {
                     arrayList.clear();
@@ -252,9 +253,12 @@ public class AddTovarFragment extends Fragment {
                 arrayAdapter.getFilter().filter(newText);
                 arrayList.clear();
                 arrayList.addAll(originalArrayList);
-                arrayAdapter.notifyDataSetChanged();
+                arrayAdapter.notifyDataSetChanged();}
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                System.out.println(newText);
+
                 return true;
             }
         });

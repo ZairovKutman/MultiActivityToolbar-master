@@ -1,5 +1,7 @@
 package kg.soulsb.ayu.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -7,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.helpers.DBHelper;
@@ -87,36 +90,63 @@ public class BaseDetailActivity extends BaseActivity {
         buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BazasRepo bazaRepo = new BazasRepo();
-                bazaRepo.delete(new Baza(ipText.getText().toString(),Integer.parseInt(portText.getText().toString()),nameText.getText().toString(),agentText.getText().toString(), getIntent().getStringExtra("bazaId")));
-                SharedPreferences sharedPreferences = getSharedPreferences(getIntent().getStringExtra("name"),MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("using");
-                editor.remove(UserSettings.can_create_orders);
-                editor.remove(UserSettings.can_create_sales);
-                editor.remove(UserSettings.password_for_app_settings);
-                editor.remove(UserSettings.can_get_gpc_coordinates_of_clients);
-                editor.remove(UserSettings.create_order_at_clients_coordinates);
-                editor.remove(UserSettings.create_sales_at_clients_coordinates);
-                editor.remove(UserSettings.forbit_select_client_with_outstanding_debt);
-                editor.remove(UserSettings.force_daily_exchange);
-                editor.remove(UserSettings.force_gps_turn_on);
-                editor.remove(UserSettings.send_all_documents_with_exchange);
-                editor.remove(UserSettings.status);
-                editor.apply();
 
-                ClientsRepo clientsRepo = new ClientsRepo();
-                clientsRepo.deleteByBase(getIntent().getStringExtra("name"));
+                AlertDialog.Builder alertDlg = new AlertDialog.Builder(BaseDetailActivity.this);
+                alertDlg.setMessage("Внимание! Все данные по этой базе будут удалены, продолжить?");
+                alertDlg.setCancelable(false); // We avoid that the dialog can be cancelled, forcing the user to choose one of the options
+                alertDlg.setPositiveButton("Да, удалить!", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
 
-                new ContractsRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new ItemsRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new OrganizationsRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new PricesRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new PriceTypesRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new ReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
-                new SavedReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        BazasRepo bazaRepo = new BazasRepo();
+                        bazaRepo.delete(new Baza(ipText.getText().toString(),Integer.parseInt(portText.getText().toString()),nameText.getText().toString(),agentText.getText().toString(), getIntent().getStringExtra("bazaId")));
+                        SharedPreferences sharedPreferences = getSharedPreferences(getIntent().getStringExtra("name"),MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.remove("using");
+                        editor.remove(UserSettings.can_create_orders);
+                        editor.remove(UserSettings.can_create_sales);
+                        editor.remove(UserSettings.password_for_app_settings);
+                        editor.remove(UserSettings.can_get_gpc_coordinates_of_clients);
+                        editor.remove(UserSettings.create_order_at_clients_coordinates);
+                        editor.remove(UserSettings.create_sales_at_clients_coordinates);
+                        editor.remove(UserSettings.forbit_select_client_with_outstanding_debt);
+                        editor.remove(UserSettings.force_daily_exchange);
+                        editor.remove(UserSettings.force_gps_turn_on);
+                        editor.remove(UserSettings.send_all_documents_with_exchange);
+                        editor.remove(UserSettings.status);
+                        editor.apply();
 
-                finish();
+                        ClientsRepo clientsRepo = new ClientsRepo();
+                        clientsRepo.deleteByBase(getIntent().getStringExtra("name"));
+
+                        new ContractsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new ItemsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new OrganizationsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new PricesRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new PriceTypesRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new ReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        new SavedReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
+                        System.out.println("++++++++++++++++++++=");
+                        System.out.println(getIntent().getStringExtra("name"));
+                        finish();
+
+                    }
+                });
+
+                alertDlg.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                alertDlg.setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                alertDlg.create().show();
+
             }
         });
 

@@ -34,16 +34,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:backgroundTint="@color/colorAccent"
-            android:elevation="4dp"
-            android:text="Полный обмен"
-            android:layout_weight="1"
-            android:textColor="@color/cardview_light_background"
-            android:translationZ="4dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:backgroundTint="@color/colorAccent"
+        android:elevation="4dp"
+        android:text="Полный обмен"
+        android:textColor="@color/cardview_light_background"
+        android:translationZ="4dp" />
 
         <Button
             android:id="@+id/button_update_stocks"

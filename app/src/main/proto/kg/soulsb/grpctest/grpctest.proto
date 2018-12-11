@@ -5,6 +5,7 @@ option java_package = "kg.soulsb.ayu.grpctest";
 option java_outer_classname = "GrpcAyuProto";
 option objc_class_prefix = "GTP";
 
+
 package ayugrpc;
 
 service AyuService {
@@ -147,6 +148,8 @@ message Contract{
 	string description = 2;
 	string point_guid = 3;
 	string item_category = 4;
+	bool check_limit = 5;
+	double limit = 6;
 }
 
 message Warehouse{
@@ -184,6 +187,16 @@ message PurchDocLine{
 	string unit = 5;
 }
 
+message ConsPaymentLine{
+	string client_guid = 1;
+	double amount = 2;
+	string contract_guid = 3;
+}
+
+message PaymentLine{
+	string client_guid = 1;
+}
+
 message DocPurch {
 	string agent = 1;
 	string client_guid = 2;
@@ -198,6 +211,9 @@ message DocPurch {
 	int32 doc_type = 11;
 	string doc_id = 12;
 	double amount = 13;
+	repeated ConsPaymentLine payments = 14;
+	string latitude = 15;
+	string longitude = 16;
 }
 
 message Docs{
@@ -239,6 +255,7 @@ message Location {
 	string latitude = 2;
 	string longitude = 3;
 	string date = 4;
+	string speed = 5;
 }
 
 message Settings{

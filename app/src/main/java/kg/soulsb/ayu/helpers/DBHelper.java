@@ -42,7 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 5;
     // Database Name
     private static final String DATABASE_NAME = "ayu_sqlite.db";
     private static final String TAG = DBHelper.class.getSimpleName().toString();
@@ -98,6 +98,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS " + Order.TABLE_ITEM);
         db.execSQL(OrdersRepo.createItemTable());
+
+        db.execSQL("DROP TABLE IF EXISTS " + Order.TABLE_SvodPay);
+        db.execSQL(OrdersRepo.createSvodPayTable());
     }
 
     @Override
@@ -108,6 +111,28 @@ public class DBHelper extends SQLiteOpenHelper {
         if ((oldVersion==1 || oldVersion==2) && newVersion ==3)
         {
             db.execSQL("ALTER TABLE "+ Order.TABLE_ITEM +" ADD COLUMN "+ Item.KEY_isDelivered  +" TEXT DEFAULT 'true'");
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3) && (newVersion == 4 ))
+        {
+            db.execSQL(OrdersRepo.createSvodPayTable());
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3) && (newVersion == 5 ))
+        {
+            try {
+                db.execSQL(OrdersRepo.createSvodPayTable());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3 || oldVersion==4) && newVersion == 5)
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
+            db.execSQL(MyLocationsRepo.createTable());
         }
     }
 }

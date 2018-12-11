@@ -42,11 +42,13 @@ public class OrderAdapter extends ArrayAdapter<Order> {
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
         OrderHolder holder = null;
+        Order order = getItem(position);
 
         if(row == null)
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
+
 
             holder = new OrderHolder();
             holder.txtTitle = (TextView)row.findViewById(R.id.text_client);
@@ -54,18 +56,21 @@ public class OrderAdapter extends ArrayAdapter<Order> {
             holder.delivered = (ImageView)row.findViewById(R.id.delivered);
             holder.image = (ImageView)row.findViewById(R.id.imageView_doc);
             row.setTag(holder);
+
         }
         else
         {
             holder = (OrderHolder) row.getTag();
         }
 
-        Order order = getItem(position);
+
         DBHelper dbHelper = new DBHelper(getContext());
         DatabaseManager.initializeInstance(dbHelper);
         ClientsRepo clientsRepo = new ClientsRepo();
         String myClient = clientsRepo.getClientObjectByGuid(order.getClient()).getName();
+
         holder.txtTitle.setText(myClient);
+
         if (order.getDoctype().equals("1")){
             holder.txtDetail.setText("Реализация от "+order.getDate()+", сумма = "+order.getTotalSum());
         }
@@ -74,6 +79,10 @@ public class OrderAdapter extends ArrayAdapter<Order> {
         }
         else if (order.getDoctype().equals("2")) {
             holder.txtDetail.setText("Оплата от " + order.getDate() + ", сумма = " + order.getTotalSum());
+        }
+        else if (order.getDoctype().equals("3")) {
+            holder.txtTitle.setText("Сводная оплата");
+            holder.txtDetail.setText("оплата от " + order.getDate() + ", сумма = " + order.getTotalSum());
         }
 
         if (order.isDelivered())

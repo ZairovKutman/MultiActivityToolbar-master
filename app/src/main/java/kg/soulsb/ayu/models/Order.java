@@ -12,6 +12,7 @@ public class Order implements Serializable {
 
     public static final String TABLE  = "SavedOrders";
     public static final String TABLE_ITEM  = "SavedItems";
+    public static final String TABLE_SvodPay  = "SvodPays";
 
     public static String KEY_OrderID   = "OrderId";
     public static String KEY_BAZA   = "baza";
@@ -33,6 +34,7 @@ public class Order implements Serializable {
     private String dogovor = "";
     private String client = "";
     private ArrayList<Item> arraylistTovar = new ArrayList<>();
+    private ArrayList<SvodPay> arraylistSvodPay = new ArrayList<>();
     private String date = "";
     private String comment = "";
     private String dateSend = "";
@@ -93,6 +95,14 @@ public class Order implements Serializable {
 
     public void setArraylistTovar(ArrayList<Item> arraylistTovar) {
         this.arraylistTovar = arraylistTovar;
+    }
+
+    public ArrayList<SvodPay> getArraylistSvodPay() {
+        return arraylistSvodPay;
+    }
+
+    public void setArraylistSvodPay(ArrayList<SvodPay> arraylistSvodPay) {
+        this.arraylistSvodPay = arraylistSvodPay;
     }
 
     public String getDate() {

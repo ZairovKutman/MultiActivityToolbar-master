@@ -423,7 +423,7 @@ public class AddOrderFragment extends Fragment {
         docId = parentActivity.order.getOrderID();
         editText.setText(parentActivity.order.getDate());
         editTextDostavka.setText(parentActivity.order.getDateSend());
-        parentActivity.othersFragment.comments.setText(parentActivity.order.getComment());
+        //parentActivity.othersFragment.comments.setText(parentActivity.order.getComment());
 
         for (Contract contract: arrayListContract)
         {
@@ -465,8 +465,8 @@ public class AddOrderFragment extends Fragment {
 
         parentActivity.setWarehouseGuid(parentActivity.getWarehouse());
         parentActivity.setPriceTypeGUID(parentActivity.getPriceType());
-        parentActivity.updatePrices();
-        parentActivity.updateStock();
+//        parentActivity.updatePrices();
+//        parentActivity.updateStock();
 
         if (parentActivity.order.isDelivered())
         {
@@ -543,7 +543,7 @@ public class AddOrderFragment extends Fragment {
             device.agent = name;
             device.deviceId = android_id;
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
-            System.out.println(deviceStatus.comment);
+
             if (!deviceStatus.active) {
                 publishProgress("Доступ с телефона запрещен");
                 return null;
@@ -561,6 +561,8 @@ public class AddOrderFragment extends Fragment {
             docPurch.priceTypeGuid = arrayListPriceType.get(spinner_pricetype.getSelectedItemPosition()).getGuid();
             docPurch.docType = Integer.parseInt(parentActivity.doctype);
             docPurch.docId = docId;
+            docPurch.latitude = Double.toString(parentActivity.mLastLocation.getLatitude());
+            docPurch.longitude = Double.toString(parentActivity.mLastLocation.getLongitude());
 
             ArrayList<Item> orderedItemsArrayList;
             orderedItemsArrayList = parentActivity.getSelectedItems();
@@ -599,7 +601,7 @@ public class AddOrderFragment extends Fragment {
                 stocksArray.add(stock1);
                 stocksRepo.insert(stock1);
             }
-            System.out.println("Stock: Done");
+
             return new Points();
         }
 

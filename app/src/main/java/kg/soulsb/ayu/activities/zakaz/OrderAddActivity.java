@@ -1,6 +1,7 @@
 package kg.soulsb.ayu.activities.zakaz;
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -47,6 +49,7 @@ public class OrderAddActivity extends BaseActivity {
     AddOrderFragment addOrderFragment = new AddOrderFragment();
     AddTovarFragment addTovarFragment = new AddTovarFragment();
     OthersFragment  othersFragment = new OthersFragment();
+
     double totalSum=0;
     public Location getLocation() {
         System.out.println(" I GOT A LOCATION: lat="+CurrentLocationClass.getInstance().getCurrentLocation().getLatitude()
@@ -180,16 +183,20 @@ public void locationUpdate(){
             doctype = "1";
             if (getIntent().getSerializableExtra("savedobj")!=null)
                 setTitle("Сохраненный документ - Продажа");
-            else
+            else {
                 setTitle("Новый документ - Продажа");
+                checkGps(OrderAddActivity.this);
+            }
         }
         else
         {
             doctype = "0";
             if (getIntent().getSerializableExtra("savedobj")!=null)
                 setTitle("Сохраненный документ - Заказ");
-            else
+            else {
                 setTitle("Новый документ - Заказ");
+                checkGps(OrderAddActivity.this);
+        }
 
         }
 
@@ -224,7 +231,9 @@ public void locationUpdate(){
     }
 
     public void setupViewPager(ViewPager viewPager) {
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+
+        adapter = new ViewPagerAdapter(fragmentManager);
 
         adapter.addFrag(addOrderFragment, "Клиент");
         adapter.addFrag(addTovarFragment, "Товары");
@@ -233,6 +242,7 @@ public void locationUpdate(){
         addOrderFragment = (AddOrderFragment) adapter.getItem(0);
         addTovarFragment = (AddTovarFragment) adapter.getItem(1);
         othersFragment = (OthersFragment) adapter.getItem(2);
+
         viewPager.setAdapter(adapter);
     }
 
@@ -276,7 +286,6 @@ public void locationUpdate(){
 
     public void updateStock()
     {
-        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
         if (addTovarFragment != null)
             addTovarFragment.updateStock();
     }

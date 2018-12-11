@@ -13,7 +13,7 @@ public class MyLocation {
     public static String KEY_longitude     = "longitude";
     public static String KEY_agent     = "agent";
     public static String KEY_formattedDate     = "formattedDate";
-
+    public static String KEY_speed = "speed";
 
 
     private String myLocationId;
@@ -21,16 +21,25 @@ public class MyLocation {
     private String longitude;
     private String agent;
     private String formattedDate;
-
+    private String speed;
 
     public MyLocation()
     {
     }
-    public MyLocation(String latitude, String longitude, String agent, String formattedDate) {
+    public MyLocation(String latitude, String longitude, String agent, String formattedDate, String speed) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.agent = agent;
         this.formattedDate = formattedDate;
+        this.speed = speed;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
     }
 
     public String getLatitude() {

@@ -57,6 +57,7 @@ public class OthersFragment extends Fragment {
             {
                 disableButtons();
             }
+            comments.setText(parentActivity.order.getComment());
         }
         totalSumTextView = (TextView) v.findViewById(R.id.otherFragment_total_sum);
 

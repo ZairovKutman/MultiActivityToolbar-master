@@ -28,6 +28,7 @@ public class MyLocationsRepo {
                 + MyLocation.KEY_agent  + "   TEXT    ,"
                 + MyLocation.KEY_latitude  + "   TEXT    ,"
                 + MyLocation.KEY_longitude  + "   TEXT    ,"
+                + MyLocation.KEY_speed  + "   TEXT    ,"
                 + MyLocation.KEY_formattedDate  + "   TEXT);";
     }
 
@@ -39,6 +40,7 @@ public class MyLocationsRepo {
         values.put(MyLocation.KEY_formattedDate, myLocation.getFormattedDate());
         values.put(MyLocation.KEY_latitude, myLocation.getLatitude());
         values.put(MyLocation.KEY_longitude, myLocation.getLongitude());
+        values.put(MyLocation.KEY_speed, myLocation.getSpeed());
 
 
         // Inserting Row
@@ -63,6 +65,7 @@ public class MyLocationsRepo {
                 + ", "+MyLocation.KEY_latitude
                 + ", "+MyLocation.KEY_formattedDate
                 + ", "+MyLocation.KEY_agent
+                + ", "+MyLocation.KEY_speed
                 + " FROM " + MyLocation.TABLE;
 
         if (db.isOpen()) {
@@ -82,6 +85,7 @@ public class MyLocationsRepo {
                 myLocation.setFormattedDate(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_formattedDate)));
                 myLocation.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_latitude)));
                 myLocation.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_longitude)));
+                myLocation.setSpeed(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_speed)));
 
                 arrayList.add(myLocation);
             } while (cursor.moveToNext());
@@ -104,6 +108,7 @@ public class MyLocationsRepo {
         values.put(MyLocation.KEY_agent, myLocation.getAgent());
         values.put(MyLocation.KEY_longitude, myLocation.getLongitude());
         values.put(MyLocation.KEY_latitude, myLocation.getLatitude());
+        values.put(MyLocation.KEY_speed, myLocation.getSpeed());
 
 
         // deleting Row

@@ -235,6 +235,7 @@ public class MyService extends Service {
             request.date = formattedDate;
             request.latitude = Double.toString(mLastLocation.getLatitude());
             request.longitude = Double.toString(mLastLocation.getLongitude());
+            request.speed = Double.toString(mLastLocation.getSpeed());
 
             DBHelper dbHelper = new DBHelper(getBaseContext());
             DatabaseManager.initializeInstance(dbHelper);
@@ -242,7 +243,7 @@ public class MyService extends Service {
             MyLocationsRepo myLocationsRepo = new MyLocationsRepo();
             OperationStatus bl = blockingStub.sendLocation(request);
             if (bl.status == 1) {
-                myLocationsRepo.insert(new MyLocation(Double.toString(mLastLocation.getLatitude()), Double.toString(mLastLocation.getLongitude()), name, formattedDate));
+                myLocationsRepo.insert(new MyLocation(Double.toString(mLastLocation.getLatitude()), Double.toString(mLastLocation.getLongitude()), name, formattedDate, Double.toString(mLastLocation.getSpeed())));
             }
             if (!isSending) {
                 isSending = true;
@@ -254,6 +255,7 @@ public class MyService extends Service {
                     request.date = list.getFormattedDate();
                     request.latitude = list.getLatitude();
                     request.longitude = list.getLongitude();
+                    request.speed = Double.toString(Double.valueOf(list.getSpeed())*3600/1000) ;
 
                     myLocationsRepo = new MyLocationsRepo();
                     bl = blockingStub.sendLocation(request);
@@ -289,6 +291,7 @@ public class MyService extends Service {
                 myLocation.setLatitude(Double.toString(mLastLocation.getLatitude()));
                 myLocation.setLongitude(Double.toString(mLastLocation.getLongitude()));
                 myLocation.setFormattedDate(formattedDate);
+                myLocation.setSpeed(Double.toString(mLastLocation.getSpeed()));
 
                 myLocationsRepo.insert(myLocation);
                 return

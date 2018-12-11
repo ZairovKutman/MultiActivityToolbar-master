@@ -8,6 +8,11 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_tasks"
+            android:icon="@android:drawable/ic_input_get"
+            android:title="Задания" />
+
+        <item
             android:id="@+id/nav_orders"
             android:icon="@drawable/ic_order"
             android:title="Создать заказ" />
@@ -21,6 +26,10 @@
             android:id="@+id/nav_pay"
             android:icon="@android:drawable/ic_menu_set_as"
             android:title="Оплата" />
+        <item
+            android:id="@+id/nav_pay_svod"
+            android:icon="@android:drawable/ic_menu_set_as"
+            android:title="Сводная оплата" />
 
         <item
             android:id="@+id/nav_svod"

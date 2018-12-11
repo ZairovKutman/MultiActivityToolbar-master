@@ -21,6 +21,7 @@ import kg.soulsb.ayu.adapters.ClientAdapter;
 import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
+import kg.soulsb.ayu.grpctest.nano.ConsPaymentLine;
 import kg.soulsb.ayu.grpctest.nano.Contract;
 import kg.soulsb.ayu.grpctest.nano.Contracts;
 import kg.soulsb.ayu.grpctest.nano.Device;
@@ -77,6 +78,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.grpctest.nano.Price;
 import kg.soulsb.ayu.models.Order;
+import kg.soulsb.ayu.models.SvodPay;
+import kg.soulsb.ayu.models.SvodPayRow;
 import kg.soulsb.ayu.models.Unit;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.DataHolderClass;
@@ -107,6 +110,35 @@ public class SettingsObmenActivity extends BaseActivity {
     boolean onlyDocs = false;
     String errorMessage="";
 
+
+    public void fillDocumentsTable(){
+        arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
+        arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
+        listViewDocuments.setAdapter(arrayAdapter);
+        listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if (arrayList.get(i).getDoctype().equals("3")) {
+                    intent = new Intent(getApplicationContext(), PaySvodActivity.class);
+                }
+                else if (arrayList.get(i).getDoctype().equals("2")) {
+                    intent = new Intent(getApplicationContext(), PayActivity.class);
+                }
+                else
+                {
+                    intent = new Intent(getApplicationContext(), OrderAddActivity.class);
+                }
+
+                intent.putExtra("doctype",arrayList.get(i).getDoctype());
+                intent.putExtra("savedobj", arrayList.get(i));
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);}
+        });
+        arrayAdapter.notifyDataSetChanged();
+
+    }
+
     @Override
     protected boolean useDrawerToggle() {
         return false;
@@ -127,26 +159,6 @@ public class SettingsObmenActivity extends BaseActivity {
         loadOnlyDocButton = (Button) findViewById(R.id.button_only_documents);
         listViewDocuments = (ListView) findViewById(R.id.listView_documents);
         textViewEmpty = (TextView) findViewById(R.id.textViewEmpty);
-        arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
-        arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
-        listViewDocuments.setAdapter(arrayAdapter);
-        listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent;
-                if (arrayList.get(i).getDoctype().equals("2")) {
-                    intent = new Intent(getApplicationContext(), PayActivity.class);
-                }
-                else
-                {
-                    intent = new Intent(getApplicationContext(), OrderAddActivity.class);
-                }
-
-                intent.putExtra("doctype",arrayList.get(i).getDoctype());
-                intent.putExtra("savedobj", arrayList.get(i));
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);}
-        });
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         lastObmenText.setText("Добавьте базу данных");
 
@@ -249,6 +261,8 @@ public class SettingsObmenActivity extends BaseActivity {
         });
 
         textView = (TextView) findViewById(R.id.usingBase);
+
+        fillDocumentsTable();
     }
     /**
      * Метод делает полный обмен с сервером и загружает в базу
@@ -348,6 +362,21 @@ public class SettingsObmenActivity extends BaseActivity {
                 docPurch.docId = order.getOrderID();
                 docPurch.amount = order.getTotalSum();
                 ArrayList<Item> itemsList = order.getArraylistTovar();
+
+                ConsPaymentLine[] arrayPayments = new ConsPaymentLine[order.getArraylistSvodPay().size()];
+                int i =0;
+
+                for (SvodPay svodPay: order.getArraylistSvodPay()) {
+
+                    ConsPaymentLine consPaymentLine = new ConsPaymentLine();
+                    consPaymentLine.clientGuid = svodPay.getClient();
+                    consPaymentLine.contractGuid = svodPay.getDogovor();
+                    consPaymentLine.amount = svodPay.getSum();
+                    arrayPayments[i] = consPaymentLine;
+                    i = i +1;
+                }
+
+                docPurch.payments = arrayPayments;
 
                 PurchDocLine[] purchDocLines = new PurchDocLine[itemsList.size()];
                 int counter = 0;
@@ -557,7 +586,6 @@ public class SettingsObmenActivity extends BaseActivity {
             pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Price price: prices.price)
             {
-                System.out.println(price.item+" - "+price.price);
                 kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
                 price1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 pricesArray.add(price1);
@@ -689,6 +717,7 @@ public class SettingsObmenActivity extends BaseActivity {
         else{
             textViewEmpty.setVisibility(View.INVISIBLE);
         }
+        fillDocumentsTable();
     }
 
     @Override

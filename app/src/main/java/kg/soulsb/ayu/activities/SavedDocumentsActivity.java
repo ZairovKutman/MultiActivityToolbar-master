@@ -84,7 +84,14 @@ public class SavedDocumentsActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                if (!orderArrayList.get(i).getDoctype().equals("2")) {
+                if (orderArrayList.get(i).getDoctype().equals("3")) {
+                    Intent intent = new Intent(getBaseContext(),PaySvodActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
+                    intent.putExtra("savedobj", orderArrayList.get(i));
+                    startActivity(intent);
+                }
+                else if (!orderArrayList.get(i).getDoctype().equals("2")) {
                     Intent intent = new Intent(SavedDocumentsActivity.this, OrderAddActivity.class);
                     intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
                     intent.putExtra("savedobj", orderArrayList.get(i));
