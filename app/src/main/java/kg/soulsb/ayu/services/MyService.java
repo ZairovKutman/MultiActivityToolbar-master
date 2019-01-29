@@ -18,10 +18,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
-import com.google.android.gms.location.LocationRequest;
-
-import org.reactivestreams.Subscription;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.reactivex.functions.Consumer;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
 import kg.soulsb.ayu.grpctest.nano.OperationStatus;
@@ -43,7 +38,6 @@ import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.MyLocation;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.CurrentLocationClass;
-import pl.charmas.android.reactivelocation2.ReactiveLocationProvider;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
@@ -53,7 +47,7 @@ public class MyService extends Service {
     private static final int LOCATION_INTERVAL = 2000;
     private static final float LOCATION_DISTANCE = 1;
     Location mLastLocation = new Location("null");
-    String currentBaseString = "";
+    String currentBaseString="";
     Baza baza;
     private Timer mTimer = null;
     boolean isSending = false;
@@ -71,13 +65,13 @@ public class MyService extends Service {
         public void onLocationChanged(Location location) {
             Log.e(TAG, "onLocationChanged: " + location);
 
-            if (location.getAccuracy() < 100) {
+            if (location.getAccuracy() < 100){
                 mLastLocation.set(location);
                 CurrentLocationClass.getInstance().setCurrentLocation(mLastLocation);
             }
         }
 
-
+        @Override
         public void onProviderDisabled(String provider) {
             Log.e(TAG, "onProviderDisabled: " + provider);
         }
@@ -93,11 +87,11 @@ public class MyService extends Service {
         }
     }
 
-
     private void prepareSending() {
         try {
             currentBaseString = CurrentBaseClass.getInstance().getCurrentBaseObject().getName();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             System.out.println("Application is dead");
             return;
         }
@@ -111,7 +105,9 @@ public class MyService extends Service {
                     .usePlaintext(true).build(), CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
 
             grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
         }
     }
@@ -125,7 +121,7 @@ public class MyService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
 
-        super.onStartCommand(intent, flags, startId);
+            super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -133,26 +129,33 @@ public class MyService extends Service {
     public void onCreate() {
         System.out.println("started onCreate");
         Log.e(TAG, "onCreate");
-        LocationRequest request = LocationRequest.create() //standard GMS LocationRequest
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setNumUpdates(5)
-                .setInterval(100);
-
-        ReactiveLocationProvider locationProvider = new ReactiveLocationProvider(getApplicationContext());
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        initializeLocationManager();
+        try {
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    mLocationListeners[1]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "network provider does not exist, " + ex.getMessage());
         }
-        Subscription subscription = locationProvider.getUpdatedLocation(request).subscribe(new Subscription<Location>() {
+        try {
+            mLocationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
+                    mLocationListeners[0]);
+        } catch (java.lang.SecurityException ex) {
+            Log.i(TAG, "fail to request location update, ignore", ex);
+        } catch (IllegalArgumentException ex) {
+            Log.d(TAG, "gps provider does not exist " + ex.getMessage());
+        }
 
- f
-        });
+        if (mTimer != null) // Cancel if already existed
+            mTimer.cancel();
+        else
+            mTimer = new Timer();
+
+        mTimer.scheduleAtFixedRate(new TimeDisplay(),5000,30000);
+
     }
     //class TimeDisplay for handling task
     class TimeDisplay extends TimerTask {
