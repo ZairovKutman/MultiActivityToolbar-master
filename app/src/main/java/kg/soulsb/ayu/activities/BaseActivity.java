@@ -118,6 +118,9 @@ public class BaseActivity extends AppCompatActivity implements
         MenuItem nav_itemTasks = menuNav.findItem(R.id.nav_tasks);
         nav_itemTasks.setEnabled(false);
 
+        MenuItem nav_itemScan = menuNav.findItem(R.id.nav_scan);
+        nav_itemScan.setEnabled(false);
+
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
 
         if (sharedPreferences.contains("default_name")) {
@@ -233,6 +236,12 @@ public class BaseActivity extends AppCompatActivity implements
 
             case R.id.nav_tasks:
                 intent = new Intent(this, TasksActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                return true;
+
+            case R.id.nav_scan:
+                intent = new Intent(this, ScanDocumentActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 return true;

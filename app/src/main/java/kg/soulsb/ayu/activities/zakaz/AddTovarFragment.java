@@ -266,9 +266,13 @@ public class AddTovarFragment extends Fragment {
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
+                try {
                 arrayList.clear();
                 arrayList.addAll(originalArrayList);
-                arrayAdapter.notifyDataSetChanged();
+                arrayAdapter.notifyDataSetChanged();}
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
         });
