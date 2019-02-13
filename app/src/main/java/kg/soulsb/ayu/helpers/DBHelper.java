@@ -42,7 +42,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 11;
     // Database Name
     private static final String DATABASE_NAME = "ayu_sqlite.db";
     private static final String TAG = DBHelper.class.getSimpleName().toString();
@@ -113,9 +113,15 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE "+ Order.TABLE_ITEM +" ADD COLUMN "+ Item.KEY_isDelivered  +" TEXT DEFAULT 'true'");
         }
 
-        if ((oldVersion==1 || oldVersion==2 || oldVersion==3) && (newVersion == 4 ))
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3))
         {
-            db.execSQL(OrdersRepo.createSvodPayTable());
+            try {
+                db.execSQL(OrdersRepo.createSvodPayTable());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         if ((oldVersion==1 || oldVersion==2 || oldVersion==3) && (newVersion == 5 ))
@@ -134,5 +140,37 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
             db.execSQL(MyLocationsRepo.createTable());
         }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3 || oldVersion==4 || oldVersion==5 || oldVersion==6) && newVersion == 7)
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
+            db.execSQL(MyLocationsRepo.createTable());
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3 || oldVersion==4 || oldVersion==5 || oldVersion==6 || oldVersion==7) && (newVersion > 8 && newVersion <= 10))
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
+            db.execSQL(MyLocationsRepo.createTable());
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3 || oldVersion==4 || oldVersion==5 || oldVersion==6 || oldVersion==7 || oldVersion==8 || oldVersion==9) && newVersion == 10)
+        {
+            db.execSQL("ALTER TABLE " + Order.TABLE + " ADD COLUMN " + Order.KEY_checkedBonusTT + " text NOT NULL DEFAULT 'false';");
+            db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
+            db.execSQL(MyLocationsRepo.createTable());
+        }
+
+        if ((oldVersion==1 || oldVersion==2 || oldVersion==3 || oldVersion==4 || oldVersion==5 || oldVersion==6 || oldVersion==7 || oldVersion==8 || oldVersion==9 || oldVersion==10) && newVersion == 11)
+        {
+            if (oldVersion!=10)
+            {
+                db.execSQL("ALTER TABLE " + Order.TABLE + " ADD COLUMN " + Order.KEY_checkedBonusTT + " text NOT NULL DEFAULT 'false';");
+            }
+
+            db.execSQL("UPDATE " + Order.TABLE + " SET " + Order.KEY_checkedBonusTT + " = 'false';");
+            db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
+            db.execSQL(MyLocationsRepo.createTable());
+        }
+
     }
 }

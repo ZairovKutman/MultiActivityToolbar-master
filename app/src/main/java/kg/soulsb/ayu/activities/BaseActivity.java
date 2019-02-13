@@ -20,6 +20,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import kg.soulsb.ayu.BuildConfig;
 import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;

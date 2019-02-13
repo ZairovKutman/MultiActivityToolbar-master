@@ -343,7 +343,7 @@ public class ReportsActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Points pointIterator) {
             try {
-                mChannel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+                mChannel.shutdown().awaitTermination(3, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

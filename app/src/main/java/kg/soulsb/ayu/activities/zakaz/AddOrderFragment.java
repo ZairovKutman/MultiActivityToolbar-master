@@ -21,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import io.grpc.ManagedChannel;
@@ -101,6 +102,7 @@ public class AddOrderFragment extends Fragment {
     String docId;
     Contract previous=new Contract();
     Contract current=null;
+    TextView distanceClient;
 
     @Nullable
     @Override
@@ -109,11 +111,16 @@ public class AddOrderFragment extends Fragment {
         dbHelper = new DBHelper(getContext());
         final Intent dateintent = new Intent(getContext(), ChooseClientTableActivity.class);
 
+
+        distanceClient = (TextView) v.findViewById(R.id.order_client_distance_text);
         editText_client = (EditText) v.findViewById(R.id.order_editText_client);
 
         editText_client.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dateintent.putExtra("latitude",parentActivity.mLastLocation.getLatitude());
+                dateintent.putExtra("longitude",parentActivity.mLastLocation.getLongitude());
+                dateintent.putExtra("doctype",parentActivity.doctype);
                 startActivityForResult(dateintent, REQUEST_CODE);
             }
         });
@@ -554,6 +561,8 @@ public class AddOrderFragment extends Fragment {
             docPurch.agent = name;
             docPurch.clientGuid = clientGUID;
             docPurch.comment = parentActivity.othersFragment.comments.getText().toString();
+            docPurch.bonusTT = parentActivity.othersFragment.bonusTT.isChecked();
+
             docPurch.deliveryDate = editTextDostavka.getText().toString();
             docPurch.contractGuid = arrayListContract.get(spinner_contract.getSelectedItemPosition()).getGuid();
             docPurch.date = editText.getText().toString();
@@ -658,6 +667,12 @@ public class AddOrderFragment extends Fragment {
         order.setBaza(CurrentBaseClass.getInstance().getCurrentBaseObject());
         order.setClient(clientGUID);
         order.setComment(parentActivity.othersFragment.comments.getText().toString());
+        if (parentActivity.othersFragment.bonusTT.isChecked()) {
+            order.setCheckedBonusTT("true");
+        }
+        else{
+            order.setCheckedBonusTT("false");
+        }
         order.setDate(editText.getText().toString());
         order.setDateSend(editTextDostavka.getText().toString());
         order.setDoctype(parentActivity.doctype);

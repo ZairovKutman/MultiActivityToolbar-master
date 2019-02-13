@@ -30,20 +30,31 @@
 
                 <TextView
                     android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:text="База данных"
                     android:textAlignment="viewStart"
                     android:layout_gravity="start"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layout_weight="2"/>
 
                 <Spinner
                     android:id="@+id/spinner_baza"
                     style="@style/spinner_style"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="5"
                     android:spinnerMode="dialog" />
+
+                <ImageView
+                    android:id="@+id/imageViewgps"
+                    android:padding="10dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@android:drawable/ic_menu_myplaces" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -170,6 +181,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/textView_no_tasks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Нет заданий на сегодня"

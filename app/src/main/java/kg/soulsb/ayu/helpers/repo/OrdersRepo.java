@@ -28,6 +28,7 @@ public class OrdersRepo {
         return "CREATE TABLE IF NOT EXISTS " + Order.TABLE  + " ("
                 + Order.KEY_OrderID  + "   PRIMARY KEY    ,"
                 + Order.KEY_comment  + "   TEXT    ,"
+                + Order.KEY_checkedBonusTT  + "   TEXT    ,"
                 + Order.KEY_dateSend  + "   TEXT    ,"
                 + Order.KEY_totalSum  + "   TEXT    ,"
                 + Order.KEY_Doctype  + "   TEXT    ,"
@@ -91,6 +92,7 @@ public class OrdersRepo {
         values.put(Order.KEY_BAZA, order.getBaza());
         values.put(Order.KEY_clientGUID, order.getClient());
         values.put(Order.KEY_comment, order.getComment());
+        values.put(Order.KEY_checkedBonusTT, order.getCheckedBonusTTString());
         values.put(Order.KEY_date, order.getDate());
         values.put(Order.KEY_dateSend, order.getDateSend());
         values.put(Order.KEY_Doctype, order.getDoctype());
@@ -157,6 +159,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_BAZA
                 + ", "+Order.KEY_clientGUID
                 + ", "+Order.KEY_comment
+                + ", "+Order.KEY_checkedBonusTT
                 + ", "+Order.KEY_date
                 + ", "+Order.KEY_dateSend
                 + ", "+Order.KEY_Doctype
@@ -187,6 +190,7 @@ public class OrdersRepo {
                 order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
                 order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
                 order.setComment(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_comment)));
+                order.setCheckedBonusTT(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_checkedBonusTT)));
                 order.setDate(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_date)));
                 order.setDateSend(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dateSend)));
                 order.setDoctype(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Doctype)));
@@ -296,6 +300,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_BAZA
                 + ", "+Order.KEY_clientGUID
                 + ", "+Order.KEY_comment
+                + ", "+Order.KEY_checkedBonusTT
                 + ", "+Order.KEY_date
                 + ", "+Order.KEY_dateSend
                 + ", "+Order.KEY_Doctype
@@ -326,6 +331,7 @@ public class OrdersRepo {
                 order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
                 order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
                 order.setComment(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_comment)));
+                order.setCheckedBonusTT(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_checkedBonusTT)));
                 order.setDate(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_date)));
                 order.setDateSend(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dateSend)));
                 order.setDoctype(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Doctype)));

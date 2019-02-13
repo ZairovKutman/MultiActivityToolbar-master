@@ -93,6 +93,13 @@
                 android:inputType="text"
                 android:id="@+id/order_editText_client"
                 tools:layout_margin="10dp" />
+            <TextView
+                android:id="@+id/order_client_distance_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textAlignment="textEnd"
+                tools:layout_margin="10dp" />
         </TableRow>
 
         <TableRow

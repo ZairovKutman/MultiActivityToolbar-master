@@ -117,41 +117,6 @@ public class PaySvodActivity extends BaseActivity {
     AlertDialog alertDialog;
     String docId;
 
-    public Location getLocation() {
-        System.out.println(" I GOT A LOCATION: lat=" + CurrentLocationClass.getInstance().getCurrentLocation().getLatitude()
-                + " long=" + CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
-        return CurrentLocationClass.getInstance().getCurrentLocation();
-    }
-
-    public void locationUpdate() {
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // run on another thread
-                mLastLocation = getLocation();
-
-                clientLocation.setLatitude(Double.parseDouble(clientLat));
-                clientLocation.setLongitude(Double.parseDouble(clientLong));
-                distance = mLastLocation.distanceTo(clientLocation);
-                System.out.println("DISTANCE = " + distance);
-                if (distance < 51) {
-                    createDocButton.setEnabled(true);
-                } else {
-                    createDocButton.setEnabled(false);
-                }
-            }
-        }, 0);
-    }
-
-    //class TimeDisplay for handling task
-    class TimeDisplay extends TimerTask {
-        @Override
-        public void run() {
-            // run on another thread
-            locationUpdate();
-        }
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -308,6 +273,7 @@ public class PaySvodActivity extends BaseActivity {
                         {
                             if (svod.clientEditText.equals(v))
                             {
+                                myIntent.putExtra("doctype", "3");
                                 startActivityForResult(myIntent, svod.getRowId());
                                 break;
                             }
@@ -513,6 +479,7 @@ public class PaySvodActivity extends BaseActivity {
                     System.out.println("clicked");
                     for (SvodPayRow svod : svodPayRowArrayList) {
                         if (svod.clientEditText.equals(v)) {
+                            myIntent.putExtra("doctype", "3");
                             startActivityForResult(myIntent, svod.getRowId());
                             break;
                         }
@@ -857,12 +824,5 @@ public class PaySvodActivity extends BaseActivity {
         //
         SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(), MODE_PRIVATE);
         String flag;
-
-        flag = sharedPreferences.getString(UserSettings.create_sales_at_clients_coordinates, "false");
-
-        if (flag.equals("true")) {
-            mTimer = new Timer();
-            mTimer.scheduleAtFixedRate(new TimeDisplay(), 2000, 2000);
-        }
     }
 }

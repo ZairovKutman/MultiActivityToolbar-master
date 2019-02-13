@@ -3,6 +3,7 @@ package kg.soulsb.ayu.activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -15,6 +16,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import kg.soulsb.ayu.BuildConfig;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
 import kg.soulsb.ayu.adapters.ClientAdapter;
@@ -186,9 +189,9 @@ public class SettingsObmenActivity extends BaseActivity {
 
         textView = (TextView) findViewById(R.id.usingBase);
         if (baza!=null)
-            textView.setText("Используемая база: "+baza.getName());
+            textView.setText("Используемая база "+ BuildConfig.VERSION_NAME.toString()+": "+baza.getName());
         else
-            textView.setText("Используемая база: Создайте базу данных");
+            textView.setText("Используемая база "+ BuildConfig.VERSION_NAME.toString()+": "+" Создайте базу данных");
 
         // BUTTON STOCKS
         loadStockButton.setOnClickListener(new View.OnClickListener() {
@@ -332,6 +335,7 @@ public class SettingsObmenActivity extends BaseActivity {
             Device device = new Device();
             device.agent = name;
             device.deviceId = android_id;
+            device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
             publishProgress("Проверка устройства в базе данных...");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
@@ -353,6 +357,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 docPurch.agent = name;
                 docPurch.clientGuid = order.getClient();
                 docPurch.comment = order.getComment();
+                docPurch.bonusTT = order.getCheckedBonusTT();
                 docPurch.deliveryDate = order.getDateSend();
                 docPurch.contractGuid = order.getDogovor();
                 docPurch.date = order.getDate();
@@ -550,6 +555,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 contract1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 contractsArray.add(contract1);
                 contractsRepo.insert(contract1);
+                System.out.println(contract1.getClientGuid());
             }
             System.out.println("Contracts: Done");
 

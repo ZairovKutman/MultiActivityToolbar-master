@@ -26,9 +26,11 @@ public class MyLocationsRepo {
         return "CREATE TABLE IF NOT EXISTS " + MyLocation.TABLE  + " ("
                 + MyLocation.KEY_MyLocationId  + "   PRIMARY KEY    ,"
                 + MyLocation.KEY_agent  + "   TEXT    ,"
-                + MyLocation.KEY_latitude  + "   TEXT    ,"
-                + MyLocation.KEY_longitude  + "   TEXT    ,"
-                + MyLocation.KEY_speed  + "   TEXT    ,"
+                + MyLocation.KEY_latitude  + "   REAL    ,"
+                + MyLocation.KEY_longitude  + "   REAL    ,"
+                + MyLocation.KEY_accuracy  + "   REAL    ,"
+                + MyLocation.KEY_speed  + "   REAL    ,"
+                + MyLocation.KEY_deviceId  + "   TEXT    ,"
                 + MyLocation.KEY_formattedDate  + "   TEXT);";
     }
 
@@ -41,6 +43,8 @@ public class MyLocationsRepo {
         values.put(MyLocation.KEY_latitude, myLocation.getLatitude());
         values.put(MyLocation.KEY_longitude, myLocation.getLongitude());
         values.put(MyLocation.KEY_speed, myLocation.getSpeed());
+        values.put(MyLocation.KEY_deviceId, myLocation.getDeviceID());
+        values.put(MyLocation.KEY_accuracy, myLocation.getAccuracy());
 
 
         // Inserting Row
@@ -66,6 +70,8 @@ public class MyLocationsRepo {
                 + ", "+MyLocation.KEY_formattedDate
                 + ", "+MyLocation.KEY_agent
                 + ", "+MyLocation.KEY_speed
+                + ", "+MyLocation.KEY_accuracy
+                + ", "+MyLocation.KEY_deviceId
                 + " FROM " + MyLocation.TABLE;
 
         if (db.isOpen()) {
@@ -83,9 +89,11 @@ public class MyLocationsRepo {
                 MyLocation myLocation = new MyLocation();
                 myLocation.setAgent(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_agent)));
                 myLocation.setFormattedDate(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_formattedDate)));
-                myLocation.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_latitude)));
-                myLocation.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_longitude)));
-                myLocation.setSpeed(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_speed)));
+                myLocation.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyLocation.KEY_latitude)));
+                myLocation.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow(MyLocation.KEY_longitude)));
+                myLocation.setSpeed(cursor.getFloat(cursor.getColumnIndexOrThrow(MyLocation.KEY_speed)));
+                myLocation.setDeviceID(cursor.getString(cursor.getColumnIndexOrThrow(MyLocation.KEY_deviceId)));
+                myLocation.setAccuracy(cursor.getFloat(cursor.getColumnIndexOrThrow(MyLocation.KEY_accuracy)));
 
                 arrayList.add(myLocation);
             } while (cursor.moveToNext());
@@ -108,7 +116,6 @@ public class MyLocationsRepo {
         values.put(MyLocation.KEY_agent, myLocation.getAgent());
         values.put(MyLocation.KEY_longitude, myLocation.getLongitude());
         values.put(MyLocation.KEY_latitude, myLocation.getLatitude());
-        values.put(MyLocation.KEY_speed, myLocation.getSpeed());
 
 
         // deleting Row

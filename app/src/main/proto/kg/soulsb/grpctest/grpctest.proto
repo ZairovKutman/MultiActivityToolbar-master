@@ -97,6 +97,7 @@ message Organizations{
 message Device{
 	string agent = 1;
 	string device_id = 2;
+	string model_description = 3;
 }
 
 message DeviceStatus{
@@ -214,6 +215,7 @@ message DocPurch {
 	repeated ConsPaymentLine payments = 14;
 	string latitude = 15;
 	string longitude = 16;
+	bool bonus_TT = 17;
 }
 
 message Docs{
@@ -252,10 +254,12 @@ message Stock{
 
 message Location {
 	Agent agent = 1;
-	string latitude = 2;
-	string longitude = 3;
+	double latitude = 2;
+	double longitude = 3;
 	string date = 4;
-	string speed = 5;
+	float speed = 5;
+	string device_id = 6;
+	float accuracy = 7;
 }
 
 message Settings{

@@ -14,47 +14,53 @@ public class MyLocation {
     public static String KEY_agent     = "agent";
     public static String KEY_formattedDate     = "formattedDate";
     public static String KEY_speed = "speed";
+    public static String KEY_deviceId = "deviceId";
+    public static String KEY_accuracy = "accuracy";
 
 
     private String myLocationId;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
     private String agent;
     private String formattedDate;
-    private String speed;
+    private Float speed;
+    private String deviceID;
+    private Float accuracy;
 
     public MyLocation()
     {
     }
-    public MyLocation(String latitude, String longitude, String agent, String formattedDate, String speed) {
+    public MyLocation(Double latitude, Double longitude, String agent, String formattedDate, Float speed, Float accuracy, String deviceID) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.agent = agent;
         this.formattedDate = formattedDate;
         this.speed = speed;
+        this.deviceID = deviceID;
+        this.accuracy = accuracy;
     }
 
-    public String getSpeed() {
+    public Float getSpeed() {
         return speed;
     }
 
-    public void setSpeed(String speed) {
+    public void setSpeed(Float speed) {
         this.speed = speed;
     }
 
-    public String getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(String latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public String getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(String longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -73,4 +79,17 @@ public class MyLocation {
     public void setFormattedDate(String formattedDate) {
         this.formattedDate = formattedDate;
     }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
+
+    public float getAccuracy() {
+        return accuracy;
+    }
+    public void setAccuracy(Float accuracy){ this.accuracy = accuracy; }
 }

@@ -18,4 +18,7 @@ public class UserSettings {
     public static String status = "status";
     public static String can_create_payment = "can_create_payment";
     public static String error_message = "error_message";
+
+    public static final int LOCATION_INTERVAL = 40000;
+    public static final int FASTEST_LOCATION_INTERVAL = 20000;
 }

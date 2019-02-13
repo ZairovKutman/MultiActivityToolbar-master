@@ -51,6 +51,7 @@ public class MyService extends Service {
     Baza baza;
     private Timer mTimer = null;
     boolean isSending = false;
+    String android_id = "";
     ArrayList<MyLocation> arrayList = new ArrayList<>();
 
     private class LocationListener implements android.location.LocationListener {
@@ -59,6 +60,7 @@ public class MyService extends Service {
         LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
+
         }
 
         @Override
@@ -127,6 +129,8 @@ public class MyService extends Service {
 
     @Override
     public void onCreate() {
+        android_id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                android.provider.Settings.Secure.ANDROID_ID);
         System.out.println("started onCreate");
         Log.e(TAG, "onCreate");
         initializeLocationManager();
@@ -154,7 +158,7 @@ public class MyService extends Service {
         else
             mTimer = new Timer();
 
-        mTimer.scheduleAtFixedRate(new TimeDisplay(),5000,30000);
+        mTimer.scheduleAtFixedRate(new TimeDisplay(),15000,50000);
 
     }
     //class TimeDisplay for handling task
@@ -225,17 +229,17 @@ public class MyService extends Service {
             AyuServiceGrpc.AyuServiceBlockingStub blockingStub = AyuServiceGrpc.newBlockingStub(mChannel);
             kg.soulsb.ayu.grpctest.nano.Location request = new kg.soulsb.ayu.grpctest.nano.Location();
 
-            Calendar c = Calendar.getInstance();
             SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            String formattedDate = df.format(c.getTime());
+            String formattedDate = df.format(mLastLocation.getTime());
 
             Agent agent = new Agent();
             agent.name = name;
             request.agent = agent;
             request.date = formattedDate;
-            request.latitude = Double.toString(mLastLocation.getLatitude());
-            request.longitude = Double.toString(mLastLocation.getLongitude());
-            request.speed = Double.toString(mLastLocation.getSpeed());
+            request.latitude = mLastLocation.getLatitude();
+            request.longitude = mLastLocation.getLongitude();
+            request.speed = mLastLocation.getSpeed();
+            request.deviceId = android_id;
 
             DBHelper dbHelper = new DBHelper(getBaseContext());
             DatabaseManager.initializeInstance(dbHelper);
@@ -243,7 +247,7 @@ public class MyService extends Service {
             MyLocationsRepo myLocationsRepo = new MyLocationsRepo();
             OperationStatus bl = blockingStub.sendLocation(request);
             if (bl.status == 1) {
-                myLocationsRepo.insert(new MyLocation(Double.toString(mLastLocation.getLatitude()), Double.toString(mLastLocation.getLongitude()), name, formattedDate, Double.toString(mLastLocation.getSpeed())));
+                myLocationsRepo.insert(new MyLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), name, formattedDate, mLastLocation.getSpeed(),mLastLocation.getAccuracy(), android_id));
             }
             if (!isSending) {
                 isSending = true;
@@ -255,8 +259,9 @@ public class MyService extends Service {
                     request.date = list.getFormattedDate();
                     request.latitude = list.getLatitude();
                     request.longitude = list.getLongitude();
-                    request.speed = Double.toString(Double.valueOf(list.getSpeed())*3600/1000) ;
-
+                    request.speed = list.getSpeed()*3600/1000;
+                    request.deviceId = list.getDeviceID();
+                    request.accuracy = list.getAccuracy();
                     myLocationsRepo = new MyLocationsRepo();
                     bl = blockingStub.sendLocation(request);
                     if (bl.status == 0)
@@ -281,17 +286,18 @@ public class MyService extends Service {
             } catch (Exception e) {
                 e.printStackTrace();
 
-                Calendar c = Calendar.getInstance();
                 SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                String formattedDate = df.format(c.getTime());
+                String formattedDate = df.format(mLastLocation.getTime());
 
                 MyLocationsRepo myLocationsRepo = new MyLocationsRepo();
                 MyLocation myLocation = new MyLocation();
                 myLocation.setAgent(name);
-                myLocation.setLatitude(Double.toString(mLastLocation.getLatitude()));
-                myLocation.setLongitude(Double.toString(mLastLocation.getLongitude()));
+                myLocation.setLatitude(mLastLocation.getLatitude());
+                myLocation.setLongitude(mLastLocation.getLongitude());
                 myLocation.setFormattedDate(formattedDate);
-                myLocation.setSpeed(Double.toString(mLastLocation.getSpeed()));
+                myLocation.setSpeed(mLastLocation.getSpeed());
+                myLocation.setDeviceID(android_id);
+                myLocation.setAccuracy(mLastLocation.getAccuracy());
 
                 myLocationsRepo.insert(myLocation);
                 return

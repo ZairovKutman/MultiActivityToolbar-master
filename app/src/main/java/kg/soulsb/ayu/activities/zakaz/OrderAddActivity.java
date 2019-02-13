@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.TypedValue;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -62,18 +64,19 @@ public void locationUpdate(){
         @Override
         public void run() {
             // run on another thread
-            mLastLocation = getLocation();
+
+            if (Double.parseDouble(addOrderFragment.clientLat) == 0) return;
             clientLat = addOrderFragment.clientLat;
             clientLong = addOrderFragment.clientLong;
             clientLocation.setLatitude(Double.parseDouble(clientLat));
             clientLocation.setLongitude(Double.parseDouble(clientLong));
             distance = mLastLocation.distanceTo(clientLocation);
             System.out.println("DISTANCE = "+distance);
-            if (distance<51) {
-                addOrderFragment.createDocButton.setEnabled(true);
+            if (distance<100) {
+
             }
             else {
-                addOrderFragment.createDocButton.setEnabled(false);
+
             }
         }
     }, 0);
@@ -107,24 +110,27 @@ public void locationUpdate(){
         }
 
         AlertDialog.Builder alertDlg = new AlertDialog.Builder(this);
-        alertDlg.setMessage("Сохранить документ перед выходом?");
-        alertDlg.setCancelable(false); // We avoid that the dialog can be cancelled, forcing the user to choose one of the options
-        alertDlg.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (addOrderFragment.documentIsReady()) {
-                            addOrderFragment.saveDocument(false);
-                            Toast.makeText(getBaseContext(),"Сохранено",Toast.LENGTH_SHORT).show();
-                            OrderAddActivity.super.onBackPressed();
-                        }
-                    }
-        });
 
-        alertDlg.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                OrderAddActivity.super.onBackPressed();
-            }
-        });
+        alertDlg.setMessage("Сохранить документ перед выходом?");
+
+            alertDlg.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    if (addOrderFragment.documentIsReady()) {
+                        addOrderFragment.saveDocument(false);
+                        Toast.makeText(getBaseContext(),"Сохранено",Toast.LENGTH_SHORT).show();
+                        OrderAddActivity.super.onBackPressed();
+                    }
+                }
+            });
+            alertDlg.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    OrderAddActivity.super.onBackPressed();
+                }
+            });
+
+        alertDlg.setCancelable(false); // We avoid that the dialog can be cancelled, forcing the user to choose one of the options
+
         alertDlg.setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -157,7 +163,7 @@ public void locationUpdate(){
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_add);
-
+        mLastLocation = getLocation();
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setOffscreenPageLimit(3);
         setupViewPager(viewPager);

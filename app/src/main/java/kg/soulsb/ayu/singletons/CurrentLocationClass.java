@@ -14,6 +14,7 @@ public class CurrentLocationClass {
         currentLocation = new Location("");
         currentLocation.setLatitude(0);
         currentLocation.setLongitude(0);
+        currentLocation.setAccuracy(999);
     }
 
     public static CurrentLocationClass getInstance() {

@@ -65,7 +65,7 @@ public class SettingsBasesActivity extends BaseActivity {
         sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         if (sharedPreferences.contains("default_name")) {
             currentBaseString = sharedPreferences.getString("default_name", null);
-
+            System.out.println(sharedPreferences.getString(UserSettings.password_for_app_settings,"0000"));
             if (!sharedPreferences.getString(UserSettings.password_for_app_settings,"0000").equals("0000"));
             {
                 d = new AlertDialog.Builder(this);

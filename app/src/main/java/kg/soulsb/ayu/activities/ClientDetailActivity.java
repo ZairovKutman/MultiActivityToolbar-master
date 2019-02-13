@@ -12,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -229,12 +230,12 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
         else
         {
             clientAccuracy.setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
-            clientSaveLocationButton.setEnabled(true);
+            if (!sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false").equals("false")) {
+                clientSaveLocationButton.setEnabled(true);
+                clientAccuracy.setText("Точность: "+location.getAccuracy()+" м.");
+                currentLocation = location;
+            }
         }
-
-        clientAccuracy.setText("Точность: "+location.getAccuracy()+" м.");
-        currentLocation = location;
-
     }
 
     @Override
@@ -293,6 +294,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
             Device device = new Device();
             device.agent = name;
             device.deviceId = android_id;
+            device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
             System.out.println(deviceStatus.comment);
             if (!deviceStatus.active) {

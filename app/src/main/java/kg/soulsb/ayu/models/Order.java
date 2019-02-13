@@ -24,6 +24,7 @@ public class Order implements Serializable {
     public static String KEY_date     = "date";
     public static String KEY_dateSend     = "dateSend";
     public static String KEY_comment     = "comment";
+    public static String KEY_checkedBonusTT     = "checkedbonusTT";
     public static String KEY_isDelivered     = "isDelivered";
     public static String KEY_totalSum     = "totalSum";
     public static String KEY_Organization = "Organization";
@@ -37,6 +38,7 @@ public class Order implements Serializable {
     private ArrayList<SvodPay> arraylistSvodPay = new ArrayList<>();
     private String date = "";
     private String comment = "";
+    private String checkedBonusTT = "";
     private String dateSend = "";
     private String doctype = "";
     private String organization = "";
@@ -47,7 +49,7 @@ public class Order implements Serializable {
     public Order()
     {
     }
-    public Order(String date, String client, String dogovor, String warehouse, String priceType, ArrayList<Item> arraylistTovar)
+    public Order(String date, String client, String dogovor, String warehouse, String priceType, ArrayList<Item> arraylistTovar, String checkedBonusTT)
     {
         this.date = date;
         this.client = client;
@@ -55,6 +57,10 @@ public class Order implements Serializable {
         this.warehouse = warehouse;
         this.priceType = priceType;
         this.arraylistTovar = arraylistTovar;
+        if (checkedBonusTT == null)
+            this.checkedBonusTT = "false";
+        else
+            this.checkedBonusTT = checkedBonusTT;
     }
 
     public String getPriceType() {
@@ -184,5 +190,17 @@ public class Order implements Serializable {
         ContractsRepo aa = new ContractsRepo();
 
         return aa.getObjectByGuid(getDogovor());
+    }
+
+    public boolean getCheckedBonusTT() {
+        return checkedBonusTT.equals("true");
+    }
+
+    public void setCheckedBonusTT(String checkedBonusTT) {
+        this.checkedBonusTT = checkedBonusTT;
+    }
+
+    public String getCheckedBonusTTString() {
+        return checkedBonusTT;
     }
 }

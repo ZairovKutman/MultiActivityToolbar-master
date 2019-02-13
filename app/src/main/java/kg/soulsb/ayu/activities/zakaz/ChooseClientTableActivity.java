@@ -1,8 +1,16 @@
 package kg.soulsb.ayu.activities.zakaz;
 
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,11 +24,13 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.activities.BaseActivity;
 import kg.soulsb.ayu.R;
+import kg.soulsb.ayu.activities.MainActivity;
 import kg.soulsb.ayu.adapters.ClientAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.models.Client;
+import kg.soulsb.ayu.services.LocationMonitoringService;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
@@ -32,10 +42,45 @@ public class ChooseClientTableActivity extends BaseActivity {
     SearchView searchView;
     ClientAdapter arrayAdapter;
     ArrayList<Client> arrayList;
+    float distance=0;
+    Location mLastLocation = new Location("mLocChooseClient");
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Double lat = intent.getExtras().getDouble("lat");
+
+            Double lon = intent.getExtras().getDouble("lon");
+
+            mLastLocation.setLatitude(lat);
+            mLastLocation.setLongitude(lon);
+            String active = intent.getStringExtra("active");
+            if (active.equals("checkgps")) { checkGps(ChooseClientTableActivity.this); return;}
+
+            //if (active.equals("test")) {notasksTextView.setText(testText);}
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_client);
+        final SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
+        Double lat = 0.0;
+        Double lon = 0.0;
+
+        String doctype = getIntent().getExtras().getString("doctype");
+
+        if (!doctype.equals("3")) {
+            lat = getIntent().getExtras().getDouble("latitude");
+            lon = getIntent().getExtras().getDouble("longitude");
+        }
+
+        mLastLocation.setLatitude(lat);
+        mLastLocation.setLongitude(lon);
+
+        IntentFilter filter = new IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
+
         DBHelper dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
         arrayList = new ClientsRepo().getClientsObject();
@@ -45,7 +90,7 @@ public class ChooseClientTableActivity extends BaseActivity {
         listViewClients.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
+
                 Client str = arrayList.get(position);
                 if (sharedPreferences.contains("default_name")) {
 
@@ -57,13 +102,49 @@ public class ChooseClientTableActivity extends BaseActivity {
                     }
                 }
 
-                Intent intent = new Intent();
-                intent.putExtra("data",str.getName());
-                intent.putExtra("guid",str.getGuid());
-                intent.putExtra("lat",str.getLatitude());
-                intent.putExtra("long",str.getLongitude());
-                setResult(RESULT_OK,intent);
-                finish();
+                String flag = "false";
+
+                String doctype = getIntent().getExtras().getString("doctype");
+
+                if (doctype.equals("1")){
+                    flag = sharedPreferences.getString(UserSettings.create_sales_at_clients_coordinates,"false");}
+                else if (doctype.equals("2")){
+                    flag = sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates,"false");
+                }
+
+                if (flag.equals("true")) {
+
+                    Location clientLocation = new Location("loc");
+                    clientLocation.setLatitude(Double.parseDouble(str.getLatitude()));
+                    clientLocation.setLongitude(Double.parseDouble(str.getLongitude()));
+
+                    distance = mLastLocation.distanceTo(clientLocation);
+
+                }
+                else {distance = 0;}
+
+
+                if (distance > 100) {
+                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(ChooseClientTableActivity.this);
+                    alertDlg.setMessage("Клиент находится на расстоянии "+distance+"м. Подойдите ближе!");
+                    alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            return;
+                        }
+                    });
+                    alertDlg.setCancelable(false);
+                    alertDlg.show();
+
+                }
+                else {
+                    Intent intent = new Intent();
+                    intent.putExtra("data", str.getName());
+                    intent.putExtra("guid", str.getGuid());
+                    intent.putExtra("lat", str.getLatitude());
+                    intent.putExtra("long", str.getLongitude());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
         });
         listViewClients.setAdapter(arrayAdapter);

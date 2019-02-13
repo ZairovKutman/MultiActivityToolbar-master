@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -41,6 +42,7 @@ import static android.app.Activity.RESULT_OK;
 public class OthersFragment extends Fragment {
 
     EditText comments;
+    CheckBox bonusTT;
     TextView totalSumTextView;
     OrderAddActivity parentActivity;
 
@@ -50,6 +52,7 @@ public class OthersFragment extends Fragment {
 
 
         comments = (EditText) v.findViewById(R.id.editText_komment);
+        bonusTT = (CheckBox) v.findViewById(R.id.checkBoxTT);
 
         if (parentActivity.order != null){
 
@@ -58,6 +61,7 @@ public class OthersFragment extends Fragment {
                 disableButtons();
             }
             comments.setText(parentActivity.order.getComment());
+            bonusTT.setChecked(parentActivity.order.getCheckedBonusTT());
         }
         totalSumTextView = (TextView) v.findViewById(R.id.otherFragment_total_sum);
 
@@ -67,7 +71,9 @@ public class OthersFragment extends Fragment {
     }
 
     private void disableButtons() {
+
         comments.setEnabled(false);
+        bonusTT.setEnabled(false);
     }
 
     @Override
