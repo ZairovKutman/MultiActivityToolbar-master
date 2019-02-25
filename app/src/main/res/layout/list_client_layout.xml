@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
 
     <ImageView
@@ -10,47 +10,51 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:srcCompat="@drawable/ic_clients" />
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="2">
         <TextView
             android:text="Клиент"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/listClient"
             android:fontFamily="sans-serif"
-            android:layout_margin="8dp"
+            android:layout_margin="4dp"
             android:textAlignment="textStart" />
 
         <TextView
             android:text="Адрес"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/listAddress"
             android:textAlignment="textStart"
             android:textColor="@android:color/holo_orange_dark"
-            android:paddingLeft="10dp" />
+            android:layout_margin="4dp" />
 
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:elevation="20dp"
         android:gravity="right"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_weight="1">
 
         <TextView
             android:id="@+id/client_debt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="2dp"
             android:layout_weight="1"
             android:text=""
             android:textColor="@color/colorAccent" />
     </LinearLayout>
-
+</LinearLayout>
 </LinearLayout>

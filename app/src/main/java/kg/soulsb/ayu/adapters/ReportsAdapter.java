@@ -2,13 +2,11 @@ package kg.soulsb.ayu.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -16,8 +14,6 @@ import java.util.List;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.helpers.repo.ClientsRepo;
-import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.models.Report;
 
 /**

@@ -1,19 +1,14 @@
 package kg.soulsb.ayu.activities.zakaz;
 
 import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.TypedValue;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -28,7 +23,6 @@ import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.CurrentLocationClass;
-import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 public class OrderAddActivity extends BaseActivity {
@@ -49,7 +43,8 @@ public class OrderAddActivity extends BaseActivity {
     float distance=0;
 
     AddOrderFragment addOrderFragment = new AddOrderFragment();
-    AddTovarFragment addTovarFragment = new AddTovarFragment();
+    //AddTovarFragment addTovarFragment = new AddTovarFragment();
+    TovarsFragment tovarsFragment = new TovarsFragment();
     OthersFragment  othersFragment = new OthersFragment();
 
     double totalSum=0;
@@ -228,8 +223,19 @@ public void locationUpdate(){
     {
         orderedItemsArrayList.add(item);
         totalSum=totalSum+item.getSum();
-        othersFragment.updateTotalSum(totalSum);
+        othersFragment.updateTotalSum();
 
+    }
+
+    public double calculateTotalSum() {
+        double mTotalSum=0;
+
+        for (Item item: orderedItemsArrayList)
+        {
+            mTotalSum = mTotalSum + item.getSum();
+        }
+
+        return mTotalSum;
     }
     public ArrayList<Item> getSelectedItems()
     {
@@ -242,30 +248,32 @@ public void locationUpdate(){
         adapter = new ViewPagerAdapter(fragmentManager);
 
         adapter.addFrag(addOrderFragment, "Клиент");
-        adapter.addFrag(addTovarFragment, "Товары");
+        //adapter.addFrag(addTovarFragment, "Товары");
+        adapter.addFrag(tovarsFragment, "Товары RV");
         adapter.addFrag(othersFragment, "Прочее");
 
         addOrderFragment = (AddOrderFragment) adapter.getItem(0);
-        addTovarFragment = (AddTovarFragment) adapter.getItem(1);
+        //addTovarFragment = (AddTovarFragment) adapter.getItem(1);
+        tovarsFragment = (TovarsFragment) adapter.getItem(1);
         othersFragment = (OthersFragment) adapter.getItem(2);
 
         viewPager.setAdapter(adapter);
     }
 
-    public void checkItem(Item item) {
-        ArrayList<Item> itemArrayList2 = new ArrayList<>();
-
-        for (Item item2: orderedItemsArrayList)
-        {
-            if (item.getGuid().equals(item2.getGuid()))
-            {
-                itemArrayList2.add(item2);
-                totalSum = totalSum - item2.getSum();
-            }
-        }
-        orderedItemsArrayList.removeAll(itemArrayList2);
-        othersFragment.updateTotalSum(totalSum);
-    }
+//    public void checkItem(Item item) {
+//        ArrayList<Item> itemArrayList2 = new ArrayList<>();
+//
+//        for (Item item2: orderedItemsArrayList)
+//        {
+//            if (item.getGuid().equals(item2.getGuid()))
+//            {
+//                itemArrayList2.add(item2);
+//                totalSum = totalSum - item2.getSum();
+//            }
+//        }
+//        orderedItemsArrayList.removeAll(itemArrayList2);
+//        othersFragment.updateTotalSum(totalSum);
+//    }
 
     public String getPriceType()
     {
@@ -278,8 +286,8 @@ public void locationUpdate(){
 
     public void updatePrices()
     {
-        if (addTovarFragment != null)
-            addTovarFragment.updatePrices();
+        if (tovarsFragment != null)
+            tovarsFragment.updatePrices();
     }
 
     public String getWarehouse() {
@@ -292,8 +300,8 @@ public void locationUpdate(){
 
     public void updateStock()
     {
-        if (addTovarFragment != null)
-            addTovarFragment.updateStock();
+        if (tovarsFragment != null)
+            tovarsFragment.updateStock();
     }
 
      @Override

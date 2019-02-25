@@ -37,9 +37,9 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
-        TovarHolder holder = new TovarHolder();;
+        TovarHolder holder;
 
-        if(row == null)
+        if(convertView == null)
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);

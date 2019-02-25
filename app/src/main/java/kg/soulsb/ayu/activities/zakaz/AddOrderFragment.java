@@ -56,7 +56,6 @@ import kg.soulsb.ayu.models.Organization;
 import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.models.Warehouse;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
-import kg.soulsb.ayu.singletons.DataHolderClass;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -351,18 +350,26 @@ public class AddOrderFragment extends Fragment {
         previous = current;
 
         parentActivity.category = current.getCategory();
-        parentActivity.addTovarFragment.originalArrayList.clear();
+//        parentActivity.addTovarFragment.originalArrayList.clear();
+//
+//        parentActivity.addTovarFragment.originalArrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+//        parentActivity.addTovarFragment.arrayList.clear();
+//        parentActivity.addTovarFragment.arrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+//
+//        parentActivity.orderedItemsArrayList.clear();
+//
+//        parentActivity.addTovarFragment.updatePrices();
+//        parentActivity.addTovarFragment.updateStock();
+//        parentActivity.addTovarFragment.arrayAdapter.notifyDataSetChanged();
 
-        parentActivity.addTovarFragment.originalArrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
-        parentActivity.addTovarFragment.arrayList.clear();
-        parentActivity.addTovarFragment.arrayList.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+        parentActivity.tovarsFragment.arrayListAllTovars.clear();
+        parentActivity.tovarsFragment.arrayListAllTovars.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
 
         parentActivity.orderedItemsArrayList.clear();
 
-        parentActivity.addTovarFragment.updatePrices();
-        parentActivity.addTovarFragment.updateStock();
-        parentActivity.addTovarFragment.arrayAdapter.notifyDataSetChanged();
-    }
+        parentActivity.tovarsFragment.updatePrices();
+        parentActivity.tovarsFragment.updateStock();
+}
 
     private void disableButtons() {
         editText.setEnabled(false);

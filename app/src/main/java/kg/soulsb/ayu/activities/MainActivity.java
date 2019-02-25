@@ -1,7 +1,6 @@
 package kg.soulsb.ayu.activities;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,9 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -43,9 +39,8 @@ import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Order;
-import kg.soulsb.ayu.services.LocationMonitoringService;
+import kg.soulsb.ayu.services.MadLocationMonitoringService;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
-import kg.soulsb.ayu.singletons.MyServiceActivatorClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 import java.util.ArrayList;
@@ -61,6 +56,7 @@ public class MainActivity extends BaseActivity {
     TextView agentNameText, notasksTextView;
     DBHelper dbHelper;
     ImageView image_gps;
+    public static final String ACTION_LOCATION_BROADCAST = "LocationBroadcast";
     private static final String TAG = MainActivity.class.getSimpleName();
     /**
      * Code used in requesting runtime permissions.
@@ -75,7 +71,6 @@ public class MainActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String active = intent.getStringExtra("active");
-            String testText = intent.getStringExtra("test");
 
             if (active.equals("yes_green"))  {  image_gps.setBackgroundColor(Color.GREEN); return;}
 
@@ -326,7 +321,7 @@ public class MainActivity extends BaseActivity {
         updateListView();
         setUpNavView();
         updateDocuments();
-        IntentFilter filter = new IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST);
+        IntentFilter filter = new IntentFilter(ACTION_LOCATION_BROADCAST);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
         checkGps(MainActivity.this);
@@ -387,10 +382,10 @@ public class MainActivity extends BaseActivity {
 
         if (!mAlreadyStartedService) {
 
-            System.out.println("Location Montir Service started");
+            System.out.println("Location Monitoring Service started");
 
             //Start location sharing service to app server.........
-            Intent intent = new Intent(this, LocationMonitoringService.class);
+            Intent intent = new Intent(this, MadLocationMonitoringService.class);
             startService(this,intent);
 
             mAlreadyStartedService = true;
@@ -422,42 +417,42 @@ public class MainActivity extends BaseActivity {
         }
         return true;
     }
-
-    /**
-     * Show A Dialog with button to refresh the internet state.
-     */
-    private void promptInternetConnect() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Нет интернета");
-        builder.setMessage("Не могу подключиться к интернету, проверьте доступ к интернету");
-
-        String positiveText = "Обновить";
-        builder.setPositiveButton(positiveText,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-
-                        //Block the Application Execution until user grants the permissions
-                        if (startStep2(dialog)) {
-
-                            //Now make sure about location permission.
-                            if (checkPermissions()) {
-
-                                //Step 2: Start the Location Monitor Service
-                                //Everything is there to start the service.
-                                startStep3();
-                            } else if (!checkPermissions()) {
-                                requestPermissions();
-                            }
-
-                        }
-                    }
-                });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
+//
+//    /**
+//     * Show A Dialog with button to refresh the internet state.
+//     */
+//    private void promptInternetConnect() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//        builder.setTitle("Нет интернета");
+//        builder.setMessage("Не могу подключиться к интернету, проверьте доступ к интернету");
+//
+//        String positiveText = "Обновить";
+//        builder.setPositiveButton(positiveText,
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//
+//                        //Block the Application Execution until user grants the permissions
+//                        if (startStep2(dialog)) {
+//
+//                            //Now make sure about location permission.
+//                            if (checkPermissions()) {
+//
+//                                //Step 2: Start the Location Monitor Service
+//                                //Everything is there to start the service.
+//                                startStep3();
+//                            } else if (!checkPermissions()) {
+//                                requestPermissions();
+//                            }
+//
+//                        }
+//                    }
+//                });
+//
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
+//    }
 
     /**
      * Return the current state of the permissions needed.
@@ -535,7 +530,7 @@ public class MainActivity extends BaseActivity {
 
         //Stop location sharing service to app server.........
 
-        stopService(new Intent(this, LocationMonitoringService.class));
+        stopService(new Intent(this, MadLocationMonitoringService.class));
         mAlreadyStartedService = false;
         //Ends................................................
 

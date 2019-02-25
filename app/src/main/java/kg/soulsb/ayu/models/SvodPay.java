@@ -17,11 +17,13 @@ public class SvodPay implements Serializable {
     public static String KEY_Base    = "base";
     public static String KEY_isDelivered = "isDelivered";
 
+    private static final long serialVersionUID = 1L;
+
     private String guid_client;
     private String guid_dogovor;
     private double sum;
     private String base;
-    private String client_name;
+
 
     public SvodPay()
     {

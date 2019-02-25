@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -24,13 +23,11 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.activities.BaseActivity;
 import kg.soulsb.ayu.R;
-import kg.soulsb.ayu.activities.MainActivity;
 import kg.soulsb.ayu.adapters.ClientAdapter;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.models.Client;
-import kg.soulsb.ayu.services.LocationMonitoringService;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
@@ -43,6 +40,7 @@ public class ChooseClientTableActivity extends BaseActivity {
     ClientAdapter arrayAdapter;
     ArrayList<Client> arrayList;
     float distance=0;
+    public static final String ACTION_LOCATION_BROADCAST = "LocationBroadcast";
     Location mLastLocation = new Location("mLocChooseClient");
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -56,7 +54,6 @@ public class ChooseClientTableActivity extends BaseActivity {
             mLastLocation.setLongitude(lon);
             String active = intent.getStringExtra("active");
             if (active.equals("checkgps")) { checkGps(ChooseClientTableActivity.this); return;}
-
             //if (active.equals("test")) {notasksTextView.setText(testText);}
         }
     };
@@ -78,7 +75,7 @@ public class ChooseClientTableActivity extends BaseActivity {
         mLastLocation.setLatitude(lat);
         mLastLocation.setLongitude(lon);
 
-        IntentFilter filter = new IntentFilter(LocationMonitoringService.ACTION_LOCATION_BROADCAST);
+        IntentFilter filter = new IntentFilter(ACTION_LOCATION_BROADCAST);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
         DBHelper dbHelper = new DBHelper(getBaseContext());

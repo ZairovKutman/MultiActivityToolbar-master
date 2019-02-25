@@ -17,8 +17,6 @@ public class MyLocation {
     public static String KEY_deviceId = "deviceId";
     public static String KEY_accuracy = "accuracy";
 
-
-    private String myLocationId;
     private Double latitude;
     private Double longitude;
     private String agent;

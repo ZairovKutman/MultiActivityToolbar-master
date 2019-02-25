@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Contract;
-import kg.soulsb.ayu.models.Warehouse;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 
 /**

@@ -43,7 +43,7 @@ public class BarcodeGraphic extends GraphicOverlay.Graphic {
     private Paint mTextPaint;
     private volatile Barcode mBarcode;
 
-    BarcodeGraphic(GraphicOverlay overlay) {
+    BarcodeGraphic(GraphicOverlay<?> overlay) {
         super(overlay);
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;

@@ -25,6 +25,8 @@ public class Item implements Serializable {
     public static String KEY_Sum    = "Sum";
     public static String KEY_isDelivered = "DeliveredItem";
 
+    private static final long serialVersionUID = 1L;
+
     private String itemId;
     private String guid;
     private String name;

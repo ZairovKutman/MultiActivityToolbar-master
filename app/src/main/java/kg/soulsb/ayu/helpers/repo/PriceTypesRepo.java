@@ -5,9 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import kg.soulsb.ayu.helpers.DatabaseManager;
-import kg.soulsb.ayu.models.Client;
-import kg.soulsb.ayu.models.Contract;
-import kg.soulsb.ayu.models.Price;
 import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 

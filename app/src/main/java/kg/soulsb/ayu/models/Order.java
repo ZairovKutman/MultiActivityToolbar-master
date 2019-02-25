@@ -14,6 +14,8 @@ public class Order implements Serializable {
     public static final String TABLE_ITEM  = "SavedItems";
     public static final String TABLE_SvodPay  = "SvodPays";
 
+    private static final long serialVersionUID = 1L;
+
     public static String KEY_OrderID   = "OrderId";
     public static String KEY_BAZA   = "baza";
     public static String KEY_clientGUID     = "clientGUID";
