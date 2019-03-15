@@ -16,6 +16,13 @@ public class DataHolderClass {
             dataObject = new DataHolderClass();
         return dataObject;
     }
-    private String addOrderComments;
-    private String addOrderDateOtgruzki;
+    private  boolean serviceRunning = false;
+
+    public boolean isServiceRunning() {
+        return serviceRunning;
+    }
+
+    public void setServiceRunning(boolean serviceRunning) {
+        this.serviceRunning = serviceRunning;
+    }
 }

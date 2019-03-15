@@ -16,8 +16,8 @@ android {
         applicationId 'kg.soulsb.ayu3'
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 23
-        versionName '3.3.3'
+        versionCode 28
+        versionName '3.4.4'
         signingConfig signingConfigs.release
         multiDexEnabled true
     }

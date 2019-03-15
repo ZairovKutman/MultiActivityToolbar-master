@@ -140,7 +140,6 @@ public class SavedDocumentsActivity extends BaseActivity {
                 alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Нет", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        System.out.println("yo no!");
                     }
                 });
 
@@ -314,10 +313,7 @@ public class SavedDocumentsActivity extends BaseActivity {
     @Override
     public void onBackPressed()
     {
-        intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
+        super.onBackPressed();
     }
 
     @Override

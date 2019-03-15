@@ -24,6 +24,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import io.grpc.ManagedChannel;
@@ -40,11 +42,12 @@ import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.CurrentLocationClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
-public class ClientDetailActivity extends BaseActivity implements LocationListener {
+public class ClientDetailActivity extends BaseActivity {
 
     private AyuServiceGrpc.AyuServiceBlockingStub blockingStub;
     TextView clientNameTextView;
@@ -58,7 +61,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
     Button clientCallButton;
     Button clientMapButton;
     Button clientSaveLocationButton;
-
+    Timer myTimer = null;
     AlertDialog.Builder d;
     public Baza baza;
     ProgressBar progressBar;
@@ -66,7 +69,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
 
     protected LocationManager locationManager;
     protected Location currentLocation = new Location("client");
-
+    SharedPreferences sharedPreferences;
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -95,9 +98,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_details);
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
+        sharedPreferences = getApplicationContext().getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         clientNameTextView = (TextView) findViewById(R.id.ClientName);
         clientPhoneTextView = (TextView) findViewById(R.id.ClientPhone);
         clientAddressTextView = (TextView) findViewById(R.id.ClientAddress);
@@ -127,7 +128,6 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
             clientCallButton.setEnabled(true);
         }
 
-        SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         if (sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false").equals("false")) {
                 clientSaveLocationButton.setEnabled(false);
                 clientAccuracy.setVisibility(View.INVISIBLE);
@@ -143,7 +143,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
 
                 if (currentLocation.getLatitude()!=0 || currentLocation.getLongitude()!=0)
                 {
-                    if (currentLocation.getAccuracy()<=20) {
+                    if (currentLocation.getAccuracy()<=50) {
                     baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
 
 
@@ -165,12 +165,12 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                     grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);}
                     else
                     {
-                        Toast.makeText(getBaseContext(),"Точность должна быть меньше 20 м.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ClientDetailActivity.this,"Точность должна быть меньше 50 м.",Toast.LENGTH_SHORT).show();
                     }
 
                 }
                 else
-                    Toast.makeText(getBaseContext(),"Местоположение не определено.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ClientDetailActivity.this,"Местоположение не определено.",Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -182,7 +182,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                 intent.setData(Uri.parse("tel:" + clientPhoneTextView.getText()));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-                if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.checkSelfPermission(ClientDetailActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getParent(),
                             new String[]{Manifest.permission.CALL_PHONE},
                             1);
@@ -203,6 +203,40 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
                 startActivity(intent);
             }
         });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (myTimer == null) {
+            myTimer = new Timer();
+            myTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            myLocationChanged(CurrentLocationClass.getInstance().getCurrentLocation());
+                        }
+                    });
+
+                }
+            }, 0, 10000);}
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (myTimer != null) {
+            try {
+                myTimer.cancel();
+            }
+            catch (Exception e)
+            {e.printStackTrace();}
+
+            myTimer = null;
+        }
     }
 
     @Override
@@ -220,37 +254,32 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        if (location.getAccuracy()>=20)
+    public void myLocationChanged(Location location) {
+        System.out.println("IM HERE123");
+        System.out.println(location.getLatitude());
+        System.out.println(location.getLongitude());
+        System.out.println(location.getAccuracy());
+        System.out.println(sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false"));
+        if (location.getAccuracy()>=100 || location.getAccuracy()==0)
         {
             clientAccuracy.setTextColor(Color.RED);
             clientSaveLocationButton.setEnabled(false);
+            currentLocation = location;
         }
         else
         {
             clientAccuracy.setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
-            if (!sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false").equals("false")) {
+            if (sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false").equals("false")) {
+                clientSaveLocationButton.setEnabled(false);
+                clientAccuracy.setText("У вас нет доступа для снятия координат!");
+            }
+            else
+            {
                 clientSaveLocationButton.setEnabled(true);
                 clientAccuracy.setText("Точность: "+location.getAccuracy()+" м.");
                 currentLocation = location;
             }
         }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 
     private class GrpcTask extends AsyncTask<Void, Void, Points> {
@@ -296,7 +325,7 @@ public class ClientDetailActivity extends BaseActivity implements LocationListen
             device.deviceId = android_id;
             device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
-            System.out.println(deviceStatus.comment);
+
             if (!deviceStatus.active) {
                 return null;
             }

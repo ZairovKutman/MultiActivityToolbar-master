@@ -122,15 +122,13 @@ public class PaySvodActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
             if (resultCode == RESULT_OK) {
-                System.out.println("requestcode = "+requestCode);
+
                 String my_data = data.getStringExtra("data");
                 clientGUID = data.getStringExtra("guid");
                 clientLat = data.getStringExtra("lat");
                 clientLong = data.getStringExtra("long");
                 for (SvodPayRow svod: svodPayRowArrayList)
                 {
-                    System.out.println(svod.getRowId());
-
                     if (svod.getRowId() == requestCode)
                     {
                         svod.setClientGuid(clientGUID);
@@ -268,7 +266,6 @@ public class PaySvodActivity extends BaseActivity {
                 clientEditText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        System.out.println("clicked");
                         for (SvodPayRow svod: svodPayRowArrayList)
                         {
                             if (svod.clientEditText.equals(v))
@@ -317,7 +314,7 @@ public class PaySvodActivity extends BaseActivity {
                         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Нет", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                System.out.println("yo no!");
+                                //TODO: handle
                             }
                         });
 
@@ -457,9 +454,6 @@ public class PaySvodActivity extends BaseActivity {
             }
         }
         isDelivered = String.valueOf(order1.isDelivered());
-        System.out.println(isDelivered);
-
-
 
         TableLayout tl=(TableLayout)findViewById(R.id.TableLayout01);
 
@@ -476,7 +470,6 @@ public class PaySvodActivity extends BaseActivity {
             clientEditText.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println("clicked");
                     for (SvodPayRow svod : svodPayRowArrayList) {
                         if (svod.clientEditText.equals(v)) {
                             myIntent.putExtra("doctype", "3");
@@ -521,7 +514,7 @@ public class PaySvodActivity extends BaseActivity {
                     alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Нет", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            System.out.println("yo no!");
+
                         }
                     });
 

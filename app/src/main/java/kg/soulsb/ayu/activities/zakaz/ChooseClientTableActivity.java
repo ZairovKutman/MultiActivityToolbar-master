@@ -5,11 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +27,7 @@ import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.CurrentLocationClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 /**
@@ -42,6 +41,7 @@ public class ChooseClientTableActivity extends BaseActivity {
     float distance=0;
     public static final String ACTION_LOCATION_BROADCAST = "LocationBroadcast";
     Location mLastLocation = new Location("mLocChooseClient");
+    Location clientLocation = new Location("loc");
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -50,10 +50,10 @@ public class ChooseClientTableActivity extends BaseActivity {
 
             Double lon = intent.getExtras().getDouble("lon");
 
-            mLastLocation.setLatitude(lat);
-            mLastLocation.setLongitude(lon);
-            String active = intent.getStringExtra("active");
-            if (active.equals("checkgps")) { checkGps(ChooseClientTableActivity.this); return;}
+            //mLastLocation.setLatitude(lat);
+            //mLastLocation.setLongitude(lon);
+            //String active = intent.getStringExtra("active");
+            //if (active.equals("checkgps")) { checkGps(ChooseClientTableActivity.this); return;}
             //if (active.equals("test")) {notasksTextView.setText(testText);}
         }
     };
@@ -68,19 +68,34 @@ public class ChooseClientTableActivity extends BaseActivity {
         String doctype = getIntent().getExtras().getString("doctype");
 
         if (!doctype.equals("3")) {
-            lat = getIntent().getExtras().getDouble("latitude");
-            lon = getIntent().getExtras().getDouble("longitude");
+            lat = CurrentLocationClass.getInstance().getCurrentLocation().getLatitude();
+            lon = CurrentLocationClass.getInstance().getCurrentLocation().getLongitude();
         }
 
         mLastLocation.setLatitude(lat);
         mLastLocation.setLongitude(lon);
 
-        IntentFilter filter = new IntentFilter(ACTION_LOCATION_BROADCAST);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
+        //IntentFilter filter = new IntentFilter(ACTION_LOCATION_BROADCAST);
+        //LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
         DBHelper dbHelper = new DBHelper(getBaseContext());
         DatabaseManager.initializeInstance(dbHelper);
-        arrayList = new ClientsRepo().getClientsObject();
+        String flag = "false";
+
+        if (doctype.equals("1")){
+            flag = sharedPreferences.getString(UserSettings.create_sales_at_clients_coordinates,"false");}
+        else if (doctype.equals("0")){
+            flag = sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates,"false");
+        }
+        if (flag.equals("true"))
+        {
+            arrayList = new ClientsRepo().getClientsObjectByDistance(mLastLocation);
+        }
+        else
+        {
+            arrayList = new ClientsRepo().getClientsObject();
+        }
+
         arrayAdapter = new ClientAdapter(this,R.layout.list_client_layout, arrayList);
         final ListView listViewClients = (ListView) findViewById(R.id.list_view_clients);
 
@@ -105,13 +120,13 @@ public class ChooseClientTableActivity extends BaseActivity {
 
                 if (doctype.equals("1")){
                     flag = sharedPreferences.getString(UserSettings.create_sales_at_clients_coordinates,"false");}
-                else if (doctype.equals("2")){
+                else if (doctype.equals("0")){
                     flag = sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates,"false");
                 }
 
                 if (flag.equals("true")) {
 
-                    Location clientLocation = new Location("loc");
+
                     clientLocation.setLatitude(Double.parseDouble(str.getLatitude()));
                     clientLocation.setLongitude(Double.parseDouble(str.getLongitude()));
 
@@ -120,8 +135,7 @@ public class ChooseClientTableActivity extends BaseActivity {
                 }
                 else {distance = 0;}
 
-
-                if (distance > 100) {
+                if (distance > 200 && clientLocation.getLatitude()!=0) {
                     AlertDialog.Builder alertDlg = new AlertDialog.Builder(ChooseClientTableActivity.this);
                     alertDlg.setMessage("Клиент находится на расстоянии "+distance+"м. Подойдите ближе!");
                     alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {

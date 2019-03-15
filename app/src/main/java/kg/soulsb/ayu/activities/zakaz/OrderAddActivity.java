@@ -66,13 +66,7 @@ public void locationUpdate(){
             clientLocation.setLatitude(Double.parseDouble(clientLat));
             clientLocation.setLongitude(Double.parseDouble(clientLong));
             distance = mLastLocation.distanceTo(clientLocation);
-            System.out.println("DISTANCE = "+distance);
-            if (distance<100) {
 
-            }
-            else {
-
-            }
         }
     }, 0);
 }

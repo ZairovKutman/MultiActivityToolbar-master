@@ -124,4 +124,11 @@ public class MyLocationsRepo {
         db.delete(MyLocation.TABLE,whereClause,null);
         DatabaseManager.getInstance().closeDatabase();
     }
+
+    public void deleteAll() {
+        db = DatabaseManager.getInstance().openDatabase();
+        // deleting Row
+        db.delete(MyLocation.TABLE,null,null);
+        DatabaseManager.getInstance().closeDatabase();
+    }
 }

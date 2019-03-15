@@ -116,7 +116,6 @@ public class PayActivity extends BaseActivity {
                 clientLocation.setLatitude(Double.parseDouble(clientLat));
                 clientLocation.setLongitude(Double.parseDouble(clientLong));
                 distance = mLastLocation.distanceTo(clientLocation);
-                System.out.println("DISTANCE = " + distance);
                 if (distance < 51) {
                     createDocButton.setEnabled(true);
                 } else {

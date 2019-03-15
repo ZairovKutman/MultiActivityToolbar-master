@@ -17,6 +17,7 @@ import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
+import kg.soulsb.ayu.helpers.repo.MyLocationsRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
@@ -111,7 +112,9 @@ public class BaseDetailActivity extends BaseActivity {
                         editor.remove(UserSettings.force_daily_exchange);
                         editor.remove(UserSettings.force_gps_turn_on);
                         editor.remove(UserSettings.send_all_documents_with_exchange);
+                        editor.remove(UserSettings.can_create_payment);
                         editor.remove(UserSettings.status);
+
                         editor.apply();
 
                         ClientsRepo clientsRepo = new ClientsRepo();
@@ -124,8 +127,9 @@ public class BaseDetailActivity extends BaseActivity {
                         new PriceTypesRepo().deleteByBase(getIntent().getStringExtra("name"));
                         new ReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
                         new SavedReportsRepo().deleteByBase(getIntent().getStringExtra("name"));
-                        System.out.println("++++++++++++++++++++=");
-                        System.out.println(getIntent().getStringExtra("name"));
+                        new MyLocationsRepo().deleteAll();
+                        CurrentBaseClass.getInstance().setCurrentBase("");
+                        CurrentBaseClass.getInstance().setCurrentBaseObject(new Baza());
                         finish();
 
                     }

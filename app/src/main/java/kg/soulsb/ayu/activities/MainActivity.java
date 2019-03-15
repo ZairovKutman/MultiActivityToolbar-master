@@ -25,10 +25,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
@@ -39,8 +35,9 @@ import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Order;
-import kg.soulsb.ayu.services.MadLocationMonitoringService;
+import kg.soulsb.ayu.services.LocationService;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.DataHolderClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 import java.util.ArrayList;
@@ -62,9 +59,6 @@ public class MainActivity extends BaseActivity {
      * Code used in requesting runtime permissions.
      */
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-
-
-    private boolean mAlreadyStartedService = false;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -325,45 +319,24 @@ public class MainActivity extends BaseActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, filter);
 
         checkGps(MainActivity.this);
-        startStep1();
+        if (!DataHolderClass.getInstance().isServiceRunning()) {
+            startStep1();
+        }
     }
 
     /**
      * Step 1: Check Google Play services
      */
     private void startStep1() {
+        startStep2(null);
 
-        //Check whether this user has installed Google play service which is being used by Location updates.
-        if (isGooglePlayServicesAvailable()) {
-
-            //Passing null to indicate that it is executing for the first time.
-            startStep2(null);
-
-        } else {
-            Toast.makeText(getApplicationContext(), "Google Play service недоступен", Toast.LENGTH_LONG).show();
-        }
     }
 
     /**
      * Step 2: Check & Prompt Internet connection
      */
     private Boolean startStep2(DialogInterface dialog) {
-//        ConnectivityManager connectivityManager
-//                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-//        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 //
-//        if (activeNetworkInfo == null || !activeNetworkInfo.isConnected()) {
-//            promptInternetConnect();
-//            return false;
-//        }
-//
-//
-//        if (dialog != null) {
-//            dialog.dismiss();
-//        }
-
-        //Yes there is active internet connection. Next check Location is granted by user or not.
-
         if (checkPermissions()) { //Yes permissions are granted by the user. Go to the next step.
             startStep3();
         } else {  //No user has not granted the permissions yet. Request now.
@@ -380,15 +353,14 @@ public class MainActivity extends BaseActivity {
         //And it will be keep running until you close the entire application from task manager.
         //This method will executed only once.
 
-        if (!mAlreadyStartedService) {
+        if (!DataHolderClass.getInstance().isServiceRunning()) {
 
             System.out.println("Location Monitoring Service started");
-
+            DataHolderClass.getInstance().setServiceRunning(true);
             //Start location sharing service to app server.........
-            Intent intent = new Intent(this, MadLocationMonitoringService.class);
+            Intent intent = new Intent(this, LocationService.class);
             startService(this,intent);
 
-            mAlreadyStartedService = true;
             //Ends................................................
         }
     }
@@ -402,57 +374,6 @@ public class MainActivity extends BaseActivity {
             context.startService(intent);
         }
     }
-
-    /**
-     * Return the availability of GooglePlayServices
-     */
-    public boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        int status = googleApiAvailability.isGooglePlayServicesAvailable(this);
-        if (status != ConnectionResult.SUCCESS) {
-            if (googleApiAvailability.isUserResolvableError(status)) {
-                googleApiAvailability.getErrorDialog(this, status, 2404).show();
-            }
-            return false;
-        }
-        return true;
-    }
-//
-//    /**
-//     * Show A Dialog with button to refresh the internet state.
-//     */
-//    private void promptInternetConnect() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//        builder.setTitle("Нет интернета");
-//        builder.setMessage("Не могу подключиться к интернету, проверьте доступ к интернету");
-//
-//        String positiveText = "Обновить";
-//        builder.setPositiveButton(positiveText,
-//                new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//
-//
-//                        //Block the Application Execution until user grants the permissions
-//                        if (startStep2(dialog)) {
-//
-//                            //Now make sure about location permission.
-//                            if (checkPermissions()) {
-//
-//                                //Step 2: Start the Location Monitor Service
-//                                //Everything is there to start the service.
-//                                startStep3();
-//                            } else if (!checkPermissions()) {
-//                                requestPermissions();
-//                            }
-//
-//                        }
-//                    }
-//                });
-//
-//        AlertDialog dialog = builder.create();
-//        dialog.show();
-//    }
 
     /**
      * Return the current state of the permissions needed.
@@ -529,9 +450,9 @@ public class MainActivity extends BaseActivity {
 
 
         //Stop location sharing service to app server.........
-
-        stopService(new Intent(this, MadLocationMonitoringService.class));
-        mAlreadyStartedService = false;
+        System.out.println("ON DESTROY EXECUTED MAIN ACTIVITY AND KILLED SERVICE");
+        stopService(new Intent(this, LocationService.class));
+        DataHolderClass.getInstance().setServiceRunning(false);
         //Ends................................................
 
 

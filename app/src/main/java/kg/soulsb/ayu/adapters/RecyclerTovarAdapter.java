@@ -94,15 +94,24 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
                 FilterResults filterResults = new FilterResults();
 
                 if (charString.isEmpty()) {
-
-                    if (spinnerSelectedState == 1)
+                    tovarsList.clear();
+                    if (spinnerSelectedState==1) {
+                        tovarsList.addAll(selectedTovarsList);
+                    }
+                    else if (spinnerSelectedState==0)
                     {
-                        filteredTovarsList.addAll(selectedTovarsList);
+                        tovarsList.addAll(allTovarsList);
                     }
                     else {
-                        filteredTovarsList.addAll(allTovarsList);
+                        for (Item item: allTovarsList)
+                        {
+                            if (item.getStock()>0)
+                            {
+                                tovarsList.add(item);
+                            }
+                        }
                     }
-
+                filteredTovarsList.addAll(tovarsList);
                 } else {
 
                     for (Item row : tovarsList) {
@@ -142,11 +151,22 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
             tovarsList.clear();
             tovarsList.addAll(selectedTovarsList);
         }
-        else
+        else if (spinnerSelectedState==0)
         {
             tovarsList.clear();
             tovarsList.addAll(allTovarsList);
         }
+        else {
+                tovarsList.clear();
+                for (Item item: allTovarsList)
+                {
+                    if (item.getStock()>0)
+                    {
+                        tovarsList.add(item);
+                    }
+                }
+            }
+
         notifyDataSetChanged();
     }
 
@@ -198,8 +218,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
                             if (quantity.equals("")) quantity="0";
                             if (selectedItem.getStock()<Integer.parseInt(quantity) * selectedUnit.getCoefficient() && selectedItem.getStock()>=0)
                             {
-                                Toast.makeText(view.getContext(),"Количество не может быть больше остатка",Toast.LENGTH_SHORT).show();
-                                return;
+                                Toast.makeText(view.getContext(),"Выбрано количество больше чем остаток, документ может не выгрузиться.",Toast.LENGTH_SHORT).show();
                             }
 
                             // Если вдруг этот товар был выбран ранее, то удаляем его

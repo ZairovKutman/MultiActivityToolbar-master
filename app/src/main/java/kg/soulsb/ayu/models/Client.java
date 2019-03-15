@@ -1,10 +1,14 @@
 package kg.soulsb.ayu.models;
 
+import android.location.Location;
+
+import kg.soulsb.ayu.singletons.CurrentLocationClass;
+
 /**
  * Created by Sultanbek Baibagyshev on 1/16/17.
  */
 
-public class Client {
+public class Client implements Comparable {
     public static final String TABLE = "clients";
 
     public static String KEY_ClientId = "ClientId";
@@ -26,6 +30,8 @@ public class Client {
     private String longitude;
     private String base;
     private double debt;
+    private Location loc;
+    private Location locOfAgent = new Location("locOfAgent");
 
     public Client(String guid, String name, String address, String phone, String latitude, String longitude, double debt) {
         this.guid = guid;
@@ -35,9 +41,20 @@ public class Client {
         this.latitude = latitude;
         this.longitude = longitude;
         this.debt = debt;
+        this.loc = new Location("loc");
+        if (!latitude.isEmpty())
+            this.loc.setLatitude(Double.parseDouble(latitude));
+        else this.loc.setLatitude(0);
+
+        if (!longitude.isEmpty()){
+            this.loc.setLongitude(Double.parseDouble(longitude));}
+        else
+            this.loc.setLongitude(0);
+
     }
 
     public Client() {
+        this.loc = new Location("loc");
     }
 
     public String getName() {
@@ -93,12 +110,33 @@ public class Client {
         this.address = address;
     }
 
+    public void setLatitudeAgent(String latitude) {
+        this.locOfAgent.setLatitude(Double.parseDouble(latitude));
+    }
+
+    public void setLongitudeAgent(String longitude) {
+        this.locOfAgent.setLongitude(Double.parseDouble(longitude));
+    }
+
     public void setLatitude(String latitude) {
-        this.latitude = latitude;
+
+        if (!latitude.isEmpty()) {
+            this.loc.setLatitude(Double.parseDouble(latitude));
+            this.latitude = latitude;
+        }
+        else {this.loc.setLatitude(0); this.latitude = "0";}
+
     }
 
     public void setLongitude(String longitude) {
-        this.longitude = longitude;
+
+        if (!longitude.isEmpty()){
+            this.loc.setLongitude(Double.parseDouble(longitude));
+            this.longitude = longitude;}
+        else {
+            this.loc.setLongitude(0);
+            this.longitude = "0";
+        }
     }
 
     public double getDebt() {
@@ -115,5 +153,37 @@ public class Client {
 
     public void setBase(String base) {
         this.base = base;
+    }
+
+    public int getDistanceToClient()
+    {
+        if (loc.getLatitude()!=0)
+            return (int)(loc.distanceTo(locOfAgent));
+        else return 0;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (locOfAgent.getLatitude() !=0 && locOfAgent.getLongitude() !=0) {
+            return Math.abs((int) (this.loc.distanceTo(locOfAgent))) - Math.abs((int) ((Client) o).loc.distanceTo(((Client) o).locOfAgent));
+        }
+        else return 0;
+    }
+
+    public void setLocOfAgent(Double latitude,Double longitude) {
+        this.locOfAgent.setLatitude(latitude);
+        this.locOfAgent.setLongitude(longitude);
+    }
+
+    public String getLocOfAgentText() {
+        if (locOfAgent.getLatitude() == 0 ) return "";
+        if (!latitude.equals("0") && !longitude.equals("0")){
+            loc.setLatitude(Double.parseDouble(latitude));
+            loc.setLongitude(Double.parseDouble(longitude));
+            locOfAgent.setLatitude(CurrentLocationClass.getInstance().getCurrentLocation().getLatitude());
+            locOfAgent.setLongitude(CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
+            return (int)(this.loc.distanceTo(locOfAgent))+"м.";}
+        else
+            return "нет крднт.";
     }
 }

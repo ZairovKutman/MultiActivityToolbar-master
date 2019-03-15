@@ -338,7 +338,6 @@ public class BaseActivity extends AppCompatActivity implements
 
     public void checkGps(final Context context) {
         final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        System.out.println(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(), MODE_PRIVATE);
 

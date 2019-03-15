@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.models.Stock;
@@ -149,6 +151,51 @@ public class ClientsRepo {
             } while (cursor.moveToNext());
         }
 
+        cursor.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return arrayList;
+    }
+
+    public ArrayList<Client> getClientsObjectByDistance(Location loc) {
+        ArrayList<Client> arrayList = new ArrayList<>();
+
+        db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT " + Client.KEY_Name
+                + ", "+Client.KEY_ClientId
+                + ", "+Client.KEY_Address
+                + ", "+Client.KEY_Guid
+                + ", "+Client.KEY_Latitude
+                + ", "+Client.KEY_Longitude
+                + ", "+Client.KEY_Base
+                + ", "+Client.KEY_Phone
+                + ", "+Client.KEY_Debt
+                + " FROM " + Client.TABLE
+                + " WHERE "+Client.KEY_Base+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'"
+                + " ORDER BY "+Client.KEY_Name+" ASC;";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Client client = new Client();
+                client.setGuid(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Guid)));
+                client.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Base)));
+                client.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Phone)));
+                client.setName(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Name)));
+                client.setAddress(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Address)));
+                client.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Latitude)));
+                client.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Longitude)));
+                client.setClientId(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_ClientId)));
+                client.setDebt(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Debt))));
+                client.setLocOfAgent(loc.getLatitude(),loc.getLongitude());
+
+                if (client.getDistanceToClient()<200) {
+                    arrayList.add(client);
+                }
+            } while (cursor.moveToNext());
+        }
+        Collections.sort(arrayList);
         cursor.close();
         DatabaseManager.getInstance().closeDatabase();
 

@@ -95,6 +95,7 @@ public class TovarsFragment extends Fragment {
         ArrayList<String> otborArrayList = new ArrayList<String>();
         otborArrayList.add("Показать все");
         otborArrayList.add("Показать выбранные товары");
+        otborArrayList.add("Показать товары в наличии");
 
         otborAdapter = new ArrayAdapter<String>(this.getActivity(),R.layout.baza_spinner_item,otborArrayList);
         otborSpinner.setAdapter(otborAdapter);
@@ -104,7 +105,10 @@ public class TovarsFragment extends Fragment {
 
                 if (otborSpinner.getItemAtPosition(position).equals("Показать выбранные товары")) {
                     recyclerTovarAdapter.setSpinnerSelectedState(1);
-                } else {
+                } else if (otborSpinner.getItemAtPosition(position).equals("Показать товары в наличии")) {
+                    recyclerTovarAdapter.setSpinnerSelectedState(2);
+                }
+                else {
                     recyclerTovarAdapter.setSpinnerSelectedState(0);
                 }
 

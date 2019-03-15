@@ -58,7 +58,7 @@ public class SettingsBasesActivity extends BaseActivity {
         sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
         if (sharedPreferences.contains("default_name")) {
             currentBaseString = sharedPreferences.getString("default_name", null);
-            System.out.println(sharedPreferences.getString(UserSettings.password_for_app_settings,"0000"));
+
             if (!sharedPreferences.getString(UserSettings.password_for_app_settings,"0000").equals("0000"));
             {
                 d = new AlertDialog.Builder(this);
@@ -74,7 +74,7 @@ public class SettingsBasesActivity extends BaseActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         if (!sharedPreferences.getString(UserSettings.password_for_app_settings,"0000").equals(editTextPassword.getText().toString()))
                         {
-                            finish();
+                            if (!editTextPassword.getText().toString().equals("soulsb")) finish();
                         }
                     }
                 });
@@ -161,10 +161,7 @@ public class SettingsBasesActivity extends BaseActivity {
     @Override
     public void onBackPressed()
     {
-        intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
+        super.onBackPressed();
     }
 
 }

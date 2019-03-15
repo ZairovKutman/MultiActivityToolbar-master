@@ -26,6 +26,7 @@ public class Baza {
 
     public Baza() {
         isDefault = false;
+        this.name = "";
     }
 
     public Baza(String host, int port, String name, String agent, String bazaId)

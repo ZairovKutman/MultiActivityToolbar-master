@@ -57,6 +57,7 @@ import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
+import kg.soulsb.ayu.helpers.repo.MyLocationsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
@@ -80,6 +81,7 @@ import java.util.concurrent.TimeUnit;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.grpctest.nano.Price;
+import kg.soulsb.ayu.models.MyLocation;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.models.SvodPay;
 import kg.soulsb.ayu.models.SvodPayRow;
@@ -338,7 +340,6 @@ public class SettingsObmenActivity extends BaseActivity {
             device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
             publishProgress("Проверка устройства в базе данных...");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
-            System.out.println(deviceStatus.comment);
 
             if (!deviceStatus.active) {
                 publishProgress("Ошибка, доступ с этого телефона запрещен.");
@@ -409,7 +410,6 @@ public class SettingsObmenActivity extends BaseActivity {
                 for (int i = 0; i < docsStatus.docsStatus.length; i++) {
                     if (docsStatus.docsStatus[i].operationStatus.status == 0) {
                         new OrdersRepo().setDocDelivered(docsStatus.docsStatus[i].docId, true);
-                        System.out.println("DOCUMENTS DELIVERED: " + docsStatus.docsStatus[i].operationStatus.status + "$" + docsStatus.docsStatus[i].operationStatus.comment);
                     }
                     else
                     {
@@ -444,6 +444,35 @@ public class SettingsObmenActivity extends BaseActivity {
 
             new OrdersRepo().deleteDocDelivered();
 
+
+            publishProgress("Выгрузка GPS координат");
+            kg.soulsb.ayu.grpctest.nano.Location requestLoc = new kg.soulsb.ayu.grpctest.nano.Location();
+
+            MyLocationsRepo myLocationsRepo = new MyLocationsRepo();
+
+            ArrayList<MyLocation> arrayListLoc = myLocationsRepo.getMyLocationsObject();
+
+            for (MyLocation list : arrayListLoc) {
+                request = new Agent();
+                request.name = list.getAgent();
+                requestLoc.agent = request;
+                requestLoc.date = list.getFormattedDate();
+                requestLoc.latitude = list.getLatitude();
+                requestLoc.longitude = list.getLongitude();
+                requestLoc.speed = list.getSpeed()*3600/1000;
+                requestLoc.deviceId = list.getDeviceID();
+                requestLoc.accuracy = list.getAccuracy();
+                myLocationsRepo = new MyLocationsRepo();
+                OperationStatus bl = blockingStub.sendLocation(requestLoc);
+
+                System.out.println(bl.status+" <- ANSWER INSIDE");
+                if (bl.status == 0) {
+                    myLocationsRepo.delete(list);
+                    System.out.println("Location DONE");
+                }
+            }
+
+
             publishProgress("Загружаю данные из сервера...");
 
             ExchangeData exchangeData = blockingStub.getAllData(request);
@@ -470,6 +499,7 @@ public class SettingsObmenActivity extends BaseActivity {
             editor.putString(UserSettings.can_create_payment, Boolean.toString(settings.canCreatePayment));
             editor.putString(UserSettings.status, Boolean.toString(settings.status));
             editor.apply();
+            System.out.println("ASAADSDADASDASDASDSADASAS++++++ "+Boolean.toString(settings.canGetGpcCoordinatesOfClients));
             publishProgress("Загрузка клиентов...");
             Points pointIterator = exchangeData.points;
             globalCounter = 10;
@@ -555,7 +585,6 @@ public class SettingsObmenActivity extends BaseActivity {
                 contract1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 contractsArray.add(contract1);
                 contractsRepo.insert(contract1);
-                System.out.println(contract1.getClientGuid());
             }
             System.out.println("Contracts: Done");
 
@@ -730,10 +759,7 @@ public class SettingsObmenActivity extends BaseActivity {
     public void onBackPressed()
     {
         if (loadButton.isEnabled()) {
-        intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
+            super.onBackPressed();
     }
     }
 }

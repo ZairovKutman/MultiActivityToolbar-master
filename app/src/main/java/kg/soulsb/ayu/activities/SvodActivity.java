@@ -119,7 +119,6 @@ public class SvodActivity extends BaseActivity {
         {
             String dateSend = order.getDateSend();
             String dateSvod = editTextDate.getText().toString();
-            System.out.println(dateSend + "  -   "+dateSvod);
 
             if (dateSend.equals(dateSvod)) {
                 for (Item item: order.getArraylistTovar())
