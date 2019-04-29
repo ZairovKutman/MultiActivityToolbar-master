@@ -1,9 +1,8 @@
 package kg.soulsb.ayu.activities.zakaz;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import net.alhazmy13.mediapicker.Image.ImagePicker;
-
 import java.util.ArrayList;
 
 import kg.soulsb.ayu.R;
-import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.UserSettings;
 
 /**
@@ -74,21 +70,6 @@ public class OthersFragment extends Fragment {
 
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<String>(parentActivity,R.layout.baza_spinner_item,statusArrayList);
         statusSpinner.setAdapter(statusAdapter);
-
-        pickImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new ImagePicker.Builder(parentActivity)
-                        .mode(ImagePicker.Mode.CAMERA_AND_GALLERY)
-                        .compressLevel(ImagePicker.ComperesLevel.MEDIUM)
-                        .directory(ImagePicker.Directory.DEFAULT)
-                        .extension(ImagePicker.Extension.PNG)
-                        .scale(600, 600)
-                        .allowMultipleImages(true)
-                        .enableDebuggingMode(true)
-                        .build();
-            }
-        });
 
         return v;
     }

@@ -2,14 +2,12 @@ package kg.soulsb.ayu.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
+
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,7 +17,6 @@ import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
-import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
 
 /**

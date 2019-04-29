@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_action_action_search"
         android:orderInCategory="100"
         app:showAsAction="always"
-        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:title="Поиск" />
 
 </menu>

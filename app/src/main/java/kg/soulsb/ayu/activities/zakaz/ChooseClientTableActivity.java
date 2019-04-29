@@ -15,7 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import android.support.v7.widget.SearchView;
+import androidx.appcompat.widget.SearchView;
 
 import java.util.ArrayList;
 

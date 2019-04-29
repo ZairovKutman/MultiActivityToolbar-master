@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import kg.soulsb.ayu.R;
-import net.alhazmy13.mediapicker.Image.ImagePicker;
+
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -66,21 +66,7 @@ public class ScanDocumentActivity extends BaseActivity {
         imageViewScanDoc.setVisibility(View.INVISIBLE);
         scanDocButton.setVisibility(View.INVISIBLE);
 
-        scanDocButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                new ImagePicker.Builder(ScanDocumentActivity.this)
-                        .mode(ImagePicker.Mode.CAMERA_AND_GALLERY)
-                        .compressLevel(ImagePicker.ComperesLevel.MEDIUM)
-                        .directory(ImagePicker.Directory.DEFAULT)
-                        .extension(ImagePicker.Extension.JPG)
-                        .scale(600, 600)
-                        .allowMultipleImages(false)
-                        .enableDebuggingMode(true)
-                        .build();
-            }
-        });
 
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,46 +104,6 @@ public class ScanDocumentActivity extends BaseActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_BARCODE_CAPTURE) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                    statusMessage.setVisibility(View.VISIBLE);
-                    barcodeValue.setVisibility(View.VISIBLE);
-                    scanDocButton.setVisibility(View.VISIBLE);
-                    statusMessage.setText("QR Code Найден");
-                    barcodeValue.setText(barcode.displayValue);
-                    Toast.makeText(ScanDocumentActivity.this, barcode.displayValue, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "Barcode read: " + barcode.displayValue);
-                } else {
-                    //statusMessage.setText(R.string.barcode_failure);
-                    Toast.makeText(ScanDocumentActivity.this, "No barcode captured, intent data is null", Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "No barcode captured, intent data is null");
-                }
-            } else {
-                Toast.makeText(ScanDocumentActivity.this, resultCode, Toast.LENGTH_SHORT).show();
-                //statusMessage.setText(String.format(getString(R.string.barcode_error),
-                  //      CommonStatusCodes.getStatusCodeString(resultCode)));
-            }
-        }
-        else if (requestCode == ImagePicker.IMAGE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
-            List<String> mPaths = data.getStringArrayListExtra(ImagePicker.EXTRA_IMAGE_PATH);
-            imageViewScanDoc.setVisibility(View.VISIBLE);
-            for (String path: mPaths)
-            {
-                File imgFile = new  File(path);
-
-                if(imgFile.exists()){
-                    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                    imageViewScanDoc.setImageBitmap(myBitmap);
-                    Toast.makeText(ScanDocumentActivity.this, myBitmap.getByteCount(), Toast.LENGTH_SHORT).show();
-
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
 
     }
 }

@@ -8,12 +8,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
+import com.google.android.material.tabs.TabLayout;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import net.alhazmy13.mediapicker.Image.ImagePicker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -257,7 +257,7 @@ public void locationUpdate(){
     }
 
     public void setupViewPager(ViewPager viewPager) {
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
         adapter = new ViewPagerAdapter(fragmentManager);
 
@@ -335,13 +335,4 @@ public void locationUpdate(){
          }
      }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ImagePicker.IMAGE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
-            List<String> mPaths = data.getStringArrayListExtra(ImagePicker.EXTRA_IMAGE_PATH);
-            System.out.println(mPaths);
-        }
-    }
 }
