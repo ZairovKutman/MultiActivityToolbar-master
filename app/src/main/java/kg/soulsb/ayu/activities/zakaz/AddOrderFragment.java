@@ -29,9 +29,11 @@ import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.grpctest.nano.Agent;
 import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
+import kg.soulsb.ayu.grpctest.nano.DailyTasks;
 import kg.soulsb.ayu.grpctest.nano.Device;
 import kg.soulsb.ayu.grpctest.nano.DeviceStatus;
 import kg.soulsb.ayu.grpctest.nano.DocPurch;
+import kg.soulsb.ayu.grpctest.nano.DocsStatus;
 import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
@@ -41,6 +43,7 @@ import kg.soulsb.ayu.helpers.DBHelper;
 import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
+import kg.soulsb.ayu.helpers.repo.DailyTasksRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
@@ -50,12 +53,14 @@ import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.models.Contract;
+import kg.soulsb.ayu.models.DailyTask;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.models.Organization;
 import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.models.Warehouse;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.CurrentLocationClass;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,7 +115,7 @@ public class AddOrderFragment extends Fragment {
         dbHelper = new DBHelper(getContext());
         final Intent dateintent = new Intent(getContext(), ChooseClientTableActivity.class);
 
-
+        createDocButton = (Button) v.findViewById(R.id.btn_create_doc);
         distanceClient = (TextView) v.findViewById(R.id.order_client_distance_text);
         editText_client = (EditText) v.findViewById(R.id.order_editText_client);
 
@@ -223,6 +228,12 @@ public class AddOrderFragment extends Fragment {
         ArrayAdapter<Organization> organizationArrayAdapter = new ArrayAdapter<Organization>(this.getActivity(), R.layout.baza_spinner_item, arrayListOrganization);
         editText_organization.setAdapter(organizationArrayAdapter);
 
+        if (parentActivity.isTask.equals("true"))
+        {
+            clientGUID = parentActivity.taskClient;
+            prepareTask();
+        }
+
         // CLIENT CONTRACT
         spinner_contract = (Spinner) v.findViewById(R.id.order_spinner_dogovor);
         if (clientGUID != null){
@@ -293,7 +304,7 @@ public class AddOrderFragment extends Fragment {
         });
 
         // Выгрузить кнопка
-        createDocButton = (Button) v.findViewById(R.id.btn_create_doc);
+
         createDocButton.setOnClickListener(new View.OnClickListener() {
             public Baza baza;
 
@@ -340,6 +351,12 @@ public class AddOrderFragment extends Fragment {
             }
         }
         return v;
+    }
+
+    private void prepareTask() {
+        editText_client.setEnabled(false);
+        editText_client.setText(parentActivity.clientName);
+        createDocButton.setEnabled(false);
     }
 
     private void updateTovarListByContract() {
@@ -543,6 +560,7 @@ public class AddOrderFragment extends Fragment {
          */
         @Override
         protected void onPreExecute() {
+            saveDocument(false);
         }
 
         private Points createDoc(ManagedChannel mChannel) {
@@ -600,12 +618,41 @@ public class AddOrderFragment extends Fragment {
             docPurch.lines = purchDocLines;
             OperationStatus bl = blockingStub.createDoc(docPurch);
 
+
+
             if (bl.status != 0)
             {
                 publishProgress("Ошибка:"+bl.comment);
                 return null;
             }
 
+            if (parentActivity.isTask.equals("true")) {
+                ArrayList<DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
+                kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
+                int i=0;
+                for (DailyTask dt: dailyTaskArrayList)
+                {
+                    kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
+                    dt2.agentName = name;
+                    dt2.clientGuid = dt.getClientGuid();
+                    dt2.dateClosed = dt.getDateClosed();
+                    dt2.docDate = dt.getDocDate();
+                    dt2.docGuid = dt.getDocGuid();
+                    dt2.docId =dt.getDocId();
+                    dt2.latitude = Double.parseDouble(dt.getLatitude());
+                    dt2.longitude = Double.parseDouble(dt.getLongitude());
+                    dt2.priority = dt.getPriority();
+                    dt2.status = Integer.parseInt(dt.getStatus());
+                    dailyTasks[i] = dt2;
+                    i=i+1;
+                }
+                DailyTasks dailyTasks1 = new DailyTasks();
+                dailyTasks1.task = dailyTasks;
+
+                DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
+
+                System.out.println(ds.docsStatus);
+            }
             ArrayList<kg.soulsb.ayu.models.Stock> stocksArray = new ArrayList<>();
             // getting Stocks
             Stocks stocks = blockingStub.getStock(request);
@@ -653,7 +700,6 @@ public class AddOrderFragment extends Fragment {
 
             if (pointIterator == null)
             {
-                saveDocument(false);
                 alertDialog.setTitle("Ошибка");
             }
             else {
@@ -704,6 +750,17 @@ public class AddOrderFragment extends Fragment {
         OrdersRepo ordersRepo = new OrdersRepo();
         ordersRepo.delete(order);
         ordersRepo.insert(order);
+
+        if (parentActivity.isTask.equals("true"))
+        {
+            Calendar myCalendar = Calendar.getInstance();
+            String myFormat = "dd/MM/yyyy";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+            myCalendar.setTimeInMillis(myCalendar.getTimeInMillis());
+
+            new DailyTasksRepo().updateStatus(clientGUID, docId, editText.getText().toString(), CurrentLocationClass.getInstance().getCurrentLocation().getLatitude(), CurrentLocationClass.getInstance().getCurrentLocation().getLongitude(), sdf.format(myCalendar.getTime()), "1");
+        }
+
         Toast.makeText(getContext(),"Сохранено",Toast.LENGTH_SHORT).show();
     }
 }

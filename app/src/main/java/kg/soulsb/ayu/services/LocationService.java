@@ -260,7 +260,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
                 //criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
 
                 Integer gpsFreqInMillis = 20000;
-                Integer gpsFreqInDistance = 3;  // in meters
+                Integer gpsFreqInDistance = 2;  // in meters
 
                 locationManager.addGpsStatusListener(this);
 
@@ -356,7 +356,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
         predictedLocation.setLongitude(predictedLng);
         float predictedDeltaInMeters =  predictedLocation.distanceTo(location);
 
-        if(predictedDeltaInMeters > 100){
+        if(predictedDeltaInMeters > 88){
             Log.d(TAG, "Kalman Filter detects mal GPS, we should probably remove this from track");
             kalmanFilter.consecutiveRejectCount += 1;
             sendMessageToUI("yes_yellow");
@@ -386,15 +386,8 @@ public class LocationService extends Service implements LocationListener, GpsSta
             return true;
         }
 
-        if (mLastLocation.getTime() - lastSentLocation.getTime() > 1200000) {
-            System.out.println("Время пришло, выгружаю координаты");
-            lastSentLocation.set(mLastLocation);
-            prepareSending();
-        }
-        else {
-            System.out.println("Время не пришло, Сохраняю в базе данных");
-            saveLocationInDatabase(mLastLocation, CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
-        }
+        lastSentLocation.set(mLastLocation);
+        prepareSending();
 
         sendMessageToUI("yes_green");
         CurrentLocationClass.getInstance().setCurrentLocation(location);

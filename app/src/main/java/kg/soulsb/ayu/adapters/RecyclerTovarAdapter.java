@@ -70,7 +70,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
             tovarHolder.txtQuantity.setText("");
         else {
             tovarHolder.txtQuantity.setText("кол-во: " + tovar.getQuantity() + " " + tovar.getMyUnit().getName());
-            tovarHolder.txtPrice.setText("Цена: "+Double.toString(tovar.getPrice()*tovar.getMyUnit().getCoefficient())+" сом");
+            tovarHolder.txtPrice.setText("Цена: "+Double.toString(tovar.getPrice()*tovar.getMyUnit().getCoefficient())+" сом ");
         }
         if (tovar.getSum() == 0)
             tovarHolder.txtSum.setText("");
@@ -216,7 +216,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
                             Unit selectedUnit = (Unit) unitSpinner.getSelectedItem();
 
                             if (quantity.equals("")) quantity="0";
-                            if (selectedItem.getStock()<Integer.parseInt(quantity) * selectedUnit.getCoefficient() && selectedItem.getStock()>=0)
+                            if (selectedItem.getStock()<Double.parseDouble(quantity) * selectedUnit.getCoefficient() && selectedItem.getStock()>=0)
                             {
                                 Toast.makeText(view.getContext(),"Выбрано количество больше чем остаток, документ может не выгрузиться.",Toast.LENGTH_SHORT).show();
                             }
@@ -225,8 +225,8 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
                             selectedTovarsList.remove(selectedItem);
 
                             // Заново добавим товар с новыми данными
-                            if (Integer.parseInt(quantity) > 0) {
-                                selectedItem.setQuantity(Integer.parseInt(quantity));
+                            if (Double.parseDouble(quantity) > 0) {
+                                selectedItem.setQuantity(Double.parseDouble(quantity));
                                 selectedItem.setMyUnit(selectedUnit);
                                 selectedItem.setSum(selectedItem.getQuantity() * selectedItem.getPrice()  * selectedItem.getMyUnit().getCoefficient());
                                 selectedTovarsList.add(selectedItem);

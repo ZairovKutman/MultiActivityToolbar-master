@@ -271,7 +271,7 @@ public class ClientDetailActivity extends BaseActivity {
             clientAccuracy.setTextColor(ResourcesCompat.getColor(getResources(), R.color.colorPrimary, null));
             if (sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false").equals("false")) {
                 clientSaveLocationButton.setEnabled(false);
-                clientAccuracy.setText("У вас нет доступа для снятия координат!");
+                clientAccuracy.setText("Нет доступа!");
             }
             else
             {

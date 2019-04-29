@@ -35,7 +35,7 @@ public class Item implements Serializable {
     private String category;
     private double price;
     private double stock;
-    private int quantity;
+    private double quantity;
     private double sum;
     private String base;
 
@@ -107,11 +107,11 @@ public class Item implements Serializable {
         this.stock = stock;
     }
 
-    public int getQuantity() {
+    public double getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
 

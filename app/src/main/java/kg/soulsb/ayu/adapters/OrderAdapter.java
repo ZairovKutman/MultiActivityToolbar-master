@@ -52,6 +52,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
 
             holder = new OrderHolder();
             holder.txtTitle = (TextView)row.findViewById(R.id.text_client);
+            holder.numeracia = (TextView)row.findViewById(R.id.text_numeracia);
             holder.txtDetail = (TextView)row.findViewById(R.id.text_detail);
             holder.delivered = (ImageView)row.findViewById(R.id.delivered);
             holder.image = (ImageView)row.findViewById(R.id.imageView_doc);
@@ -68,7 +69,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
         DatabaseManager.initializeInstance(dbHelper);
         ClientsRepo clientsRepo = new ClientsRepo();
         String myClient = clientsRepo.getClientObjectByGuid(order.getClient()).getName();
-
+        holder.numeracia.setText(Integer.toString(position+1));
         holder.txtTitle.setText(myClient);
 
         if (order.getDoctype().equals("1")){
@@ -102,6 +103,7 @@ public class OrderAdapter extends ArrayAdapter<Order> {
     {
         TextView txtTitle;
         TextView txtDetail;
+        TextView numeracia;
         ImageView delivered;
         ImageView image;
     }

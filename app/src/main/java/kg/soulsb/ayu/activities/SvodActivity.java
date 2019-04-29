@@ -109,8 +109,8 @@ public class SvodActivity extends BaseActivity {
     }
     public void createTable()
     {
-        int upakovka = 0;
-        int shtuk = 0;
+        double upakovka = 0;
+        double shtuk = 0;
         double summa = 0;
         svodRowList = new ArrayList<>();
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);

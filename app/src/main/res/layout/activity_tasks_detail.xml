@@ -2,12 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ececec"
-    android:orientation="vertical"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="kg.soulsb.ayu.activities.MainActivity">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
     <android.support.v7.widget.CardView
         android:id="@+id/card_view0"
         android:layout_width="match_parent"
@@ -29,54 +28,18 @@
 
 
                 <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                    android:text="База данных"
-                    android:textAlignment="viewStart"
-                    android:layout_gravity="start"
-                    android:textStyle="bold"
-                    android:layout_weight="2"/>
-
-                <Spinner
-                    android:id="@+id/spinner_baza"
-                    style="@style/spinner_style"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:spinnerMode="dialog" />
-
-                <ImageView
-                    android:id="@+id/imageViewgps"
-                    android:padding="10dp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@android:drawable/ic_menu_myplaces" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-
-                <TextView
-                    android:id="@+id/textView_agent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="Агент"
+                    android:text="Клиент:"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView_agent_name"
+                    android:id="@+id/textView_task_client"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="Иванов И." />
+                    android:text="" />
             </LinearLayout>
 
             <LinearLayout
@@ -85,25 +48,23 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/textView_last_obmen2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
-                    android:text="Последний обмен: "
+                    android:text="Статус: "
                     android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView_last_obmen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="" />
+                <TextView
+                    android:id="@+id/textView_task_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="" />
 
-        </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
-
 
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
@@ -120,7 +81,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/create_order_button"
+                android:id="@+id/new_order_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
@@ -134,43 +95,74 @@
                 android:textColor="@android:color/holo_green_dark" />
 
             <Button
-                android:id="@+id/svod_button"
+                android:id="@+id/new_photo_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
+                android:drawableTop="@android:drawable/ic_menu_camera"
                 android:drawableTint="@color/colorPrimaryDark"
-                android:drawableTop="@android:drawable/ic_menu_agenda"
-                android:paddingBottom="2dp"
                 android:paddingTop="4dp"
-                android:text="\nСвод заказов"
+                android:paddingBottom="2dp"
+                android:text="\nДобавить фото"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/colorPrimaryDark" />
 
             <Button
-                android:id="@+id/obmen_button"
+                android:id="@+id/new_closed_photo_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="@android:color/background_light"
+                android:drawableTop="@android:drawable/ic_menu_camera"
                 android:drawableTint="@color/colorAccent"
-                android:drawableTop="@android:drawable/ic_menu_upload"
-                android:paddingBottom="2dp"
                 android:paddingTop="4dp"
-                android:text="\nОбмен"
+                android:paddingBottom="2dp"
+                android:text="\nМагазин закрыт (фото)"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/colorAccent" />
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+
+        android:layout_margin="5dp"
+        android:elevation="3dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Фотографии"
+                android:textColor="@color/colorAccent"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/gv"
+                android:orientation="horizontal">
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
-        android:id="@+id/card_view2"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
 
         android:layout_margin="5dp"
@@ -186,12 +178,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="Невыгруженные документы"
+                android:text="Документы задания"
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold" />
 
             <ListView
-                android:id="@+id/listView_documents"
+                android:id="@+id/list_view_docs"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -199,13 +191,14 @@
                 android:maxHeight="120dp" />
 
             <TextView
-                android:id="@+id/empty"
+                android:id="@+id/empty_1"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_marginLeft="10dp"
-                android:text="Нет документов для выгрузки..."></TextView>
+                android:text="Нет документов..."></TextView>
 
         </LinearLayout>
 
     </android.support.v7.widget.CardView>
+
 </LinearLayout>

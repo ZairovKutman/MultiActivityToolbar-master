@@ -14,6 +14,9 @@ import android.widget.ListView;
 
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.vision.L;
 
 import java.util.ArrayList;
 
@@ -23,6 +26,7 @@ import kg.soulsb.ayu.adapters.OrderAdapter;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
+import kg.soulsb.ayu.singletons.UserSettings;
 
 public class SavedDocumentsActivity extends BaseActivity {
     AlertDialog.Builder d;
@@ -83,8 +87,11 @@ public class SavedDocumentsActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                if (orderArrayList.get(i).getDoctype().equals("3")) {
+                if (sharedPreferences.getString(UserSettings.workWithTasks,"false").equals("true")) {
+                    Toast.makeText(SavedDocumentsActivity.this,"Документ можно открыть только в разделе Задания!", Toast.LENGTH_LONG).show();
+                }
+                else
+                {   if (orderArrayList.get(i).getDoctype().equals("3")) {
                     Intent intent = new Intent(getBaseContext(),PaySvodActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.putExtra("doctype", orderArrayList.get(i).getDoctype());
@@ -111,6 +118,7 @@ public class SavedDocumentsActivity extends BaseActivity {
                     }
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                }
                 }
             }
         });

@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ExpandableListView
+    <Button
+        android:id="@+id/button_send_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="4dp"
+        android:text="Выгрузить задания"
+        android:textColor="@color/cardview_light_background"
+        android:translationZ="4dp" />
+
+    <ListView
         android:id="@+id/tasks_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </ExpandableListView>
+    </ListView>
 
 </LinearLayout>

@@ -2,6 +2,7 @@ package kg.soulsb.ayu.activities.zakaz;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -12,7 +13,10 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import net.alhazmy13.mediapicker.Image.ImagePicker;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,12 +39,17 @@ public class OrderAddActivity extends BaseActivity {
     Location mLastLocation;
     String clientLat="0";
     String clientLong="0";
+    String clientName = "";
     Location clientLocation = new Location("");
     Order order = null;
     String isDelivered = "false";
     String category = "";
     ViewPager viewPager;
     float distance=0;
+    String isTask = "false";
+    String taskClient = "";
+    int priority;
+    SharedPreferences sharedPreferences;
 
     AddOrderFragment addOrderFragment = new AddOrderFragment();
     //AddTovarFragment addTovarFragment = new AddTovarFragment();
@@ -152,6 +161,7 @@ public void locationUpdate(){
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_add);
+        sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(), MODE_PRIVATE);
         mLastLocation = getLocation();
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setOffscreenPageLimit(3);
@@ -201,6 +211,16 @@ public void locationUpdate(){
         {
             isDelivered = getIntent().getStringExtra("isDelivered");
             Toast.makeText(this, "Документ выгружен, редактирование запрещено", Toast.LENGTH_SHORT).show();
+        }
+
+        if (getIntent().getStringExtra("isTask")!=null)
+        {
+           isTask = "true";
+           taskClient = getIntent().getStringExtra("clientGuid");
+           clientLat =  getIntent().getStringExtra("clientLat");
+           clientLong =  getIntent().getStringExtra("clientLon");
+           clientName =  getIntent().getStringExtra("clientName");
+           priority = getIntent().getIntExtra("priority",999);
         }
     }
 
@@ -314,4 +334,14 @@ public void locationUpdate(){
              mTimer.cancel();
          }
      }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ImagePicker.IMAGE_PICKER_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> mPaths = data.getStringArrayListExtra(ImagePicker.EXTRA_IMAGE_PATH);
+            System.out.println(mPaths);
+        }
+    }
 }

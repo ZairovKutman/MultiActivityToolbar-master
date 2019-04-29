@@ -17,6 +17,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Tasks;
+
 import kg.soulsb.ayu.BuildConfig;
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.activities.zakaz.OrderAddActivity;
@@ -27,6 +29,8 @@ import kg.soulsb.ayu.grpctest.nano.AyuServiceGrpc;
 import kg.soulsb.ayu.grpctest.nano.ConsPaymentLine;
 import kg.soulsb.ayu.grpctest.nano.Contract;
 import kg.soulsb.ayu.grpctest.nano.Contracts;
+import kg.soulsb.ayu.grpctest.nano.DailyTask;
+import kg.soulsb.ayu.grpctest.nano.DailyTasks;
 import kg.soulsb.ayu.grpctest.nano.Device;
 import kg.soulsb.ayu.grpctest.nano.DeviceStatus;
 import kg.soulsb.ayu.grpctest.nano.DocPurch;
@@ -48,6 +52,7 @@ import kg.soulsb.ayu.grpctest.nano.Reports;
 import kg.soulsb.ayu.grpctest.nano.Settings;
 import kg.soulsb.ayu.grpctest.nano.Stock;
 import kg.soulsb.ayu.grpctest.nano.Stocks;
+import kg.soulsb.ayu.grpctest.nano.TaskPhoto;
 import kg.soulsb.ayu.grpctest.nano.Units;
 import kg.soulsb.ayu.grpctest.nano.Warehouse;
 import kg.soulsb.ayu.grpctest.nano.Warehouses;
@@ -56,10 +61,12 @@ import kg.soulsb.ayu.helpers.DatabaseManager;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
+import kg.soulsb.ayu.helpers.repo.DailyTasksRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.MyLocationsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
+import kg.soulsb.ayu.helpers.repo.PhotosRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
@@ -69,10 +76,12 @@ import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
+import kg.soulsb.ayu.models.DailyPhoto;
 import kg.soulsb.ayu.models.Item;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -338,7 +347,7 @@ public class SettingsObmenActivity extends BaseActivity {
             device.agent = name;
             device.deviceId = android_id;
             device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
-            publishProgress("Проверка устройства в базе данных...");
+            publishProgress("Соединение с сервером и запрос доступа...");
             DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
 
             if (!deviceStatus.active) {
@@ -418,7 +427,51 @@ public class SettingsObmenActivity extends BaseActivity {
                 }
             }
             //Конец выгрузки документов
+
+                publishProgress("Выгрузка заданий...");
+                ArrayList<kg.soulsb.ayu.models.DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
+                kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
+                int i=0;
+                for (kg.soulsb.ayu.models.DailyTask dt: dailyTaskArrayList)
+                {
+                    kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
+                    dt2.agentName = name;
+                    dt2.deviceId = android_id;
+                    dt2.clientGuid = dt.getClientGuid();
+                    dt2.dateClosed = dt.getDateClosed();
+                    dt2.docDate = dt.getDocDate();
+                    dt2.docGuid = dt.getDocGuid();
+                    dt2.docId =dt.getDocId();
+                    dt2.latitude = Double.parseDouble(dt.getLatitude());
+                    dt2.longitude = Double.parseDouble(dt.getLongitude());
+                    dt2.priority = dt.getPriority();
+                    dt2.status = Integer.parseInt(dt.getStatus());
+
+                    ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByClientGuid(dt.getClientGuid());
+                    int j =0;
+                    TaskPhoto[] taskPhotos = new TaskPhoto[dailyPhotoArrayList.size()];
+                    for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
+                    {
+                        TaskPhoto tp = new TaskPhoto();
+                        tp.photo = dailyPhoto.getPhotoBytes();
+                        taskPhotos[j] = tp;
+                        j=j+1;
+                    }
+
+                    dt2.taskPhoto = taskPhotos;
+
+                    dailyTasks[i] = dt2;
+                    i=i+1;
+                }
+                DailyTasks dailyTasks1 = new DailyTasks();
+                dailyTasks1.task = dailyTasks;
+                DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
+                System.out.println(Arrays.toString(ds.docsStatus));
+
+                new PhotosRepo().deleteAllDailyPhoto();
             }
+
+
 
             if (onlyOstatki) {
                 ArrayList<kg.soulsb.ayu.models.Stock> stocksArray = new ArrayList<>();
@@ -453,8 +506,6 @@ public class SettingsObmenActivity extends BaseActivity {
             ArrayList<MyLocation> arrayListLoc = myLocationsRepo.getMyLocationsObject();
 
             for (MyLocation list : arrayListLoc) {
-                request = new Agent();
-                request.name = list.getAgent();
                 requestLoc.agent = request;
                 requestLoc.date = list.getFormattedDate();
                 requestLoc.latitude = list.getLatitude();
@@ -471,7 +522,6 @@ public class SettingsObmenActivity extends BaseActivity {
                     System.out.println("Location DONE");
                 }
             }
-
 
             publishProgress("Загружаю данные из сервера...");
 
@@ -498,8 +548,10 @@ public class SettingsObmenActivity extends BaseActivity {
             editor.putString(UserSettings.password_for_app_settings, settings.passwordForAppSettings);
             editor.putString(UserSettings.can_create_payment, Boolean.toString(settings.canCreatePayment));
             editor.putString(UserSettings.status, Boolean.toString(settings.status));
+            editor.putString(UserSettings.workWithTasks, Boolean.toString(settings.workWithTasks));
+            //editor.putString(UserSettings.workWithTasks, "true");
             editor.apply();
-            System.out.println("ASAADSDADASDASDASDSADASAS++++++ "+Boolean.toString(settings.canGetGpcCoordinatesOfClients));
+            System.out.println("ASAADSDADASDASDASDSADASAS++++++ "+Boolean.toString(settings.workWithTasks));
             publishProgress("Загрузка клиентов...");
             Points pointIterator = exchangeData.points;
             globalCounter = 10;
@@ -653,6 +705,21 @@ public class SettingsObmenActivity extends BaseActivity {
                 reportsRepo.insert(report1);
             }
             System.out.println("Reports: Done");
+
+
+            // gettings tasks
+            publishProgress("Загрузка заданий...");
+            //getting reports
+            DailyTasks tasks = exchangeData.dailyTasks;
+            new DailyTasksRepo().deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+            System.out.println("DAILYTASKS: "+tasks.task);
+            for (DailyTask task: tasks.task)
+            {
+                System.out.println("ONETASK: "+task);
+                kg.soulsb.ayu.models.DailyTask dailyTask1 = new kg.soulsb.ayu.models.DailyTask(task.docGuid, task.clientGuid, task.priority, Integer.toString(task.status), task.docId, task.docDate, task.dateClosed, Double.toString(task.latitude), Double.toString(task.longitude), task.agentName, CurrentBaseClass.getInstance().getCurrentBase());
+                new DailyTasksRepo().insert(dailyTask1);
+            }
+            System.out.println("Tasks: Done");
 
             System.out.println("Finally all done! yay!");
             return pointIterator;

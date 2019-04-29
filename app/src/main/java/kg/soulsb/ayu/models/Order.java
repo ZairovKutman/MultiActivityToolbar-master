@@ -32,6 +32,7 @@ public class Order implements Serializable {
     public static String KEY_Organization = "Organization";
 
     private String orderID = "";
+    private String clientName = "";
     private String priceType = "";
     private String warehouse = "";
     private String dogovor = "";
@@ -50,6 +51,7 @@ public class Order implements Serializable {
 
     public Order()
     {
+        this.clientName = "";
     }
     public Order(String date, String client, String dogovor, String warehouse, String priceType, ArrayList<Item> arraylistTovar, String checkedBonusTT)
     {
@@ -63,6 +65,7 @@ public class Order implements Serializable {
             this.checkedBonusTT = "false";
         else
             this.checkedBonusTT = checkedBonusTT;
+        this.clientName = "";
     }
 
     public String getPriceType() {
@@ -204,5 +207,18 @@ public class Order implements Serializable {
 
     public String getCheckedBonusTTString() {
         return checkedBonusTT;
+    }
+
+    @Override
+    public String toString() {
+        return "Создать заказ";
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 }

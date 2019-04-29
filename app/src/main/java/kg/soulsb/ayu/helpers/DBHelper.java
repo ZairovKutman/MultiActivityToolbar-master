@@ -9,10 +9,12 @@ import kg.soulsb.ayu.grpctest.nano.Units;
 import kg.soulsb.ayu.helpers.repo.BazasRepo;
 import kg.soulsb.ayu.helpers.repo.ClientsRepo;
 import kg.soulsb.ayu.helpers.repo.ContractsRepo;
+import kg.soulsb.ayu.helpers.repo.DailyTasksRepo;
 import kg.soulsb.ayu.helpers.repo.ItemsRepo;
 import kg.soulsb.ayu.helpers.repo.MyLocationsRepo;
 import kg.soulsb.ayu.helpers.repo.OrdersRepo;
 import kg.soulsb.ayu.helpers.repo.OrganizationsRepo;
+import kg.soulsb.ayu.helpers.repo.PhotosRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
@@ -23,6 +25,8 @@ import kg.soulsb.ayu.helpers.repo.WarehousesRepo;
 import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.Client;
 import kg.soulsb.ayu.models.Contract;
+import kg.soulsb.ayu.models.DailyPhoto;
+import kg.soulsb.ayu.models.DailyTask;
 import kg.soulsb.ayu.models.Item;
 import kg.soulsb.ayu.models.MyLocation;
 import kg.soulsb.ayu.models.Order;
@@ -42,7 +46,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
     // Database Name
     private static final String DATABASE_NAME = "ayu_sqlite.db";
     private static final String TAG = DBHelper.class.getSimpleName().toString();
@@ -101,6 +105,12 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS " + Order.TABLE_SvodPay);
         db.execSQL(OrdersRepo.createSvodPayTable());
+
+        db.execSQL("DROP TABLE IF EXISTS " + DailyTask.TABLE);
+        db.execSQL(DailyTasksRepo.createTable());
+
+        db.execSQL("DROP TABLE IF EXISTS " + DailyPhoto.TABLE);
+        db.execSQL(PhotosRepo.createTable());
     }
 
     @Override
@@ -170,6 +180,15 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("UPDATE " + Order.TABLE + " SET " + Order.KEY_checkedBonusTT + " = 'false';");
             db.execSQL("DROP TABLE IF EXISTS " + MyLocation.TABLE);
             db.execSQL(MyLocationsRepo.createTable());
+        }
+
+        if (newVersion>=12 && oldVersion<12)
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + DailyTask.TABLE);
+            db.execSQL(DailyTasksRepo.createTable());
+
+            db.execSQL("DROP TABLE IF EXISTS " + DailyPhoto.TABLE);
+            db.execSQL(PhotosRepo.createTable());
         }
 
     }

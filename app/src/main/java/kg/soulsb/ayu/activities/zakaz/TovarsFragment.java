@@ -76,6 +76,13 @@ public class TovarsFragment extends Fragment {
         pricesRepo = new PricesRepo();
         stocksRepo = new StocksRepo();
 
+        // Создаем отбор
+        otborSpinner = (Spinner) v.findViewById(R.id.spinner_otbor);
+        ArrayList<String> otborArrayList = new ArrayList<String>();
+        otborArrayList.add("Показать все");
+        otborArrayList.add("Показать выбранные товары");
+        otborArrayList.add("Показать товары в наличии");
+
         if (parentActivity.order != null){
             for (Item item: parentActivity.order.getArraylistTovar() )
             {
@@ -90,12 +97,6 @@ public class TovarsFragment extends Fragment {
             checkDeliveredDoc();
         }
         recyclerTovarAdapter = new RecyclerTovarAdapter(arrayListAllTovars,parentActivity.orderedItemsArrayList,parentActivity.othersFragment);
-        // Создаем отбор
-        otborSpinner = (Spinner) v.findViewById(R.id.spinner_otbor);
-        ArrayList<String> otborArrayList = new ArrayList<String>();
-        otborArrayList.add("Показать все");
-        otborArrayList.add("Показать выбранные товары");
-        otborArrayList.add("Показать товары в наличии");
 
         otborAdapter = new ArrayAdapter<String>(this.getActivity(),R.layout.baza_spinner_item,otborArrayList);
         otborSpinner.setAdapter(otborAdapter);
@@ -116,6 +117,7 @@ public class TovarsFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+
 
         if (otborSpinner.getSelectedItem().equals("Показать выбранные товары")) {
             recyclerTovarAdapter.setSpinnerSelectedState(1);
@@ -171,6 +173,9 @@ public class TovarsFragment extends Fragment {
                 @Override
                 public void onRequestDisallowInterceptTouchEvent(boolean b) { }
             });
+
+            otborSpinner.setSelection(1);
+
         }
     }
 

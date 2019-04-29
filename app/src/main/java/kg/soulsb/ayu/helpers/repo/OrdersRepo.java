@@ -225,7 +225,127 @@ public class OrdersRepo {
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
                         item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
-                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
+                        itemArrayList.add(item);
+                    } while (myCursor.moveToNext());
+                }
+                myCursor.close();
+
+                order.setArraylistTovar(itemArrayList);
+
+                ////////
+
+                ArrayList<SvodPay> svodPayArrayList = new ArrayList<>();
+
+                String selectSvodPayQuery =  " SELECT " + Order.KEY_OrderID
+                        + ", "+SvodPay.KEY_Guid_Client
+                        + ", "+SvodPay.KEY_Guid_Dogovor
+                        + ", "+SvodPay.KEY_Sum
+                        + " FROM " + Order.TABLE_SvodPay
+                        + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
+
+                Cursor myCursor1 = db.rawQuery(selectSvodPayQuery, null);
+
+                if (myCursor1.moveToFirst()) {
+                    do {
+                        SvodPay svodPay = new SvodPay();
+                        svodPay.setGuid_client(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Client)));
+                        svodPay.setGuid_dogovor(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Guid_Dogovor)));
+                        svodPay.setSum(Double.parseDouble(myCursor1.getString(myCursor1.getColumnIndexOrThrow(SvodPay.KEY_Sum))));
+                        svodPayArrayList.add(svodPay);
+                    } while (myCursor1.moveToNext());
+                }
+                myCursor1.close();
+                order.setArraylistSvodPay(svodPayArrayList);
+
+
+
+                arrayList.add(order);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        DatabaseManager.getInstance().closeDatabase();
+
+        return arrayList;
+    }
+
+    public ArrayList<Order> getOrdersObjectByClientGuid(String baza, String clientGuid) {
+        ArrayList<Order> arrayList = new ArrayList<>();
+
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT " + Order.KEY_OrderID
+                + ", "+Order.KEY_BAZA
+                + ", "+Order.KEY_clientGUID
+                + ", "+Order.KEY_comment
+                + ", "+Order.KEY_checkedBonusTT
+                + ", "+Order.KEY_date
+                + ", "+Order.KEY_dateSend
+                + ", "+Order.KEY_Doctype
+                + ", "+Order.KEY_dogovor
+                + ", "+Order.KEY_isDelivered
+                + ", "+Order.KEY_pricetype
+                + ", "+Order.KEY_warehouse
+                + ", "+Order.KEY_totalSum
+                + ", "+Order.KEY_Organization
+                + " FROM " + Order.TABLE
+                + " WHERE "+Order.KEY_BAZA+" = '"+baza+"' AND "+Order.KEY_clientGUID+" = '"+clientGuid+"' ";
+
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        // looping through all rows and adding to list
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order order = new Order();
+                order.setOrderID(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID)));
+                order.setOrganization(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Organization)));
+                order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
+                order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
+                order.setComment(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_comment)));
+                order.setCheckedBonusTT(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_checkedBonusTT)));
+                order.setDate(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_date)));
+                order.setDateSend(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dateSend)));
+                order.setDoctype(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Doctype)));
+                order.setDogovor(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dogovor)));
+                order.setPriceType(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_pricetype)));
+                order.setWarehouse(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_warehouse)));
+                if (cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isDelivered)).equals("true"))
+                    order.setDelivered(true);
+                else
+                    order.setDelivered(false);
+                ArrayList<Item> itemArrayList = new ArrayList<>();
+
+                String selectItemQuery =  " SELECT " + Order.KEY_OrderID
+                        + ", "+Item.KEY_Guid
+                        + ", "+Item.KEY_Name
+                        + ", "+Item.KEY_Price
+                        + ", "+Item.KEY_Quantity
+                        + ", "+Item.KEY_ItemId
+                        + ", "+Item.KEY_Sum
+                        + ", "+Item.KEY_Unit
+                        + ", "+Item.KEY_UnitGUID
+                        + " FROM " + Order.TABLE_ITEM
+                        + " WHERE "+Order.KEY_OrderID+" = '"+cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID))+"'";
+
+                Cursor myCursor = db.rawQuery(selectItemQuery, null);
+
+                if (myCursor.moveToFirst()) {
+                    do {
+                        Item item = new Item();
+                        item.setItemId(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_ItemId)));
+                        item.setName(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Name)));
+                        item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
+                        item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
+                        item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
+                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
                         item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
@@ -366,7 +486,7 @@ public class OrdersRepo {
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
                         item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
-                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
                         item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
