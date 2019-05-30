@@ -165,9 +165,9 @@ public class LocationService extends Service implements LocationListener, GpsSta
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Log.d(LOG_TAG, "onTaskRemoved ");
-        this.stopUpdatingLocation();
-        getApplicationContext().unregisterReceiver(gpsReceiver);
-        stopSelf();
+//        this.stopUpdatingLocation();
+//        getApplicationContext().unregisterReceiver(gpsReceiver);
+//        stopSelf();
     }
 
     /**
@@ -328,7 +328,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         //setAccuracy(newLocation.getAccuracy());
         float horizontalAccuracy = location.getAccuracy();
-        if(horizontalAccuracy > 100){ //10meter filter
+        if(horizontalAccuracy > 80){ //10meter filter
             Log.d(TAG, "Accuracy is too low.");
             sendMessageToUI("yes_yellow");
             return false;

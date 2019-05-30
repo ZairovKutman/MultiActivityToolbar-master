@@ -34,6 +34,7 @@ import kg.soulsb.ayu.grpctest.nano.DailyTasks;
 import kg.soulsb.ayu.grpctest.nano.Device;
 import kg.soulsb.ayu.grpctest.nano.DeviceStatus;
 import kg.soulsb.ayu.grpctest.nano.DocPurch;
+import kg.soulsb.ayu.grpctest.nano.DocStatus;
 import kg.soulsb.ayu.grpctest.nano.Docs;
 import kg.soulsb.ayu.grpctest.nano.DocsStatus;
 import kg.soulsb.ayu.grpctest.nano.ExchangeData;
@@ -308,7 +309,7 @@ public class SettingsObmenActivity extends BaseActivity {
                     loadOnlyDocButton.setEnabled(true);
                 }
             }
-        }, 150000 );
+        }, 400000 );
     }
 
     @Override
@@ -428,48 +429,48 @@ public class SettingsObmenActivity extends BaseActivity {
             }
             //Конец выгрузки документов
 
-                publishProgress("Выгрузка заданий...");
-                ArrayList<kg.soulsb.ayu.models.DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
-                kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
-                int i=0;
-                for (kg.soulsb.ayu.models.DailyTask dt: dailyTaskArrayList)
+            publishProgress("Выгрузка заданий...");
+            ArrayList<kg.soulsb.ayu.models.DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
+            kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
+            int i=0;
+            for (kg.soulsb.ayu.models.DailyTask dt: dailyTaskArrayList)
+            {
+                kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
+                dt2.agentName = name;
+                dt2.deviceId = android_id;
+                dt2.clientGuid = dt.getClientGuid();
+                dt2.dateClosed = dt.getDateClosed();
+                dt2.docDate = dt.getDocDate();
+                dt2.docGuid = dt.getDocGuid();
+                dt2.docId =dt.getDocId();
+                dt2.latitude = Double.parseDouble(dt.getLatitude());
+                dt2.longitude = Double.parseDouble(dt.getLongitude());
+                dt2.priority = dt.getPriority();
+                dt2.status = Integer.parseInt(dt.getStatus());
+
+                ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByClientGuid(dt.getClientGuid());
+                int j =0;
+                TaskPhoto[] taskPhotos = new TaskPhoto[dailyPhotoArrayList.size()];
+                for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
                 {
-                    kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
-                    dt2.agentName = name;
-                    dt2.deviceId = android_id;
-                    dt2.clientGuid = dt.getClientGuid();
-                    dt2.dateClosed = dt.getDateClosed();
-                    dt2.docDate = dt.getDocDate();
-                    dt2.docGuid = dt.getDocGuid();
-                    dt2.docId =dt.getDocId();
-                    dt2.latitude = Double.parseDouble(dt.getLatitude());
-                    dt2.longitude = Double.parseDouble(dt.getLongitude());
-                    dt2.priority = dt.getPriority();
-                    dt2.status = Integer.parseInt(dt.getStatus());
-
-                    ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByClientGuid(dt.getClientGuid());
-                    int j =0;
-                    TaskPhoto[] taskPhotos = new TaskPhoto[dailyPhotoArrayList.size()];
-                    for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
-                    {
-                        TaskPhoto tp = new TaskPhoto();
-                        tp.photo = dailyPhoto.getPhotoBytes();
-                        taskPhotos[j] = tp;
-                        j=j+1;
-                    }
-
-                    dt2.taskPhoto = taskPhotos;
-
-                    dailyTasks[i] = dt2;
-                    i=i+1;
+                    TaskPhoto tp = new TaskPhoto();
+                    tp.photo = dailyPhoto.getPhotoBytes();
+                    taskPhotos[j] = tp;
+                    j=j+1;
                 }
-                DailyTasks dailyTasks1 = new DailyTasks();
-                dailyTasks1.task = dailyTasks;
-                DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
-                System.out.println(Arrays.toString(ds.docsStatus));
 
-                new PhotosRepo().deleteAllDailyPhoto();
+                dt2.taskPhoto = taskPhotos;
+
+                dailyTasks[i] = dt2;
+                i=i+1;
             }
+            DailyTasks dailyTasks1 = new DailyTasks();
+            dailyTasks1.task = dailyTasks;
+            DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
+            System.out.println(Arrays.toString(ds.docsStatus));
+
+            new PhotosRepo().deleteAllDailyPhoto();
+        }
 
 
 
@@ -613,6 +614,33 @@ public class SettingsObmenActivity extends BaseActivity {
             }
             System.out.println("Units: Done");
 
+            publishProgress("Загрузка типов цен...");
+            // getting price types
+            PriceTypes priceTypes = exchangeData.priceTypes;
+            PriceTypesRepo priceTypesRepo = new PriceTypesRepo();
+            priceTypesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+            for (PriceType priceType: priceTypes.priceType)
+            {
+                kg.soulsb.ayu.models.PriceType priceType1 = new kg.soulsb.ayu.models.PriceType(priceType.guid,priceType.description);
+                priceType1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
+                pricetypesArray.add(priceType1);
+                priceTypesRepo.insert(priceType1);
+            }
+            System.out.println("Price types: Done");
+            publishProgress("Загрузка цен...");
+            // getting prices
+            Prices prices = exchangeData.prices;
+            PricesRepo pricesRepo = new PricesRepo();
+            pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+            for (Price price: prices.price)
+            {
+                kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
+                price1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
+                pricesArray.add(price1);
+                pricesRepo.insert(price1);
+            }
+            System.out.println("Price: Done");
+
             publishProgress("Загрузка складов...");
             // getting warehouses
             Warehouses warehouses = exchangeData.warehouses;
@@ -653,32 +681,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 organizationsRepo.insert(organization1);
             }
             System.out.println("Organization: Done");
-            publishProgress("Загрузка типов цен...");
-            // getting price types
-            PriceTypes priceTypes = exchangeData.priceTypes;
-            PriceTypesRepo priceTypesRepo = new PriceTypesRepo();
-            priceTypesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (PriceType priceType: priceTypes.priceType)
-            {
-                kg.soulsb.ayu.models.PriceType priceType1 = new kg.soulsb.ayu.models.PriceType(priceType.guid,priceType.description);
-                priceType1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
-                pricetypesArray.add(priceType1);
-                priceTypesRepo.insert(priceType1);
-            }
-            System.out.println("Price types: Done");
-            publishProgress("Загрузка цен...");
-            // getting prices
-            Prices prices = exchangeData.prices;
-            PricesRepo pricesRepo = new PricesRepo();
-            pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Price price: prices.price)
-            {
-                kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
-                price1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
-                pricesArray.add(price1);
-                pricesRepo.insert(price1);
-            }
-            System.out.println("Price: Done");
+
             publishProgress("Загрузка остатков...");
             // getting Stocks
             Stocks stocks = exchangeData.stocks;

@@ -87,9 +87,10 @@ public class SavedDocumentsActivity extends BaseActivity {
         listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (sharedPreferences.getString(UserSettings.workWithTasks,"false").equals("true")) {
-                    Toast.makeText(SavedDocumentsActivity.this,"Документ можно открыть только в разделе Задания!", Toast.LENGTH_LONG).show();
+                if (orderArrayList.get(i).isTask().equals("true")) {
+                    Toast.makeText(SavedDocumentsActivity.this,"Документ из задания можно открыть только в разделе Задания!", Toast.LENGTH_LONG).show();
                 }
+
                 else
                 {   if (orderArrayList.get(i).getDoctype().equals("3")) {
                     Intent intent = new Intent(getBaseContext(),PaySvodActivity.class);

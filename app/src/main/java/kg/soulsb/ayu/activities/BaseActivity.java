@@ -170,12 +170,6 @@ public class BaseActivity extends AppCompatActivity implements
 
             if (!sharedPreferences.getString(UserSettings.workWithTasks,"false").equals("false"))
             {
-                MenuItem nav_item4 = menuNav.findItem(R.id.nav_orders);
-                nav_item4.setEnabled(false);
-
-                MenuItem nav_item5 = menuNav.findItem(R.id.nav_orders_real);
-                nav_item5.setEnabled(false);
-
                 MenuItem nav_item6 = menuNav.findItem(R.id.nav_tasks);
                 nav_item6.setEnabled(true);
             }

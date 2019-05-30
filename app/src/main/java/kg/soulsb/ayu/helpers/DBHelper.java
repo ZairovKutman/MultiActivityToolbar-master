@@ -182,13 +182,15 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL(MyLocationsRepo.createTable());
         }
 
-        if (newVersion>=12 && oldVersion<12)
+        if (oldVersion<12)
         {
             db.execSQL("DROP TABLE IF EXISTS " + DailyTask.TABLE);
             db.execSQL(DailyTasksRepo.createTable());
 
             db.execSQL("DROP TABLE IF EXISTS " + DailyPhoto.TABLE);
             db.execSQL(PhotosRepo.createTable());
+
+            db.execSQL("ALTER TABLE " + Order.TABLE + " ADD COLUMN " + Order.KEY_isTask + " text NOT NULL DEFAULT 'false';");
         }
 
     }

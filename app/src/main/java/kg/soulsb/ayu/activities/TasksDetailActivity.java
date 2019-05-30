@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -203,6 +204,21 @@ public class TasksDetailActivity extends BaseActivity {
         populateImages();
     }
 
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+        return resizedBitmap;
+    }
+
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
@@ -210,7 +226,18 @@ public class TasksDetailActivity extends BaseActivity {
 
             myBitmap = BitmapFactory.decodeFile(image.getPath());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 60, baos);
+            int myHeight = myBitmap.getHeight();
+            int myWidth = myBitmap.getWidth();
+
+            while (myHeight >1000 || myWidth>1000)
+            {
+                myHeight = myHeight / 2;
+                myWidth = myWidth / 2;
+            }
+
+            myBitmap = getResizedBitmap(myBitmap,myHeight,myWidth);
+
+            myBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
             byte[] imageInByte = baos.toByteArray();
             DailyPhoto dailyPhoto = new DailyPhoto(client.getGuid(), imageInByte);
             new PhotosRepo().insert(dailyPhoto);
@@ -232,9 +259,11 @@ public class TasksDetailActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        orderArrayList = new OrdersRepo().getOrdersObjectByClientGuid(CurrentBaseClass.getInstance().getCurrentBase(),client.getGuid());
-        arrayAdapter.notifyDataSetChanged();
+
         populateImages();
+        orderArrayList.clear();
+        orderArrayList.addAll(new OrdersRepo().getOrdersObjectByClientGuid(CurrentBaseClass.getInstance().getCurrentBase(),client.getGuid()));
+        arrayAdapter.notifyDataSetChanged();
         if (status.equals("1")) {
             taskDetailTextView.setText("Задание №"+priority+", Статус = Заказ принят");
         }

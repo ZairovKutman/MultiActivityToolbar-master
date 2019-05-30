@@ -269,9 +269,29 @@ public class MainActivity extends BaseActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if (position != 0)
                     {
-                        if (orderTasksArraylist.get(position-1).getStatus().equals("0") && orderTasksArraylist.get(position-1).getPriority()!= orderTasksArraylist.get(position).getPriority()) {
-                            Toast.makeText(MainActivity.this,"Нужно закончить предыдущее задание!",Toast.LENGTH_LONG).show();
-                            return;
+                        if (orderTasksArraylist.get(position-1).getStatus().equals("0")) {
+                            int counter = 1;
+                            while (position-counter>0) {
+                                if (orderTasksArraylist.get(position - counter).getPriority() < orderTasksArraylist.get(position).getPriority() && orderTasksArraylist.get(position - counter).getStatus().equals("0")) {
+                                    int pos1 = position - counter;
+                                    int posCounter = 1;
+                                    boolean flag = false;
+                                    while (pos1 - posCounter >=0)
+                                    {
+                                        if (orderTasksArraylist.get(pos1).getPriority() == orderTasksArraylist.get(pos1 - posCounter).getPriority() && !orderTasksArraylist.get(pos1 - posCounter).getStatus().equals("0")) {
+                                            flag = true;
+                                           break;
+                                        }
+                                        posCounter = posCounter + 1;
+                                    }
+                                    if (flag)
+                                        break;
+
+                                    Toast.makeText(MainActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+                                counter = counter + 1;
+                            }
                         }
                     }
 
@@ -284,7 +304,7 @@ public class MainActivity extends BaseActivity {
                         distance = 1;
                     }
 
-                    if (distance>200) {
+                    if (distance>UserSettings.DISTANCE_TO_CLIENT) {
                         AlertDialog.Builder alertDlg = new AlertDialog.Builder(MainActivity.this);
                         alertDlg.setMessage("Клиент находится на расстоянии " + distance + "м. Подойдите ближе!");
                         alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
@@ -542,8 +562,8 @@ public class MainActivity extends BaseActivity {
 
         //Stop location sharing service to app server.........
         System.out.println("ON DESTROY EXECUTED MAIN ACTIVITY AND KILLED SERVICE");
-        stopService(new Intent(this, LocationService.class));
-        DataHolderClass.getInstance().setServiceRunning(false);
+        //stopService(new Intent(this, LocationService.class));
+        //DataHolderClass.getInstance().setServiceRunning(false);
         //Ends................................................
 
 

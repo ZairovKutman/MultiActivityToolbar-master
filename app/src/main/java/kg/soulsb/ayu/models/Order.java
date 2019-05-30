@@ -27,6 +27,7 @@ public class Order implements Serializable {
     public static String KEY_dateSend     = "dateSend";
     public static String KEY_comment     = "comment";
     public static String KEY_checkedBonusTT     = "checkedbonusTT";
+    public static String KEY_isTask     = "isTask";
     public static String KEY_isDelivered     = "isDelivered";
     public static String KEY_totalSum     = "totalSum";
     public static String KEY_Organization = "Organization";
@@ -47,6 +48,7 @@ public class Order implements Serializable {
     private String organization = "";
     private double totalSum;
     private boolean isDelivered;
+    private boolean isTask = false;
     private Baza baza;
 
     public Order()
@@ -220,5 +222,21 @@ public class Order implements Serializable {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+
+    public String isTask() {
+        if (isTask)
+        {
+            return "true";
+        }
+
+        return "false";
+    }
+
+    public void setTask(String task) {
+        if (task.equals("true"))
+            isTask = true;
+        else
+            isTask = false;
     }
 }

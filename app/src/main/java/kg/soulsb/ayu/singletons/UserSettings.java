@@ -22,4 +22,6 @@ public class UserSettings {
 
     public static final int LOCATION_INTERVAL = 40000;
     public static final int FASTEST_LOCATION_INTERVAL = 20000;
+
+    public static int DISTANCE_TO_CLIENT = 200;
 }

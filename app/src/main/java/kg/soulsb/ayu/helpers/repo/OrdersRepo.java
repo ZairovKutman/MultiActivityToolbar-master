@@ -39,7 +39,9 @@ public class OrdersRepo {
                 + Order.KEY_warehouse  + "   TEXT    ,"
                 + Order.KEY_BAZA  + "   TEXT    ,"
                 + Order.KEY_Organization  + "   TEXT    ,"
+                + Order.KEY_isTask  + "   TEXT    ,"
                 + Order.KEY_date  + "   TEXT);";
+
     }
 
     public static String createItemTable(){
@@ -102,6 +104,7 @@ public class OrdersRepo {
         values.put(Order.KEY_warehouse,order.getWarehouse());
         values.put(Order.KEY_totalSum,order.getTotalSum());
         values.put(Order.KEY_Organization,order.getOrganization());
+        values.put(Order.KEY_isTask,order.isTask());
 
         // Inserting Row
         orderId = (int) db.insert(Order.TABLE, null, values);
@@ -169,6 +172,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_warehouse
                 + ", "+Order.KEY_totalSum
                 + ", "+Order.KEY_Organization
+                + ", "+Order.KEY_isTask
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"'";
 
@@ -197,6 +201,7 @@ public class OrdersRepo {
                 order.setDogovor(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_dogovor)));
                 order.setPriceType(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_pricetype)));
                 order.setWarehouse(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_warehouse)));
+                order.setTask(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isTask)));
                 if (cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isDelivered)).equals("true"))
                     order.setDelivered(true);
                 else
@@ -289,6 +294,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_warehouse
                 + ", "+Order.KEY_totalSum
                 + ", "+Order.KEY_Organization
+                + ", "+Order.KEY_isTask
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"' AND "+Order.KEY_clientGUID+" = '"+clientGuid+"' ";
 
@@ -306,6 +312,7 @@ public class OrdersRepo {
             do {
                 Order order = new Order();
                 order.setOrderID(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID)));
+                order.setTask(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isTask)));
                 order.setOrganization(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Organization)));
                 order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
                 order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));
@@ -430,6 +437,7 @@ public class OrdersRepo {
                 + ", "+Order.KEY_warehouse
                 + ", "+Order.KEY_totalSum
                 + ", "+Order.KEY_Organization
+                + ", "+Order.KEY_isTask
                 + " FROM " + Order.TABLE
                 + " WHERE "+Order.KEY_BAZA+" = '"+baza+"' AND "+Order.KEY_isDelivered+" = 'false'";
 
@@ -447,6 +455,7 @@ public class OrdersRepo {
             do {
                 Order order = new Order();
                 order.setOrderID(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_OrderID)));
+                order.setTask(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_isTask)));
                 order.setOrganization(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_Organization)));
                 order.setTotalSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_totalSum))));
                 order.setClient(cursor.getString(cursor.getColumnIndexOrThrow(Order.KEY_clientGUID)));

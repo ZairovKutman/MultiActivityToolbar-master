@@ -734,7 +734,7 @@ public class AddOrderFragment extends Fragment {
         order.setPriceType(arrayListPriceType.get(spinner_pricetype.getSelectedItemPosition()).getGuid());
         order.setWarehouse(arrayListWarehouse.get(spinner_warehouse.getSelectedItemPosition()).getGuid());
         order.setOrganization(arrayListOrganization.get(editText_organization.getSelectedItemPosition()).getGuid());
-
+        order.setTask(parentActivity.isTask);
         ArrayList<Item> itemArrayList;
 
         itemArrayList = parentActivity.getSelectedItems();
