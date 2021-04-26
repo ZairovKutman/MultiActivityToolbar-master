@@ -23,6 +23,7 @@ import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 import kg.soulsb.ayu.models.Item;
+import kg.soulsb.ayu.models.SalesHistory;
 import kg.soulsb.ayu.models.Unit;
 
 /**
@@ -77,6 +78,13 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
         else
             tovarHolder.txtSum.setText("Сумма: "+Double.toString(tovar.getSum()));
 
+        tovarHolder.txtqty1.setText(Double.toString(tovar.getQty1()));
+        tovarHolder.txtqty2.setText(Double.toString(tovar.getQty2()));
+        tovarHolder.txtqty3.setText(Double.toString(tovar.getQty3()));
+
+        tovarHolder.txtdate1.setText(tovar.getDate1());
+        tovarHolder.txtdate2.setText(tovar.getDate2());
+        tovarHolder.txtdate3.setText(tovar.getDate3());
     }
 
     @Override
@@ -171,7 +179,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
     }
 
     public class TovarHolder extends RecyclerView.ViewHolder {
-        public TextView txtTitle, txtPrice, txtStock, txtQuantity, txtSum;
+        public TextView txtTitle, txtPrice, txtStock, txtQuantity, txtSum, txtdate1,txtdate2,txtdate3, txtqty1,txtqty2,txtqty3;
 
         public TovarHolder(View view) {
             super(view);
@@ -180,6 +188,15 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
             txtStock = (TextView) view.findViewById(R.id.stock_list);
             txtQuantity = (TextView) view.findViewById(R.id.tovar_quantity);
             txtSum = (TextView) view.findViewById(R.id.tovar_sum);
+
+            txtdate1 = (TextView) view.findViewById(R.id.txtDate1);
+            txtdate2 = (TextView) view.findViewById(R.id.txtDate2);
+            txtdate3 = (TextView) view.findViewById(R.id.txtDate3);
+
+            txtqty1 = (TextView) view.findViewById(R.id.txtQty1);
+            txtqty2 = (TextView) view.findViewById(R.id.txtQty2);
+            txtqty3 = (TextView) view.findViewById(R.id.txtQty3);
+
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -226,7 +243,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
 
                             // Заново добавим товар с новыми данными
                             if (Double.parseDouble(quantity) > 0) {
-                                selectedItem.setQuantity(Double.parseDouble(quantity));
+                                selectedItem.setQuantity(Integer.parseInt(quantity));
                                 selectedItem.setMyUnit(selectedUnit);
                                 selectedItem.setSum(selectedItem.getQuantity() * selectedItem.getPrice()  * selectedItem.getMyUnit().getCoefficient());
                                 selectedTovarsList.add(selectedItem);
@@ -297,5 +314,18 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
 
         for (Item item: selectedTovarsList)
         { item.setStock(stocksRepo.getItemStockByWarehouse(item.getGuid(),warehouse)); }
+    }
+
+    public void updateSalesHistory(String clientGuid )
+    {
+
+        for (Item item: allTovarsList)
+        { item.updateSalesHistory(clientGuid); }
+
+        for (Item item: tovarsList)
+        { item.updateSalesHistory(clientGuid);}
+
+        for (Item item: selectedTovarsList)
+        { item.updateSalesHistory(clientGuid); }
     }
 }

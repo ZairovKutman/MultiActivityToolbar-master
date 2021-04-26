@@ -110,7 +110,7 @@ public class ItemsRepo {
                 item.setBase(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Base)));
                 item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
                 item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
-                item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
+                item.setStock(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
                 item.setSum(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Sum))));
 
                 arrayList.add(item);
@@ -179,7 +179,7 @@ public class ItemsRepo {
                 item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category)));
                 item.setPrice(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Price))));
 
-                item.setStock(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
+                item.setStock(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Stock))));
 
                 arrayList.add(item);
             } while (cursor.moveToNext());

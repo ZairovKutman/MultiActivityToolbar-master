@@ -22,10 +22,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
+import kg.soulsb.ayu.grpctest.nano.PointRating;
+import kg.soulsb.ayu.models.SmartRate;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import kg.soulsb.ayu.R;
@@ -58,13 +63,14 @@ public class ClientDetailActivity extends BaseActivity {
     TextView clientAccuracy;
     Button clientCallButton;
     Button clientMapButton;
-    Button clientSaveLocationButton;
+    Button clientSaveLocationButton,rateClientButton;
     Timer myTimer = null;
     AlertDialog.Builder d;
     public Baza baza;
     ProgressBar progressBar;
     AlertDialog alertDialog;
-
+    public String ratingComment = "";
+    public int ratingInt = 0;
     protected LocationManager locationManager;
     protected Location currentLocation = new Location("client");
     SharedPreferences sharedPreferences;
@@ -105,6 +111,7 @@ public class ClientDetailActivity extends BaseActivity {
         clientLongitudeTextView = (TextView) findViewById(R.id.ClientLongitude);
         clientCallButton = (Button) findViewById(R.id.ClientCall);
         clientMapButton = (Button) findViewById(R.id.ClientMap);
+        rateClientButton = findViewById(R.id.rateClientButton);
         clientSaveLocationButton = (Button) findViewById(R.id.Client_saveLocation);
         clientDebtTextView = (TextView) findViewById(R.id.ClientDebt);
         clientAccuracy = (TextView) findViewById(R.id.Client_accuracy);
@@ -135,13 +142,20 @@ public class ClientDetailActivity extends BaseActivity {
             clientAccuracy.setVisibility(View.VISIBLE);
         }
 
+        if (sharedPreferences.getString(UserSettings.can_rate_point,"false").equals("false")) {
+            rateClientButton.setEnabled(false);
+        }
+        else {
+            rateClientButton.setEnabled(true);
+        }
+
         clientSaveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (currentLocation.getLatitude()!=0 || currentLocation.getLongitude()!=0)
                 {
-                    if (currentLocation.getAccuracy()<=50) {
+                    if (currentLocation.getAccuracy()<=90) {
                     baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
 
 
@@ -160,10 +174,12 @@ public class ClientDetailActivity extends BaseActivity {
 
                     ClientDetailActivity.GrpcTask grpcTask = new ClientDetailActivity.GrpcTask(ManagedChannelBuilder.forAddress(mHost,mPort)
                             .usePlaintext(true).build(),CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
-                    grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);}
+                    grpcTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
+
+                    }
                     else
                     {
-                        Toast.makeText(ClientDetailActivity.this,"Точность должна быть меньше 50 м.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ClientDetailActivity.this,"Точность должна быть меньше 90 м.",Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -202,6 +218,39 @@ public class ClientDetailActivity extends BaseActivity {
             }
         });
 
+        rateClientButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                SmartRate.Rate(ClientDetailActivity.this
+                        , "Оцените ТТ"
+                        , clientNameTextView.getText().toString()
+                        , "Продолжить"
+                        , ""
+                        , "Нажмите Сюда"
+                        , "Отмена"
+                        , "Спасибо за оценку!"
+                        , Color.parseColor("#3f51b5")
+                        , -1
+                        , new SmartRate.CallBack_UserRating() {
+                            @Override
+                            public void userRating(int rating, String comment) {
+                                ratingComment = comment;
+                                ratingInt = rating;
+                                baza = CurrentBaseClass.getInstance().getCurrentBaseObject();
+String mHost = baza.getHost();
+                                int mPort = baza.getPort();
+
+                                ClientDetailActivity.GrpcTaskRate grpcTaskRate = new ClientDetailActivity.GrpcTaskRate(ManagedChannelBuilder.forAddress(mHost,mPort)
+                                        .usePlaintext(true).build(),CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent());
+                                grpcTaskRate.executeOnExecutor(THREAD_POOL_EXECUTOR);
+                            }
+                        }
+                );
+
+            }
+        });
+
     }
 
     @Override
@@ -220,7 +269,7 @@ public class ClientDetailActivity extends BaseActivity {
                     });
 
                 }
-            }, 0, 10000);}
+            }, 0, 4000);}
     }
 
     @Override
@@ -258,9 +307,10 @@ public class ClientDetailActivity extends BaseActivity {
         System.out.println(location.getLongitude());
         System.out.println(location.getAccuracy());
         System.out.println(sharedPreferences.getString(UserSettings.can_get_gpc_coordinates_of_clients,"false"));
-        if (location.getAccuracy()>=100 || location.getAccuracy()==0)
+        if (location.getAccuracy()>=90 || location.getAccuracy()==0)
         {
             clientAccuracy.setTextColor(Color.RED);
+            clientAccuracy.setText("Точность: "+location.getAccuracy()+" м.");
             clientSaveLocationButton.setEnabled(false);
             currentLocation = location;
         }
@@ -357,13 +407,107 @@ public class ClientDetailActivity extends BaseActivity {
             alertDialog.dismiss();
             if (pointIterator == null)
             {
-                Toast.makeText(getBaseContext(),"Ошибка, доступ запрещен!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(),"Возникла ошибка...!",Toast.LENGTH_SHORT).show();
             }
             else {
                 new ClientsRepo().setClientLocation(getIntent().getStringExtra("guid"),currentLocation);
                 clientLatitudeTextView.setText("Широта: "+Double.toString(currentLocation.getLatitude()));
                 clientLongitudeTextView.setText("Долгота: "+Double.toString(currentLocation.getLongitude()));
                 Toast.makeText(getBaseContext(),"Успех! геолокация отправлена. =)",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    private class GrpcTaskRate extends AsyncTask<Void, Void, String> {
+        private ManagedChannel mChannel;
+        private String name;
+
+        public GrpcTaskRate(ManagedChannel mChannel, String name) {
+            this.mChannel = mChannel;
+            this.name = name;
+        }
+        /**
+         * Метод срабатывает перед началом работы AsyncTask
+         */
+        @Override
+        protected void onPreExecute() {
+        }
+
+        /**
+         * Метод отрабатывает код в фоновом режиме.
+         *
+         * @param nothing
+         * @return
+         */
+        @Override
+        protected String doInBackground(Void... nothing) {
+            try {
+                return sendRateData(mChannel);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return e.getMessage();
+            }
+        }
+
+        private String sendRateData(ManagedChannel mChannel) {
+            blockingStub = AyuServiceGrpc.newBlockingStub(mChannel);
+            Agent request = new Agent();
+            request.name = name;
+
+            String android_id = android.provider.Settings.Secure.getString(getBaseContext().getContentResolver(),
+                    android.provider.Settings.Secure.ANDROID_ID);
+            Device device = new Device();
+            device.agent = name;
+            device.deviceId = android_id;
+            device.modelDescription = Build.MANUFACTURER + " " + Build.MODEL;
+            DeviceStatus deviceStatus = blockingStub.checkDeviceStatus(device);
+
+            if (!deviceStatus.active) {
+                return "Проверка не прошла. Доступ запрещен!";
+            }
+
+            PointRating pointRating = new PointRating();
+            pointRating.agent = request;
+            pointRating.comment = ratingComment;
+
+            Point point = new Point();
+            point.guid = getIntent().getStringExtra("guid");
+            point.address = getIntent().getStringExtra("address");
+            point.debt = Double.parseDouble(getIntent().getStringExtra("debt"));
+            point.description = getIntent().getStringExtra("name");
+            point.phoneNumber = getIntent().getStringExtra("phone");
+
+
+            pointRating.point = point;
+
+            pointRating.rate = ratingInt;
+
+            // Сохранить дату последнего обмена
+            Calendar myCalendar = Calendar.getInstance();
+            String myFormat = "dd/MM/yyyy HH:mm:ss";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+            String formattedDate = sdf.format(myCalendar.getTime());
+
+            pointRating.date = formattedDate;
+
+            OperationStatus bl = blockingStub.sendPointRating(pointRating);
+            return "ok";
+        }
+
+        @Override
+        protected void onPostExecute(String status) {
+            try {
+                mChannel.shutdown().awaitTermination(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            if (!status.equals("ok"))
+            {
+                Toast.makeText(getBaseContext(),"Возникла ошибка: "+status,Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(getBaseContext(),"Успех! Оценка отправлена!",Toast.LENGTH_SHORT).show();
             }
         }
     }

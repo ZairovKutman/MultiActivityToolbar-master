@@ -18,6 +18,7 @@ import kg.soulsb.ayu.helpers.repo.PhotosRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
+import kg.soulsb.ayu.helpers.repo.SalesHistoryRepo;
 import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.UnitsRepo;
@@ -34,6 +35,7 @@ import kg.soulsb.ayu.models.Organization;
 import kg.soulsb.ayu.models.Price;
 import kg.soulsb.ayu.models.PriceType;
 import kg.soulsb.ayu.models.Report;
+import kg.soulsb.ayu.models.SalesHistory;
 import kg.soulsb.ayu.models.Stock;
 import kg.soulsb.ayu.models.Unit;
 import kg.soulsb.ayu.models.Warehouse;
@@ -46,7 +48,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 12;
+    private static final int DATABASE_VERSION = 14;
     // Database Name
     private static final String DATABASE_NAME = "ayu_sqlite.db";
     private static final String TAG = DBHelper.class.getSimpleName().toString();
@@ -111,6 +113,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("DROP TABLE IF EXISTS " + DailyPhoto.TABLE);
         db.execSQL(PhotosRepo.createTable());
+
+        db.execSQL("DROP TABLE IF EXISTS " + SalesHistory.TABLE);
+        db.execSQL(SalesHistoryRepo.createTable());
     }
 
     @Override
@@ -193,5 +198,17 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + Order.TABLE + " ADD COLUMN " + Order.KEY_isTask + " text NOT NULL DEFAULT 'false';");
         }
 
+        if (oldVersion<13)
+        {
+            db.execSQL("DROP TABLE IF EXISTS " + SalesHistory.TABLE);
+            db.execSQL(SalesHistoryRepo.createTable());
+        }
+
+        if (oldVersion<14)
+        {
+            db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate_date + " text NOT NULL DEFAULT '';");
+            db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate + " text NOT NULL DEFAULT '';");
+            db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate_comment + " text NOT NULL DEFAULT '';");
+        }
     }
 }

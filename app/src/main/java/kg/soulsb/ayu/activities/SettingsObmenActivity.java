@@ -1,11 +1,14 @@
 package kg.soulsb.ayu.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -50,6 +53,8 @@ import kg.soulsb.ayu.grpctest.nano.Prices;
 import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
 import kg.soulsb.ayu.grpctest.nano.Report;
 import kg.soulsb.ayu.grpctest.nano.Reports;
+import kg.soulsb.ayu.grpctest.nano.SalesHistories;
+import kg.soulsb.ayu.grpctest.nano.SalesHistory;
 import kg.soulsb.ayu.grpctest.nano.Settings;
 import kg.soulsb.ayu.grpctest.nano.Stock;
 import kg.soulsb.ayu.grpctest.nano.Stocks;
@@ -71,6 +76,7 @@ import kg.soulsb.ayu.helpers.repo.PhotosRepo;
 import kg.soulsb.ayu.helpers.repo.PriceTypesRepo;
 import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.ReportsRepo;
+import kg.soulsb.ayu.helpers.repo.SalesHistoryRepo;
 import kg.soulsb.ayu.helpers.repo.SavedReportsRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.UnitsRepo;
@@ -123,10 +129,11 @@ public class SettingsObmenActivity extends BaseActivity {
     boolean fullObmen = false;
     boolean onlyOstatki = false;
     boolean onlyDocs = false;
+    boolean sendPhotos = false;
     String errorMessage="";
 
 
-    public void fillDocumentsTable(){
+    public void fillDocumentsTable() {
         arrayList = new OrdersRepo().getOrdersObjectNotDelivered(CurrentBaseClass.getInstance().getCurrentBase());
         arrayAdapter = new OrderAdapter(this,R.layout.list_docs_layout, arrayList);
         listViewDocuments.setAdapter(arrayAdapter);
@@ -232,23 +239,49 @@ public class SettingsObmenActivity extends BaseActivity {
         loadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (baza!= null) {
-                loadingComment.setText("Подключение... "+"5%");
-                try {
-                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                    fullObmen = true;
-                    onlyOstatki = false;
-                    onlyDocs = false;
-                    loadButton.setEnabled(false);
-                    loadOnlyDocButton.setEnabled(false);
-                    loadStockButton.setEnabled(false);
-                    doFullObmen();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }}
-                else{
-                Toast.makeText(getBaseContext(),"Создайте базу данных",Toast.LENGTH_SHORT).show();}
+
+                final AlertDialog.Builder d1 = new AlertDialog.Builder(SettingsObmenActivity.this);
+                LayoutInflater inflater1 = getLayoutInflater();
+                final View dialogView1 = inflater1.inflate(R.layout.are_you_sure_dialog, null);
+                d1.setTitle("Подтвердите");
+                d1.setMessage("Вы уверены что хотите сделать Полный Обмен? Все заказы будут отправлены на сервер и удалены с телефона.");
+                d1.setView(dialogView1);
+
+                d1.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (baza!= null) {
+                            loadingComment.setText("Подключение... "+"5%");
+                            try {
+                                getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                                fullObmen = true;
+                                sendPhotos = true;
+                                onlyOstatki = false;
+                                onlyDocs = false;
+                                loadButton.setEnabled(false);
+                                loadOnlyDocButton.setEnabled(false);
+                                loadStockButton.setEnabled(false);
+                                doFullObmen();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }}
+                        else{
+                            Toast.makeText(getBaseContext(),"Создайте базу данных",Toast.LENGTH_SHORT).show();}
+
+
+                    }
+                });
+
+                d1.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                AlertDialog alertDialog1 = d1.create();
+                alertDialog1.show();
             }
         });
 
@@ -263,6 +296,7 @@ public class SettingsObmenActivity extends BaseActivity {
                         fullObmen = false;
                         onlyOstatki = true;
                         onlyDocs = true;
+                        sendPhotos = false;
                         loadButton.setEnabled(false);
                         loadOnlyDocButton.setEnabled(false);
                         loadStockButton.setEnabled(false);
@@ -357,121 +391,136 @@ public class SettingsObmenActivity extends BaseActivity {
             }
 
             if (onlyDocs || fullObmen) {
-            //
-            publishProgress("Выгрузка документов...");
+                //
+                publishProgress("Выгрузка документов...");
 
-            //Выгружаю документы
-            DocPurch docPurchArray[] = new DocPurch[arrayList.size()];
-            for (Order order : arrayList) {
-                DocPurch docPurch = new DocPurch();
-                docPurch.organizationGuid = order.getOrganization();
-                docPurch.agent = name;
-                docPurch.clientGuid = order.getClient();
-                docPurch.comment = order.getComment();
-                docPurch.bonusTT = order.getCheckedBonusTT();
-                docPurch.deliveryDate = order.getDateSend();
-                docPurch.contractGuid = order.getDogovor();
-                docPurch.date = order.getDate();
-                docPurch.warehouseGuid = order.getWarehouse();
-                docPurch.priceTypeGuid = order.getPriceType();
-                docPurch.docType = Integer.parseInt(order.getDoctype());
-                docPurch.docId = order.getOrderID();
-                docPurch.amount = order.getTotalSum();
-                ArrayList<Item> itemsList = order.getArraylistTovar();
+                //Выгружаю документы
+                DocPurch docPurchArray[] = new DocPurch[arrayList.size()];
+                for (Order order : arrayList) {
+                    DocPurch docPurch = new DocPurch();
+                    docPurch.organizationGuid = order.getOrganization();
+                    docPurch.agent = name;
+                    docPurch.clientGuid = order.getClient();
+                    docPurch.comment = order.getComment();
+                    docPurch.bonusTT = order.getCheckedBonusTT();
+                    docPurch.deliveryDate = order.getDateSend();
+                    docPurch.contractGuid = order.getDogovor();
+                    docPurch.date = order.getDate();
+                    docPurch.warehouseGuid = order.getWarehouse();
+                    docPurch.priceTypeGuid = order.getPriceType();
+                    docPurch.docType = Integer.parseInt(order.getDoctype());
+                    docPurch.docId = order.getOrderID();
+                    docPurch.amount = order.getTotalSum();
+                    ArrayList<Item> itemsList = order.getArraylistTovar();
 
-                ConsPaymentLine[] arrayPayments = new ConsPaymentLine[order.getArraylistSvodPay().size()];
-                int i =0;
+                    ConsPaymentLine[] arrayPayments = new ConsPaymentLine[order.getArraylistSvodPay().size()];
+                    int i = 0;
 
-                for (SvodPay svodPay: order.getArraylistSvodPay()) {
+                    for (SvodPay svodPay : order.getArraylistSvodPay()) {
 
-                    ConsPaymentLine consPaymentLine = new ConsPaymentLine();
-                    consPaymentLine.clientGuid = svodPay.getClient();
-                    consPaymentLine.contractGuid = svodPay.getDogovor();
-                    consPaymentLine.amount = svodPay.getSum();
-                    arrayPayments[i] = consPaymentLine;
-                    i = i +1;
-                }
-
-                docPurch.payments = arrayPayments;
-
-                PurchDocLine[] purchDocLines = new PurchDocLine[itemsList.size()];
-                int counter = 0;
-                for (Item item : itemsList) {
-                    PurchDocLine line = new PurchDocLine();
-                    line.amount = item.getQuantity() * item.getPrice() * item.getMyUnit().getCoefficient();
-                    line.itemGuid = item.getGuid();
-                    line.price = item.getPrice() * item.getMyUnit().getCoefficient();
-                    line.quantity = item.getQuantity();
-                    line.unit = item.getMyUnit().getUnitGuid();
-
-                    purchDocLines[counter] = line;
-                    counter++;
-                }
-
-                docPurch.lines = purchDocLines;
-
-                docPurchArray[arrayList.indexOf(order)] = docPurch;
-            }
-            if (arrayList.size() > 0) {
-                Docs docs = new Docs();
-                docs.doc = docPurchArray;
-                DocsStatus docsStatus = blockingStub.getDocuments(docs);
-
-                for (int i = 0; i < docsStatus.docsStatus.length; i++) {
-                    if (docsStatus.docsStatus[i].operationStatus.status == 0) {
-                        new OrdersRepo().setDocDelivered(docsStatus.docsStatus[i].docId, true);
+                        ConsPaymentLine consPaymentLine = new ConsPaymentLine();
+                        consPaymentLine.clientGuid = svodPay.getClient();
+                        consPaymentLine.contractGuid = svodPay.getDogovor();
+                        consPaymentLine.amount = svodPay.getSum();
+                        arrayPayments[i] = consPaymentLine;
+                        i = i + 1;
                     }
-                    else
-                    {
-                      errorMessage=errorMessage+"\n"+ docsStatus.docsStatus[i].operationStatus.comment;
+
+                    docPurch.payments = arrayPayments;
+
+                    PurchDocLine[] purchDocLines = new PurchDocLine[itemsList.size()];
+                    int counter = 0;
+                    for (Item item : itemsList) {
+                        PurchDocLine line = new PurchDocLine();
+                        line.amount = item.getQuantity() * item.getPrice() * item.getMyUnit().getCoefficient();
+                        line.itemGuid = item.getGuid();
+                        line.price = item.getPrice() * item.getMyUnit().getCoefficient();
+                        line.quantity = item.getQuantity();
+                        line.unit = item.getMyUnit().getUnitGuid();
+
+                        purchDocLines[counter] = line;
+                        counter++;
+                    }
+
+                    docPurch.lines = purchDocLines;
+
+                    docPurchArray[arrayList.indexOf(order)] = docPurch;
+                }
+                if (arrayList.size() > 0) {
+                    Docs docs = new Docs();
+                    docs.doc = docPurchArray;
+                    DocsStatus docsStatus = blockingStub.getDocuments(docs);
+
+                    for (int i = 0; i < docsStatus.docsStatus.length; i++) {
+                        if (docsStatus.docsStatus[i].operationStatus.status == 0) {
+                            new OrdersRepo().setDocDelivered(docsStatus.docsStatus[i].docId, true);
+                        } else {
+                            errorMessage = errorMessage + "\n" + docsStatus.docsStatus[i].operationStatus.comment;
+                        }
                     }
                 }
-            }
-            //Конец выгрузки документов
+                //Конец выгрузки документов
 
-            publishProgress("Выгрузка заданий...");
-            ArrayList<kg.soulsb.ayu.models.DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
-            kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
-            int i=0;
-            for (kg.soulsb.ayu.models.DailyTask dt: dailyTaskArrayList)
-            {
-                kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
-                dt2.agentName = name;
-                dt2.deviceId = android_id;
-                dt2.clientGuid = dt.getClientGuid();
-                dt2.dateClosed = dt.getDateClosed();
-                dt2.docDate = dt.getDocDate();
-                dt2.docGuid = dt.getDocGuid();
-                dt2.docId =dt.getDocId();
-                dt2.latitude = Double.parseDouble(dt.getLatitude());
-                dt2.longitude = Double.parseDouble(dt.getLongitude());
-                dt2.priority = dt.getPriority();
-                dt2.status = Integer.parseInt(dt.getStatus());
+                if (sendPhotos) {
+                    ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotos();
+                    int j = 0;
+                    for (DailyPhoto dailyPhoto : dailyPhotoArrayList) {
+                        j = j + 1;
+                        publishProgress("Выгрузка фотографий: " + j + " из " + dailyPhotoArrayList.size());
+                        TaskPhoto tp = new TaskPhoto();
+                        tp.photo = dailyPhoto.getPhotoBytes();
+                        Agent agent = new Agent();
+                        agent.name = dailyPhoto.getAgent();
+                        tp.agent = agent;
+                        tp.clientGuid = dailyPhoto.getClientGuid();
+                        tp.dateClosed = dailyPhoto.getDateClosed();
+                        tp.deviceId = dailyPhoto.getDevice_id();
+                        tp.docGuid = dailyPhoto.getDocGuid();
+                        tp.latitude = dailyPhoto.getLatitude();
+                        tp.longitude = dailyPhoto.getLongitude();
 
-                ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByClientGuid(dt.getClientGuid());
-                int j =0;
-                TaskPhoto[] taskPhotos = new TaskPhoto[dailyPhotoArrayList.size()];
-                for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
-                {
-                    TaskPhoto tp = new TaskPhoto();
-                    tp.photo = dailyPhoto.getPhotoBytes();
-                    taskPhotos[j] = tp;
-                    j=j+1;
+                        OperationStatus photoStatus = blockingStub.getTaskPhoto(tp);
+                        System.out.println("photo send status: " + photoStatus.status + ", " + photoStatus.comment);
+                        if (photoStatus.status == 0) {
+                            new PhotosRepo().deleteDailyPhoto(tp.photo);
+                        } else {
+                            errorMessage = errorMessage + "\n" + photoStatus.comment;
+                        }
+                    }
                 }
 
-                dt2.taskPhoto = taskPhotos;
+                publishProgress("Выгрузка заданий...");
+                ArrayList<kg.soulsb.ayu.models.DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
+                kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
+                int i = 0;
+                String docGuid = "";
+                for (kg.soulsb.ayu.models.DailyTask dt : dailyTaskArrayList) {
+                    docGuid = dt.getDocGuid();
+                    kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
+                    dt2.agentName = name;
+                    dt2.deviceId = android_id;
+                    dt2.clientGuid = dt.getClientGuid();
+                    dt2.dateClosed = dt.getDateClosed();
+                    dt2.docDate = dt.getDocDate();
+                    dt2.docGuid = dt.getDocGuid();
+                    dt2.docId = dt.getDocId();
+                    dt2.latitude = Double.parseDouble(dt.getLatitude());
+                    dt2.longitude = Double.parseDouble(dt.getLongitude());
+                    dt2.priority = dt.getPriority();
+                    dt2.status = Integer.parseInt(dt.getStatus());
 
-                dailyTasks[i] = dt2;
-                i=i+1;
+                    dailyTasks[i] = dt2;
+                    i = i + 1;
+                }
+                DailyTasks dailyTasks1 = new DailyTasks();
+                dailyTasks1.task = dailyTasks;
+                DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
+                System.out.println(Arrays.toString(ds.docsStatus));
+
+                if (!errorMessage.equals("")) {
+                    return null;
+                }
             }
-            DailyTasks dailyTasks1 = new DailyTasks();
-            dailyTasks1.task = dailyTasks;
-            DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
-            System.out.println(Arrays.toString(ds.docsStatus));
-
-            new PhotosRepo().deleteAllDailyPhoto();
-        }
-
 
 
             if (onlyOstatki) {
@@ -482,6 +531,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 StocksRepo stocksRepo = new StocksRepo();
                 stocksRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
                 for (Stock stock : stocks.stock) {
+                    System.out.println(stock.stock);
                     kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item, stock.warehouse, stock.stock);
                     stock1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                     stocksArray.add(stock1);
@@ -491,8 +541,7 @@ public class SettingsObmenActivity extends BaseActivity {
                 return new Points();
             }
 
-            if (!fullObmen)
-            {
+            if (!fullObmen) {
                 return new Points();
             }
 
@@ -511,13 +560,13 @@ public class SettingsObmenActivity extends BaseActivity {
                 requestLoc.date = list.getFormattedDate();
                 requestLoc.latitude = list.getLatitude();
                 requestLoc.longitude = list.getLongitude();
-                requestLoc.speed = list.getSpeed()*3600/1000;
+                requestLoc.speed = list.getSpeed() * 3600 / 1000;
                 requestLoc.deviceId = list.getDeviceID();
                 requestLoc.accuracy = list.getAccuracy();
                 myLocationsRepo = new MyLocationsRepo();
                 OperationStatus bl = blockingStub.sendLocation(requestLoc);
 
-                System.out.println(bl.status+" <- ANSWER INSIDE");
+                System.out.println(bl.status + " <- ANSWER INSIDE");
                 if (bl.status == 0) {
                     myLocationsRepo.delete(list);
                     System.out.println("Location DONE");
@@ -535,8 +584,9 @@ public class SettingsObmenActivity extends BaseActivity {
                 publishProgress("Ошибка: " + settings.errorMessage);
             }
             // Получаю настройки
-            SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
+            SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(), MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
+
             editor.putString(UserSettings.can_create_orders, Boolean.toString(settings.canCreateOrders));
             editor.putString(UserSettings.can_create_sales, Boolean.toString(settings.canCreateSales));
             editor.putString(UserSettings.send_all_documents_with_exchange, Boolean.toString(settings.sendAllDocumentsWithExchange));
@@ -550,9 +600,9 @@ public class SettingsObmenActivity extends BaseActivity {
             editor.putString(UserSettings.can_create_payment, Boolean.toString(settings.canCreatePayment));
             editor.putString(UserSettings.status, Boolean.toString(settings.status));
             editor.putString(UserSettings.workWithTasks, Boolean.toString(settings.workWithTasks));
-            //editor.putString(UserSettings.workWithTasks, "true");
+            editor.putString(UserSettings.can_rate_point,Boolean.toString(settings.canRatePoint) );
             editor.apply();
-            System.out.println("ASAADSDADASDASDASDSADASAS++++++ "+Boolean.toString(settings.workWithTasks));
+
             publishProgress("Загрузка клиентов...");
             Points pointIterator = exchangeData.points;
             globalCounter = 10;
@@ -573,13 +623,12 @@ public class SettingsObmenActivity extends BaseActivity {
             // getting clients
             ClientsRepo clientsRepo = new ClientsRepo();
             clientsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Point point: pointIterator.point)
-            {
-                Client client = new Client(point.guid,point.description,point.address, point.phoneNumber,point.latitude,point.longitude,point.debt);
+            for (Point point : pointIterator.point) {
+                Client client = new Client(point.guid, point.description, point.address, point.phoneNumber, point.latitude, point.longitude, point.debt);
                 client.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 clientsArray.add(client);
                 clientsRepo.insert(client);
-           }
+            }
             System.out.println("Clients: Done");
 
             publishProgress("Загрузка товаров...");
@@ -588,9 +637,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Items items = exchangeData.items;
             ItemsRepo itemsRepo = new ItemsRepo();
             itemsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (kg.soulsb.ayu.grpctest.nano.Item item: items.item)
-            {
-                Item item1 = new Item(item.guid,item.description,item.unit, item.price,item.stock,item.category);
+            for (kg.soulsb.ayu.grpctest.nano.Item item : items.item) {
+                Item item1 = new Item(item.guid, item.description, item.unit, item.price, item.stock, item.category);
                 item1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 itemsArray.add(item1);
                 itemsRepo.insert(item1);
@@ -605,9 +653,8 @@ public class SettingsObmenActivity extends BaseActivity {
             UnitsRepo unitsRepo = new UnitsRepo();
             unitsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
 
-            for (kg.soulsb.ayu.grpctest.nano.Unit unit: units.unit)
-            {
-                Unit unit1 = new Unit(unit.guid,unit.item,unit.coefficient,unit.description,unit.default_);
+            for (kg.soulsb.ayu.grpctest.nano.Unit unit : units.unit) {
+                Unit unit1 = new Unit(unit.guid, unit.item, unit.coefficient, unit.description, unit.default_);
                 unit1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 unitsArray.add(unit1);
                 unitsRepo.insert(unit1);
@@ -619,9 +666,8 @@ public class SettingsObmenActivity extends BaseActivity {
             PriceTypes priceTypes = exchangeData.priceTypes;
             PriceTypesRepo priceTypesRepo = new PriceTypesRepo();
             priceTypesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (PriceType priceType: priceTypes.priceType)
-            {
-                kg.soulsb.ayu.models.PriceType priceType1 = new kg.soulsb.ayu.models.PriceType(priceType.guid,priceType.description);
+            for (PriceType priceType : priceTypes.priceType) {
+                kg.soulsb.ayu.models.PriceType priceType1 = new kg.soulsb.ayu.models.PriceType(priceType.guid, priceType.description);
                 priceType1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 pricetypesArray.add(priceType1);
                 priceTypesRepo.insert(priceType1);
@@ -632,9 +678,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Prices prices = exchangeData.prices;
             PricesRepo pricesRepo = new PricesRepo();
             pricesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Price price: prices.price)
-            {
-                kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item,price.price,price.priceType);
+            for (Price price : prices.price) {
+                kg.soulsb.ayu.models.Price price1 = new kg.soulsb.ayu.models.Price(price.item, price.price, price.priceType);
                 price1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 pricesArray.add(price1);
                 pricesRepo.insert(price1);
@@ -646,9 +691,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Warehouses warehouses = exchangeData.warehouses;
             WarehousesRepo warehousesRepo = new WarehousesRepo();
             warehousesRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Warehouse warehouse: warehouses.warehouse)
-            {
-                kg.soulsb.ayu.models.Warehouse warehouse1 = new kg.soulsb.ayu.models.Warehouse(warehouse.guid,warehouse.description);
+            for (Warehouse warehouse : warehouses.warehouse) {
+                kg.soulsb.ayu.models.Warehouse warehouse1 = new kg.soulsb.ayu.models.Warehouse(warehouse.guid, warehouse.description);
                 warehouse1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 warehousesArray.add(warehouse1);
                 warehousesRepo.insert(warehouse1);
@@ -659,9 +703,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Contracts contracts = exchangeData.contracts;
             ContractsRepo contractsRepo = new ContractsRepo();
             contractsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Contract contract: contracts.contract)
-            {
-                kg.soulsb.ayu.models.Contract contract1 = new kg.soulsb.ayu.models.Contract(contract.guid,contract.description,contract.pointGuid,contract.itemCategory);
+            for (Contract contract : contracts.contract) {
+                kg.soulsb.ayu.models.Contract contract1 = new kg.soulsb.ayu.models.Contract(contract.guid, contract.description, contract.pointGuid, contract.itemCategory);
                 contract1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 contractsArray.add(contract1);
                 contractsRepo.insert(contract1);
@@ -673,9 +716,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Organizations organizations = exchangeData.organizations;
             OrganizationsRepo organizationsRepo = new OrganizationsRepo();
             organizationsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Organization organization: organizations.organization)
-            {
-                kg.soulsb.ayu.models.Organization organization1 = new kg.soulsb.ayu.models.Organization(organization.guid,organization.description);
+            for (Organization organization : organizations.organization) {
+                kg.soulsb.ayu.models.Organization organization1 = new kg.soulsb.ayu.models.Organization(organization.guid, organization.description);
                 organization1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 organizationsArray.add(organization1);
                 organizationsRepo.insert(organization1);
@@ -687,9 +729,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Stocks stocks = exchangeData.stocks;
             StocksRepo stocksRepo = new StocksRepo();
             stocksRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Stock stock: stocks.stock)
-            {
-                kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item,stock.warehouse,stock.stock);
+            for (Stock stock : stocks.stock) {
+                kg.soulsb.ayu.models.Stock stock1 = new kg.soulsb.ayu.models.Stock(stock.item, stock.warehouse, stock.stock);
                 stock1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 stocksArray.add(stock1);
                 stocksRepo.insert(stock1);
@@ -700,9 +741,8 @@ public class SettingsObmenActivity extends BaseActivity {
             Reports reports = exchangeData.reports;
             ReportsRepo reportsRepo = new ReportsRepo();
             reportsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            for (Report report: reports.report)
-            {
-                kg.soulsb.ayu.models.Report report1 = new kg.soulsb.ayu.models.Report(report.guid,report.description);
+            for (Report report : reports.report) {
+                kg.soulsb.ayu.models.Report report1 = new kg.soulsb.ayu.models.Report(report.guid, report.description);
                 report1.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 reportsArray.add(report1);
                 reportsRepo.insert(report1);
@@ -712,17 +752,37 @@ public class SettingsObmenActivity extends BaseActivity {
 
             // gettings tasks
             publishProgress("Загрузка заданий...");
-            //getting reports
             DailyTasks tasks = exchangeData.dailyTasks;
             new DailyTasksRepo().deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
-            System.out.println("DAILYTASKS: "+tasks.task);
-            for (DailyTask task: tasks.task)
-            {
-                System.out.println("ONETASK: "+task);
+            System.out.println("DAILYTASKS: " + tasks.task);
+            for (DailyTask task : tasks.task) {
+                System.out.println("ONETASK: " + task.docGuid);
                 kg.soulsb.ayu.models.DailyTask dailyTask1 = new kg.soulsb.ayu.models.DailyTask(task.docGuid, task.clientGuid, task.priority, Integer.toString(task.status), task.docId, task.docDate, task.dateClosed, Double.toString(task.latitude), Double.toString(task.longitude), task.agentName, CurrentBaseClass.getInstance().getCurrentBase());
+                dailyTask1.setRateDate(task.rateDate);
+                dailyTask1.setRate(Integer.toString(task.rate));
+                dailyTask1.setRateComment(task.rateComment);
                 new DailyTasksRepo().insert(dailyTask1);
             }
             System.out.println("Tasks: Done");
+
+            // gettings Sales Histories
+            publishProgress("Загрузка истории продаж...");
+            System.out.println(request.name);
+            SalesHistories salesHistories = blockingStub.getSalesHistory(request);
+
+            if (settings.getSalesHistory) {
+
+                new SalesHistoryRepo().deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
+
+                for (SalesHistory salesHistory : salesHistories.salesHistory) {
+
+                    kg.soulsb.ayu.models.SalesHistory salesHistory1 = new kg.soulsb.ayu.models.SalesHistory(salesHistory.clientGuid, salesHistory.itemGuid, salesHistory.date1, salesHistory.qty1, salesHistory.date2, salesHistory.qty2, salesHistory.date3, salesHistory.qty3, CurrentBaseClass.getInstance().getCurrentBase());
+                    new SalesHistoryRepo().insert(salesHistory1);
+                }
+
+
+                System.out.println("Sales History: Done");
+            }
 
             System.out.println("Finally all done! yay!");
             return pointIterator;

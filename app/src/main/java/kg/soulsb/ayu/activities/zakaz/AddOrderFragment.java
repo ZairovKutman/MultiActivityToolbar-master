@@ -361,7 +361,10 @@ public class AddOrderFragment extends Fragment {
 
     private void updateTovarListByContract() {
 
-        if (previous.equals(current)) {return;}
+        if (previous.equals(current)) {
+
+            //return;
+        }
 
 
         previous = current;
@@ -378,14 +381,15 @@ public class AddOrderFragment extends Fragment {
 //        parentActivity.addTovarFragment.updatePrices();
 //        parentActivity.addTovarFragment.updateStock();
 //        parentActivity.addTovarFragment.arrayAdapter.notifyDataSetChanged();
-
-        parentActivity.tovarsFragment.arrayListAllTovars.clear();
-        parentActivity.tovarsFragment.arrayListAllTovars.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
-
-        parentActivity.orderedItemsArrayList.clear();
+//
+//        parentActivity.tovarsFragment.arrayListAllTovars.clear();
+//        parentActivity.tovarsFragment.arrayListAllTovars.addAll(new ItemsRepo().getItemsObjectByCategory(current.getCategory()));
+//
+//        parentActivity.orderedItemsArrayList.clear();
 
         parentActivity.tovarsFragment.updatePrices();
         parentActivity.tovarsFragment.updateStock();
+        parentActivity.tovarsFragment.updateSalesHistory();
 }
 
     private void disableButtons() {

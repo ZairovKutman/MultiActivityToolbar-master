@@ -14,69 +14,131 @@
         android:layout_height="wrap_content"
         android:layout_margin="3dp"
         android:elevation="4dp">
+
         <LinearLayout
-            android:orientation="horizontal" android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/tovar_style">
-
-
-            <TextView
-                android:id="@+id/tovar_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif"
-                android:text="товар"
-                android:textStyle="bold" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
+                style="@style/tovar_style"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_marginRight="1dp">
+                android:orientation="horizontal">
+
 
                 <TextView
-                    android:text="Цена"
+                    android:id="@+id/tovar_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tovar_price"
+                    android:layout_margin="3dp"
                     android:layout_weight="1"
-                    android:textColor="?android:attr/colorActivatedHighlight" />
+                    android:fontFamily="sans-serif"
+                    android:text="товар"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:text="остаток"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/stock_list"
-                    android:layout_weight="1"
-                    android:textColor="@android:color/holo_blue_light" />
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="0"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tovar_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Цена"
+                        android:textColor="?android:attr/colorActivatedHighlight" />
+
+                    <TextView
+                        android:id="@+id/stock_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="остаток"
+                        android:textColor="@android:color/holo_blue_light" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="1dp"
+                    android:layout_weight="0"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tovar_quantity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Количество"
+                        android:textColor="?android:attr/colorActivatedHighlight" />
+
+                    <TextView
+                        android:id="@+id/tovar_sum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Сумма"
+
+                        android:textColor="@color/colorAccent" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_marginRight="1dp">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginStart="3dp">
 
                 <TextView
-                    android:text="Количество"
+                    android:id="@+id/txtDate1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tovar_quantity"
-                    android:textColor="?android:attr/colorActivatedHighlight" />
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@android:color/holo_green_dark" />
 
                 <TextView
-                    android:text="Сумма"
+                    android:id="@+id/txtQty1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tovar_sum"
+                    android:layout_weight="1"
+                    android:text="" />
 
-                    android:textColor="@color/colorAccent" />
+                <TextView
+                    android:id="@+id/txtDate2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@android:color/holo_green_dark" />
+
+                <TextView
+                    android:id="@+id/txtQty2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="" />
+
+                <TextView
+                    android:id="@+id/txtDate3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text=""
+                    android:textColor="@android:color/holo_green_dark" />
+
+                <TextView
+                    android:id="@+id/txtQty3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="" />
             </LinearLayout>
 
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -19,27 +19,27 @@ public class Stock {
     private String stockId;
     private String itemGuid;
     private String warehouseGuid;
-    private double stock;
+    private int stock;
     private String base;
 
     public Stock()
     {
 
     }
-    public Stock(String itemGuid, String warehouseGuid, double stock) {
+    public Stock(String itemGuid, String warehouseGuid, int stock) {
         this.itemGuid = itemGuid;
         this.warehouseGuid = warehouseGuid;
         this.stock = stock;
 
     }
 
-    public Double getStock() {
+    public int getStock() {
         return stock;
     }
 
     @Override
     public String toString() {
-        return getItemGuid()+" "+Double.toString(getStock());
+        return ""+getItemGuid()+" "+getStock();
     }
 
     public String getItemGuid() {
@@ -58,7 +58,7 @@ public class Stock {
         this.itemGuid = guid;
     }
 
-    public void setStock(Double stock) {
+    public void setStock(int stock) {
         this.stock = stock;
     }
 

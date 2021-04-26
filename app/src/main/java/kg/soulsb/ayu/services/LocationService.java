@@ -259,8 +259,8 @@ public class LocationService extends Service implements LocationListener, GpsSta
                 //criteria.setBearingAccuracy(Criteria.ACCURACY_HIGH);
                 //criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
 
-                Integer gpsFreqInMillis = 20000;
-                Integer gpsFreqInDistance = 2;  // in meters
+                Integer gpsFreqInMillis = 15000;
+                Integer gpsFreqInDistance = 3;  // in meters
 
                 locationManager.addGpsStatusListener(this);
 
@@ -312,7 +312,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         long age = getLocationAge(location);
 
-        if(age > 40 * 1000){ //more than 5 seconds
+        if(age > 30 * 1000){ //more than 5 seconds
             Log.d(TAG, "Location is old");
             oldLocationList.add(location);
             sendMessageToUI("yes_yellow");
@@ -356,7 +356,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
         predictedLocation.setLongitude(predictedLng);
         float predictedDeltaInMeters =  predictedLocation.distanceTo(location);
 
-        if(predictedDeltaInMeters > 88){
+        if(predictedDeltaInMeters > 100){
             Log.d(TAG, "Kalman Filter detects mal GPS, we should probably remove this from track");
             kalmanFilter.consecutiveRejectCount += 1;
             sendMessageToUI("yes_yellow");

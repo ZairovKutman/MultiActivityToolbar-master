@@ -87,6 +87,7 @@ public class Order implements Serializable {
     }
 
     public String getDogovor() {
+        if (dogovor == null) return "00000000-0000-0000-0000-000000000000";
         return dogovor;
     }
 

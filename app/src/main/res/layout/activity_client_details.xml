@@ -139,9 +139,24 @@
         </LinearLayout>
 
 
+
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
+        <Button
+            android:text="Оценить Торговую Точку"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rateClientButton"
+            android:minHeight="1dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp" />
+
+    </LinearLayout>
 
 
 </LinearLayout>

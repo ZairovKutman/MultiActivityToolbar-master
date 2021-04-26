@@ -26,6 +26,10 @@ public class DailyTask implements Serializable {
     public static String KEY_longitude = "longitude";
     public static String KEY_agentName = "agentname";
 
+    public static String KEY_rate_date = "ratedate";
+    public static String KEY_rate = "rate";
+    public static String KEY_rate_comment = "ratecomment";
+
     private String docGuid;
     private String clientGuid;
     private int priority;
@@ -38,10 +42,15 @@ public class DailyTask implements Serializable {
     private String longitude;
     private String agentName;
     private String base;
+    private String rateDate;
+    private String rate;
+    private String rateComment;
 
     public DailyTask()
     {
-
+        this.rate = "";
+        this.rateDate = "";
+        this.rateComment = "";
     }
 
     public DailyTask(String docGuid, String clientGuid, int priority, String status, String docId, String docDate, String dateClosed, String latitude, String longitude, String agentName, String base)
@@ -57,6 +66,9 @@ public class DailyTask implements Serializable {
         this.longitude = longitude;
         this.agentName = agentName;
         this.base = base;
+        this.rate = "";
+        this.rateDate = "";
+        this.rateComment = "";
 
     }
 
@@ -171,5 +183,29 @@ public class DailyTask implements Serializable {
     @Override
     public String toString() {
         return Integer.toString(getPriority())+". Заказ: "+getClientName();
+    }
+
+    public String getRateDate() {
+        return rateDate;
+    }
+
+    public void setRateDate(String rateDate) {
+        this.rateDate = rateDate;
+    }
+
+    public String getRate() {
+        return rate;
+    }
+
+    public void setRate(String rate) {
+        this.rate = rate;
+    }
+
+    public String getRateComment() {
+        return rateComment;
+    }
+
+    public void setRateComment(String rateComment) {
+        this.rateComment = rateComment;
     }
 }

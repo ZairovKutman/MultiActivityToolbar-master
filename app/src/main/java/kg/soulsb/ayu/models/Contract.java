@@ -75,6 +75,8 @@ public class Contract {
     }
 
     public String getCategory() {
+        if (category == null) category = "00000000-0000-0000-0000-000000000000";
+
         if (category.equals("00000000-0000-0000-0000-000000000000"))
             return "";
         else

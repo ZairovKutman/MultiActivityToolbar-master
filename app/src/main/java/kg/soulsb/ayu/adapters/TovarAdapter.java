@@ -77,7 +77,7 @@ public class TovarAdapter extends ArrayAdapter<Item> implements Filterable {
         else
             holder.txtPrice.setText("");
 
-        holder.txtStock.setText("ост: "+Double.toString(Tovar.getStock())+" "+Tovar.getUnit());
+        holder.txtStock.setText("ост: "+Integer.toString(Tovar.getStock())+" "+Tovar.getUnit());
 
         if (Tovar.getQuantity() == 0)
             holder.txtQuantity.setText("");

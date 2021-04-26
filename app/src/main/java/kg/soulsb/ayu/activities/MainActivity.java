@@ -10,12 +10,16 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +46,7 @@ import kg.soulsb.ayu.models.Baza;
 import kg.soulsb.ayu.models.DailyTask;
 import kg.soulsb.ayu.models.Order;
 import kg.soulsb.ayu.services.LocationService;
+import kg.soulsb.ayu.services.MadLocationMonitoringService;
 import kg.soulsb.ayu.singletons.CurrentBaseClass;
 import kg.soulsb.ayu.singletons.CurrentLocationClass;
 import kg.soulsb.ayu.singletons.DataHolderClass;
@@ -76,6 +81,7 @@ public class MainActivity extends BaseActivity {
             String active = intent.getStringExtra("active");
 
             if (active.equals("yes_green"))  {  image_gps.setBackgroundColor(Color.GREEN); return;}
+            if (active.equals("yes_blue"))  {  image_gps.setBackgroundColor(Color.BLUE); return;}
 
             if (active.equals("yes_yellow")) { image_gps.setBackgroundColor(Color.YELLOW); return;}
 
@@ -264,6 +270,10 @@ public class MainActivity extends BaseActivity {
             listAdapter = new TasksAdapter(MainActivity.this, R.layout.tasks_list, orderTasksArraylist);
             listViewDocuments.setAdapter(listAdapter);
 
+            if (DataHolderClass.getInstance().getCurrentRowTaskActivity() != null) {
+                listViewDocuments.onRestoreInstanceState(DataHolderClass.getInstance().getCurrentRowTaskActivity());
+            }
+
             listViewDocuments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -271,50 +281,78 @@ public class MainActivity extends BaseActivity {
                     {
                         if (orderTasksArraylist.get(position-1).getStatus().equals("0")) {
                             int counter = 1;
+                            int priorityNow = orderTasksArraylist.get(position).getPriority();
+                            int previousPriority = priorityNow;
+                            boolean foundPreviousPriority = false;
                             while (position-counter>0) {
-                                if (orderTasksArraylist.get(position - counter).getPriority() < orderTasksArraylist.get(position).getPriority() && orderTasksArraylist.get(position - counter).getStatus().equals("0")) {
-                                    int pos1 = position - counter;
-                                    int posCounter = 1;
-                                    boolean flag = false;
-                                    while (pos1 - posCounter >=0)
-                                    {
-                                        if (orderTasksArraylist.get(pos1).getPriority() == orderTasksArraylist.get(pos1 - posCounter).getPriority() && !orderTasksArraylist.get(pos1 - posCounter).getStatus().equals("0")) {
-                                            flag = true;
-                                           break;
-                                        }
-                                        posCounter = posCounter + 1;
-                                    }
-                                    if (flag)
-                                        break;
 
-                                    Toast.makeText(MainActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
-                                    return;
+                                if (orderTasksArraylist.get(position - counter).getPriority() < priorityNow && !foundPreviousPriority) {
+                                    foundPreviousPriority = true;
+                                    previousPriority = orderTasksArraylist.get(position - counter).getPriority();
+
                                 }
-                                counter = counter + 1;
+                                else {
+                                    if (!foundPreviousPriority) {
+                                        if (orderTasksArraylist.get(position - counter).getPriority() == priorityNow && !orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                            break;
+
+                                        if (orderTasksArraylist.get(position - counter).getPriority() == priorityNow && orderTasksArraylist.get(position - counter).getStatus().equals("0")) {
+                                            counter = counter + 1;
+                                            continue;
+                                        }
+                                    }
+
+                                }
+
+                                if (foundPreviousPriority)
+                                {
+                                    if (orderTasksArraylist.get(position - counter).getPriority() == previousPriority && !orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                    {
+                                        break;
+                                    }
+
+                                    if (orderTasksArraylist.get(position - counter).getPriority() == previousPriority && orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                    {
+                                        if (position - counter - 1 == 0 && orderTasksArraylist.get(position - counter - 1).getStatus().equals("0"))
+                                        {
+                                            Toast.makeText(MainActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
+
+                                        counter = counter + 1;
+                                        continue;
+                                    }
+
+                                    if (orderTasksArraylist.get(position - counter).getPriority()<previousPriority)
+                                    {
+                                        Toast.makeText(MainActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                }
                             }
                         }
                     }
+                    if (orderTasksArraylist.get(position).getStatus().equals("0")) {
+                        Location clientLocation = orderTasksArraylist.get(position).getClientLocation();
+                        Location myLocation = CurrentLocationClass.getInstance().getCurrentLocation();
 
-                    Location clientLocation = orderTasksArraylist.get(position).getClientLocation();
-                    Location myLocation = CurrentLocationClass.getInstance().getCurrentLocation();
+                        float distance = myLocation.distanceTo(clientLocation);
+                        if (!sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates, "false").equals("true")) {
+                            distance = 1;
+                        }
 
-                    float distance = myLocation.distanceTo(clientLocation);
-                    if (!sharedPreferences.getString(UserSettings.create_order_at_clients_coordinates,"false").equals("true"))
-                    {
-                        distance = 1;
-                    }
-
-                    if (distance>UserSettings.DISTANCE_TO_CLIENT) {
-                        AlertDialog.Builder alertDlg = new AlertDialog.Builder(MainActivity.this);
-                        alertDlg.setMessage("Клиент находится на расстоянии " + distance + "м. Подойдите ближе!");
-                        alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                return;
-                            }
-                        });
-                        alertDlg.setCancelable(false);
-                        alertDlg.show();
-                        return;
+                        if (distance > UserSettings.DISTANCE_TO_CLIENT) {
+                            AlertDialog.Builder alertDlg = new AlertDialog.Builder(MainActivity.this);
+                            alertDlg.setMessage("Клиент находится на расстоянии " + distance + "м. Подойдите ближе!");
+                            alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    return;
+                                }
+                            });
+                            alertDlg.setCancelable(false);
+                            alertDlg.show();
+                            return;
+                        }
                     }
 
                     intent = new Intent(MainActivity.this, TasksDetailActivity.class);
@@ -325,8 +363,13 @@ public class MainActivity extends BaseActivity {
                     intent.putExtra("clientLon", orderTasksArraylist.get(position).getLongitude());
                     intent.putExtra("priority", orderTasksArraylist.get(position).getPriority());
                     intent.putExtra("status", orderTasksArraylist.get(position).getStatus());
+                    intent.putExtra("docGuid", orderTasksArraylist.get(position).getDocGuid());
+                    intent.putExtra("rate", orderTasksArraylist.get(position).getRate());
+                    intent.putExtra("rateDate", orderTasksArraylist.get(position).getRateDate());
+                    intent.putExtra("rateDetails", orderTasksArraylist.get(position).getRateComment());
 
-
+                    Parcelable state = listViewDocuments.onSaveInstanceState();
+                    DataHolderClass.getInstance().setCurrentRowTaskActivity(state);
                     startActivity(intent);
 
                 }
@@ -469,7 +512,18 @@ public class MainActivity extends BaseActivity {
             System.out.println("Location Monitoring Service started");
             DataHolderClass.getInstance().setServiceRunning(true);
             //Start location sharing service to app server.........
-            Intent intent = new Intent(this, LocationService.class);
+            SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+            Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+            Sensor sensor2 = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
+
+            Intent intent;
+            if (sensor == null || sensor2 == null)
+            {
+                intent = new Intent(this, LocationService.class);
+            }
+            else {
+                intent = new Intent(this, MadLocationMonitoringService.class);
+            }
             startService(this,intent);
 
             //Ends................................................

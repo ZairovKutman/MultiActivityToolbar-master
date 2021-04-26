@@ -193,4 +193,11 @@ public class TovarsFragment extends Fragment {
         checkDeliveredDoc();
 
     }
+
+    public void updateSalesHistory()
+    {
+        recyclerTovarAdapter.updateSalesHistory(parentActivity.addOrderFragment.clientGUID);
+        recyclerTovarAdapter.notifyDataSetChanged();
+        checkDeliveredDoc();
+    }
 }

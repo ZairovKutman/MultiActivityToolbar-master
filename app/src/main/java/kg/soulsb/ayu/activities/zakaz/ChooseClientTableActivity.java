@@ -42,6 +42,9 @@ public class ChooseClientTableActivity extends BaseActivity {
     public static final String ACTION_LOCATION_BROADCAST = "LocationBroadcast";
     Location mLastLocation = new Location("mLocChooseClient");
     Location clientLocation = new Location("loc");
+    Double lat = 0.0;
+    Double lon = 0.0;
+
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -62,8 +65,7 @@ public class ChooseClientTableActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_client);
         final SharedPreferences sharedPreferences = getSharedPreferences(CurrentBaseClass.getInstance().getCurrentBase(),MODE_PRIVATE);
-        Double lat = 0.0;
-        Double lon = 0.0;
+
 
         String doctype = getIntent().getExtras().getString("doctype");
 
@@ -126,6 +128,11 @@ public class ChooseClientTableActivity extends BaseActivity {
 
                 if (flag.equals("true")) {
 
+                    lat = CurrentLocationClass.getInstance().getCurrentLocation().getLatitude();
+                    lon = CurrentLocationClass.getInstance().getCurrentLocation().getLongitude();
+
+                    mLastLocation.setLatitude(lat);
+                    mLastLocation.setLongitude(lon);
 
                     clientLocation.setLatitude(Double.parseDouble(str.getLatitude()));
                     clientLocation.setLongitude(Double.parseDouble(str.getLongitude()));
@@ -135,7 +142,7 @@ public class ChooseClientTableActivity extends BaseActivity {
                 }
                 else {distance = 0;}
 
-                if (distance > 200 && clientLocation.getLatitude()!=0) {
+                if (distance > UserSettings.DISTANCE_TO_CLIENT && clientLocation.getLatitude()!=0) {
                     AlertDialog.Builder alertDlg = new AlertDialog.Builder(ChooseClientTableActivity.this);
                     alertDlg.setMessage("Клиент находится на расстоянии "+distance+"м. Подойдите ближе!");
                     alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {

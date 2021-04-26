@@ -22,6 +22,30 @@
         android:text="ед. измерения" />
 
     <TextView
+        android:id="@+id/item_photo_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:textStyle="bold"
+        android:text="Фото" />
+
+
+    <Button
+        android:id="@+id/button_show_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Показать Фото" />
+
+    <ImageView
+        android:id="@+id/imageView_item_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/noimage" />
+
+    <TextView
         android:id="@+id/item_price_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

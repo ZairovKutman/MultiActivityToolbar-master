@@ -230,7 +230,7 @@ public class OrdersRepo {
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
                         item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
-                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
                         item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
@@ -352,7 +352,7 @@ public class OrdersRepo {
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
                         item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
-                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
                         item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());
@@ -495,7 +495,7 @@ public class OrdersRepo {
                         item.setGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Guid)));
                         item.setPrice(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Price))));
                         item.setSum(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Sum))));
-                        item.setQuantity(Double.parseDouble(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
+                        item.setQuantity(Integer.parseInt(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_Quantity))));
                         item.setMyUnitByGuid(myCursor.getString(myCursor.getColumnIndexOrThrow(Item.KEY_UnitGUID)));
                         itemArrayList.add(item);
                     } while (myCursor.moveToNext());

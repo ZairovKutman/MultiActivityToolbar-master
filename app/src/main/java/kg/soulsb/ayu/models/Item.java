@@ -2,6 +2,7 @@ package kg.soulsb.ayu.models;
 
 import java.io.Serializable;
 
+import kg.soulsb.ayu.helpers.repo.SalesHistoryRepo;
 import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 
 /**
@@ -27,6 +28,7 @@ public class Item implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String clientGuid;
     private String itemId;
     private String guid;
     private String name;
@@ -34,17 +36,29 @@ public class Item implements Serializable {
     private Unit myUnit = new Unit();
     private String category;
     private double price;
-    private double stock;
-    private double quantity;
+    private int stock;
+    private int quantity;
     private double sum;
     private String base;
+    private String date1;
+    private String date2;
+    private String date3;
+    private double qty1;
+    private double qty2;
+    private double qty3;
 
     public Item()
     {
         myUnit.setName("");
+        date1 = "";
+        date2 = "";
+        date3 = "";
 
+        qty1 = 0;
+        qty2 = 0;
+        qty3 = 0;
     }
-    public Item(String guid, String name, String unit, double price, double stock, String category) {
+    public Item(String guid, String name, String unit, double price, int stock, String category) {
         this.guid = guid;
         this.name = name;
         this.unit = unit;
@@ -52,6 +66,13 @@ public class Item implements Serializable {
         this.stock = stock;
         this.category = category;
         myUnit.setName("");
+        date1 = "";
+        date2 = "";
+        date3 = "";
+
+        qty1 = 0;
+        qty2 = 0;
+        qty3 = 0;
     }
 
     public String getName() {
@@ -75,7 +96,7 @@ public class Item implements Serializable {
         return itemId;
     }
 
-    public double getStock() {
+    public int getStock() {
         return stock;
     }
 
@@ -103,15 +124,15 @@ public class Item implements Serializable {
         this.price = price;
     }
 
-    public void setStock(double stock) {
+    public void setStock(int stock) {
         this.stock = stock;
     }
 
-    public double getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(double quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
@@ -165,5 +186,65 @@ public class Item implements Serializable {
 
     public void setMyUnitByGuid(String myUnitByGuid) {
         this.myUnit = new UnitsRepo().getUnitsObjectByItemGuidAndUnitGuid(getGuid(),myUnitByGuid);
+    }
+
+    public void updateSalesHistory(String clientGuid) {
+        SalesHistory salesHistory = new SalesHistoryRepo().getItemSalesHistory(clientGuid, guid);
+        this.date1 = salesHistory.getDate1();
+        this.date2 = salesHistory.getDate2();
+        this.date3 = salesHistory.getDate3();
+
+        this.qty1 = salesHistory.getQty1();
+        this.qty2 = salesHistory.getQty2();
+        this.qty3 = salesHistory.getQty3();
+
+    }
+
+    public String getDate1() {
+        return date1;
+    }
+
+    public void setDate1(String date1) {
+        this.date1 = date1;
+    }
+
+    public String getDate2() {
+        return date2;
+    }
+
+    public void setDate2(String date2) {
+        this.date2 = date2;
+    }
+
+    public String getDate3() {
+        return date3;
+    }
+
+    public void setDate3(String date3) {
+        this.date3 = date3;
+    }
+
+    public double getQty1() {
+        return qty1;
+    }
+
+    public void setQty1(double qty1) {
+        this.qty1 = qty1;
+    }
+
+    public double getQty2() {
+        return qty2;
+    }
+
+    public void setQty2(double qty2) {
+        this.qty2 = qty2;
+    }
+
+    public double getQty3() {
+        return qty3;
+    }
+
+    public void setQty3(double qty3) {
+        this.qty3 = qty3;
     }
 }

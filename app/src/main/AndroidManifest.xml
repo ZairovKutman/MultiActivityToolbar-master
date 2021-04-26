@@ -190,6 +190,8 @@
             android:exported="false"
             android:stopWithTask="false" />
 
+        <service android:name="kg.soulsb.ayu.services.MadLocationMonitoringService" />
+
         <service android:name="kg.soulsb.ayu.services.LocationService" />
 
     </application>

@@ -47,10 +47,32 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="10dp"
+                    android:text="Долг:"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView_task_client_debt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="4dp"
+                    android:paddingStart="10dp"
                     android:text="Статус: "
                     android:textStyle="bold" />
 
@@ -58,10 +80,43 @@
                     android:id="@+id/textView_task_details"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="10dp"
+                    android:padding="2dp"
                     android:text="" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Оценка: "
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:padding="12dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="#FF5722" />
+
+                <TextView
+                    android:id="@+id/textView_rate_details"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Нет оценки"
+                    android:textColor="#FF1400"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -109,20 +164,20 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/colorPrimaryDark" />
 
-            <Button
-                android:id="@+id/new_closed_photo_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:layout_weight="1"
-                android:background="@android:color/background_light"
-                android:drawableTop="@android:drawable/ic_menu_camera"
-                android:drawableTint="@color/colorAccent"
-                android:paddingTop="4dp"
-                android:paddingBottom="2dp"
-                android:text="\nМагазин закрыт (фото)"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/colorAccent" />
+<!--            <Button-->
+<!--                android:id="@+id/new_closed_photo_button"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="3dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:background="@android:color/background_light"-->
+<!--                android:drawableTop="@android:drawable/ic_menu_camera"-->
+<!--                android:drawableTint="@color/colorAccent"-->
+<!--                android:paddingTop="4dp"-->
+<!--                android:paddingBottom="2dp"-->
+<!--                android:text="\nМагазин закрыт (фото)"-->
+<!--                android:textAppearance="@style/TextAppearance.AppCompat.Body1"-->
+<!--                android:textColor="@color/colorAccent" />-->
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

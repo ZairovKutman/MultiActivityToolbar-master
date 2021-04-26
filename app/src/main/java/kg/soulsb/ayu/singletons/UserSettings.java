@@ -19,9 +19,10 @@ public class UserSettings {
     public static String can_create_payment = "can_create_payment";
     public static String error_message = "error_message";
     public static String workWithTasks = "work_with_tasks";
+    public static String can_rate_point = "can_rate_point";
 
     public static final int LOCATION_INTERVAL = 40000;
-    public static final int FASTEST_LOCATION_INTERVAL = 20000;
+    public static final int FASTEST_LOCATION_INTERVAL = 10000;
 
-    public static int DISTANCE_TO_CLIENT = 200;
+    public static int DISTANCE_TO_CLIENT = 260;
 }

@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +29,6 @@ import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 import kg.soulsb.ayu.R;
@@ -48,7 +48,7 @@ import kg.soulsb.ayu.singletons.CurrentLocationClass;
 
 public class TasksDetailActivity extends BaseActivity {
 
-    TextView clientTextView, taskDetailTextView;
+    TextView clientTextView, taskDetailTextView,rateTextView,rateDetailsTextView, clientDebtTextView;
     Button newOrderButton, newPhotoButton, newClosedPhotoButton;
     ListView listViewDocuments;
     ArrayList<Order> orderArrayList;
@@ -58,6 +58,7 @@ public class TasksDetailActivity extends BaseActivity {
     AlertDialog alertDialog;
     String status;
     String priority;
+    String dailyTaskGuid;
     Client client;
     ArrayList<DailyPhoto> dailyPhotosArraylist = new ArrayList<>();
     LinearLayout linearLayout;
@@ -74,15 +75,26 @@ public class TasksDetailActivity extends BaseActivity {
         taskDetailTextView = findViewById(R.id.textView_task_details);
         newOrderButton = findViewById(R.id.new_order_button);
         newPhotoButton = findViewById(R.id.new_photo_button);
-        newClosedPhotoButton = findViewById(R.id.new_closed_photo_button);
-
+        //newClosedPhotoButton = findViewById(R.id.new_closed_photo_button);
+        clientDebtTextView = findViewById(R.id.textView_task_client_debt);
+        rateTextView = findViewById(R.id.textView_rate);
+        rateDetailsTextView = findViewById(R.id.textView_rate_details);
         client = new ClientsRepo().getClientObjectByGuid(getIntent().getStringExtra("clientGuid"));
         clientTextView.setText(client.getName());
 
+        clientDebtTextView.setText(Double.toString(client.getDebt()));
+        String rate = getIntent().getStringExtra("rate");
+        String rateDetails = getIntent().getStringExtra("rateDetails");
+        String rateDate = getIntent().getStringExtra("rateDate");
 
+        if (!rate.equals("")) {
+            rateTextView.setText(rate);
+            rateDetailsTextView.setText("Оценка произведена " + rateDate + ", комментарий: " + rateDetails);
+        }
         priority = Integer.toString(getIntent().getIntExtra("priority",-1));
         status = getIntent().getStringExtra("status");
-
+        dailyTaskGuid = getIntent().getStringExtra("docGuid");
+        System.out.println("Getting docGuid = "+dailyTaskGuid);
         taskDetailTextView.setText("Задание №"+priority+", Статус = "+status);
 
         newOrderButton.setOnClickListener(new View.OnClickListener() {
@@ -111,6 +123,26 @@ public class TasksDetailActivity extends BaseActivity {
                     Toast.makeText(TasksDetailActivity.this,"Нельзя добавить больше 5 фотографий",Toast.LENGTH_LONG).show();
                     return;
                 }
+
+                Location clientLocation = new Location("ClientLocation");
+                clientLocation.setLatitude(Double.parseDouble(client.getLatitude()));
+                clientLocation.setLongitude(Double.parseDouble(client.getLongitude()));
+
+                Location myLocation = CurrentLocationClass.getInstance().getCurrentLocation();
+
+                float distance = myLocation.distanceTo(clientLocation);
+
+//                if (distance>300) {
+//                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(TasksDetailActivity.this);
+//                    alertDlg.setMessage("Клиент находится на расстоянии " + distance + "м. Подойдите ближе!");
+//                    alertDlg.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int id) {
+//                        }
+//                    });
+//                    alertDlg.setCancelable(false);
+//                    alertDlg.show();
+//                    return;
+//                }
                 //new ImagePicker.Builder(TasksDetailActivity.this)
                 //        .mode(ImagePicker.Mode.CAMERA_AND_GALLERY)
                 //        .compressLevel(ImagePicker.ComperesLevel.HARD)
@@ -120,12 +152,7 @@ public class TasksDetailActivity extends BaseActivity {
                 //        .enableDebuggingMode(true)
                 //       .build();
 
-                ImagePicker.create(TasksDetailActivity.this)
-                        .returnMode(ReturnMode.ALL) // set whether pick and / or camera action should return immediate result or not.
-                        .toolbarImageTitle("Выберите фото") // image selection title
-                        .toolbarArrowColor(Color.BLACK) // Toolbar 'up' arrow color
-                        .single() // single mode
-                        .start();
+                ImagePicker.cameraOnly().start(TasksDetailActivity.this);
 
             }
         });
@@ -224,32 +251,40 @@ public class TasksDetailActivity extends BaseActivity {
         if (ImagePicker.shouldHandle(requestCode, resultCode, data)) {
             Image image = ImagePicker.getFirstImageOrNull(data);
 
+            Calendar myCalendar = Calendar.getInstance();
+            String myFormat = "dd/MM/yyyy";
+            SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
+            myCalendar.setTimeInMillis(myCalendar.getTimeInMillis());
+
             myBitmap = BitmapFactory.decodeFile(image.getPath());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             int myHeight = myBitmap.getHeight();
             int myWidth = myBitmap.getWidth();
 
-            while (myHeight >1000 || myWidth>1000)
+            while (myHeight >1600 || myWidth>1600)
             {
                 myHeight = myHeight / 2;
                 myWidth = myWidth / 2;
             }
 
             myBitmap = getResizedBitmap(myBitmap,myHeight,myWidth);
-
-            myBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+            System.out.println("activity result: "+dailyTaskGuid);
+            myBitmap.compress(Bitmap.CompressFormat.JPEG, 77, baos);
             byte[] imageInByte = baos.toByteArray();
-            DailyPhoto dailyPhoto = new DailyPhoto(client.getGuid(), imageInByte);
+            String android_id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
+                    android.provider.Settings.Secure.ANDROID_ID);
+            DailyPhoto dailyPhoto = new DailyPhoto(client.getGuid(), imageInByte, CurrentBaseClass.getInstance().getCurrentBaseObject().getAgent(), android_id, sdf.format(myCalendar.getTime()), dailyTaskGuid,CurrentLocationClass.getInstance().getCurrentLocation().getLatitude(),CurrentLocationClass.getInstance().getCurrentLocation().getLongitude());
             new PhotosRepo().insert(dailyPhoto);
 
-            if (orderArrayList.isEmpty())
+            if (!orderArrayList.isEmpty())
             {
-                Calendar myCalendar = Calendar.getInstance();
-                String myFormat = "dd/MM/yyyy";
-                SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.ENGLISH);
-                myCalendar.setTimeInMillis(myCalendar.getTimeInMillis());
+                new DailyTasksRepo().updateStatusByPhoto(client.getGuid(), CurrentLocationClass.getInstance().getCurrentLocation().getLatitude(), CurrentLocationClass.getInstance().getCurrentLocation().getLongitude(), sdf.format(myCalendar.getTime()), "1");
+            }
+            else
+            {
                 new DailyTasksRepo().updateStatusByPhoto(client.getGuid(), CurrentLocationClass.getInstance().getCurrentLocation().getLatitude(), CurrentLocationClass.getInstance().getCurrentLocation().getLongitude(), sdf.format(myCalendar.getTime()), "3");
             }
+
 
 
         }

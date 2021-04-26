@@ -190,7 +190,7 @@ public class ClientsRepo {
                 client.setDebt(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Debt))));
                 client.setLocOfAgent(loc.getLatitude(),loc.getLongitude());
 
-                if (client.getDistanceToClient()<200) {
+                if (client.getDistanceToClient()<250) {
                     arrayList.add(client);
                 }
             } while (cursor.moveToNext());

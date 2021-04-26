@@ -39,6 +39,7 @@ import kg.soulsb.ayu.grpctest.nano.DailyTasks;
 import kg.soulsb.ayu.grpctest.nano.DocPurch;
 import kg.soulsb.ayu.grpctest.nano.Docs;
 import kg.soulsb.ayu.grpctest.nano.DocsStatus;
+import kg.soulsb.ayu.grpctest.nano.OperationStatus;
 import kg.soulsb.ayu.grpctest.nano.Points;
 import kg.soulsb.ayu.grpctest.nano.PurchDocLine;
 import kg.soulsb.ayu.grpctest.nano.TaskPhoto;
@@ -160,26 +161,55 @@ public class TasksActivity extends BaseActivity {
                 {
                     if (orderTasksArraylist.get(position-1).getStatus().equals("0")) {
                         int counter = 1;
+                        int priorityNow = orderTasksArraylist.get(position).getPriority();
+                        int previousPriority = priorityNow;
+                        boolean foundPreviousPriority = false;
                         while (position-counter>0) {
-                            if (orderTasksArraylist.get(position - counter).getPriority() < orderTasksArraylist.get(position).getPriority() && orderTasksArraylist.get(position - counter).getStatus().equals("0")) {
-                                int pos1 = position - counter;
-                                int posCounter = 1;
-                                boolean flag = false;
-                                while (pos1 - posCounter >=0)
-                                {
-                                    if (orderTasksArraylist.get(pos1).getPriority() == orderTasksArraylist.get(pos1 - posCounter).getPriority() && !orderTasksArraylist.get(pos1 - posCounter).getStatus().equals("0")) {
-                                        flag = true;
-                                        break;
-                                    }
-                                    posCounter = posCounter + 1;
-                                }
-                                if (flag)
-                                    break;
 
-                                Toast.makeText(TasksActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
-                                return;
+                            if (orderTasksArraylist.get(position - counter).getPriority() < priorityNow && !foundPreviousPriority) {
+                                foundPreviousPriority = true;
+                                previousPriority = orderTasksArraylist.get(position - counter).getPriority();
+
                             }
-                            counter = counter + 1;
+                            else {
+                                if (!foundPreviousPriority) {
+                                    if (orderTasksArraylist.get(position - counter).getPriority() == priorityNow && !orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                        break;
+
+                                    if (orderTasksArraylist.get(position - counter).getPriority() == priorityNow && orderTasksArraylist.get(position - counter).getStatus().equals("0")) {
+                                        counter = counter + 1;
+                                        continue;
+                                    }
+                                }
+
+                            }
+
+                            if (foundPreviousPriority)
+                            {
+                                if (orderTasksArraylist.get(position - counter).getPriority() == previousPriority && !orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                {
+                                    break;
+                                }
+
+                                if (orderTasksArraylist.get(position - counter).getPriority() == previousPriority && orderTasksArraylist.get(position - counter).getStatus().equals("0"))
+                                {
+                                    if (position - counter - 1 == 0 && orderTasksArraylist.get(position - counter - 1).getStatus().equals("0"))
+                                    {
+                                        Toast.makeText(TasksActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                    counter = counter + 1;
+                                    continue;
+                                }
+
+                                if (orderTasksArraylist.get(position - counter).getPriority()<previousPriority)
+                                {
+                                    Toast.makeText(TasksActivity.this, "Нужно закончить предыдущее задание!", Toast.LENGTH_LONG).show();
+                                    return;
+                                }
+
+
+                            }
                         }
                     }
                 }
@@ -210,8 +240,10 @@ public class TasksActivity extends BaseActivity {
                     intent.putExtra("clientLon", orderTasksArraylist.get(position).getLongitude());
                     intent.putExtra("priority", orderTasksArraylist.get(position).getPriority());
                     intent.putExtra("status", orderTasksArraylist.get(position).getStatus());
-
-
+                    intent.putExtra("docGuid", orderTasksArraylist.get(position).getDocGuid());
+                    intent.putExtra("rate", orderTasksArraylist.get(position).getRate());
+                    intent.putExtra("rateDate", orderTasksArraylist.get(position).getRateDate());
+                    intent.putExtra("rateDetails", orderTasksArraylist.get(position).getRateComment());
                     startActivity(intent);
 
 
@@ -379,15 +411,17 @@ public class TasksActivity extends BaseActivity {
                         errorMessage=errorMessage+"\n"+ docsStatus.docsStatus[i].operationStatus.comment;
                     }
                 }
-            }//Конец выгрузки документов
+            } //Конец выгрузки документов
 
             ArrayList<DailyTask> dailyTaskArrayList = new DailyTasksRepo().getDailyTasksObject();
             kg.soulsb.ayu.grpctest.nano.DailyTask[] dailyTasks = new kg.soulsb.ayu.grpctest.nano.DailyTask[dailyTaskArrayList.size()];
             int i=0;
             String android_id = android.provider.Settings.Secure.getString(getApplicationContext().getContentResolver(),
                     android.provider.Settings.Secure.ANDROID_ID);
+            String docGuid = "";
             for (DailyTask dt: dailyTaskArrayList)
             {
+                docGuid = dt.getDocGuid();
                 kg.soulsb.ayu.grpctest.nano.DailyTask dt2 = new kg.soulsb.ayu.grpctest.nano.DailyTask();
                 dt2.agentName = name;
                 dt2.deviceId = android_id;
@@ -401,29 +435,43 @@ public class TasksActivity extends BaseActivity {
                 dt2.priority = dt.getPriority();
                 dt2.status = Integer.parseInt(dt.getStatus());
 
-                ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByClientGuid(dt.getClientGuid());
-                int j =0;
-                TaskPhoto[] taskPhotos = new TaskPhoto[dailyPhotoArrayList.size()];
-                for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
-                {
-                    TaskPhoto tp = new TaskPhoto();
-                    tp.photo = dailyPhoto.getPhotoBytes();
-                    taskPhotos[j] = tp;
-                    j=j+1;
-                }
-
-                dt2.taskPhoto = taskPhotos;
-
                 dailyTasks[i] = dt2;
                 i=i+1;
             }
             DailyTasks dailyTasks1 = new DailyTasks();
             dailyTasks1.task = dailyTasks;
-            System.out.println(dailyTasks[0].taskPhoto[0].photo);
+
             DocsStatus ds = blockingStub.updateDailyTasks(dailyTasks1);
             System.out.println(Arrays.toString(ds.docsStatus));
 
-
+//            ArrayList<DailyPhoto> dailyPhotoArrayList = new PhotosRepo().getPhotosByDocGuid(docGuid);
+//            int j = 0;
+//            for (DailyPhoto dailyPhoto: dailyPhotoArrayList)
+//            {
+//                j= j+1;
+//                publishProgress("Выгрузка фотографий: " + j + " из "+dailyPhotoArrayList.size());
+//                TaskPhoto tp = new TaskPhoto();
+//                tp.photo = dailyPhoto.getPhotoBytes();
+//                Agent agent = new Agent();
+//                agent.name = dailyPhoto.getAgent();
+//                tp.agent = agent;
+//                tp.clientGuid = dailyPhoto.getClientGuid();
+//                tp.dateClosed = dailyPhoto.getDateClosed();
+//                tp.deviceId = dailyPhoto.getDevice_id();
+//                tp.docGuid = dailyPhoto.getDocGuid();
+//                tp.latitude = dailyPhoto.getLatitude();
+//                tp.longitude = dailyPhoto.getLongitude();
+//
+//                OperationStatus photoStatus = blockingStub.getTaskPhoto(tp);
+//                System.out.println("photo send status: "+photoStatus.status+", "+photoStatus.comment);
+//                if (photoStatus.status==0)
+//                {
+//                    new PhotosRepo().deleteDailyPhoto(tp.photo);
+//                }
+//                else {
+//                    errorMessage=errorMessage+"\n"+ photoStatus.comment;
+//                }
+//            }
 
             return new Points();
 

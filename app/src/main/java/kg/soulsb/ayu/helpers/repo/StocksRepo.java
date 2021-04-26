@@ -68,8 +68,8 @@ public class StocksRepo {
     }
 
 
-    public double getItemStockByWarehouse(String itemGUID, String warehouse) {
-        double stockFromOrders=0;
+    public int getItemStockByWarehouse(String itemGUID, String warehouse) {
+        int stockFromOrders=0;
         db = DatabaseManager.getInstance().openDatabase();
 /*
         String selectQuery =  " SELECT IFNULL(SUM(" + Stock.KEY_Stock
@@ -114,13 +114,13 @@ public class StocksRepo {
             cursor = db.rawQuery(selectQuery, null);
         }
         // looping through all rows and adding to list
-        double originalStock = 0;
+        int originalStock = 0;
         UnitsRepo unitsRepo = new UnitsRepo();
         if (cursor.moveToFirst()) {
             do {
-                originalStock = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Stock)));
+                originalStock = Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_Stock)));
                 Unit unit = unitsRepo.getUnitsObjectByItemGuidAndUnitGuid(cursor.getString(cursor.getColumnIndexOrThrow(Stock.KEY_ItemGuid)),cursor.getString(cursor.getColumnIndexOrThrow("unitGuid")));
-                stockFromOrders =  stockFromOrders+Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("usedItems")))*unit.getCoefficient();
+                stockFromOrders = (int) (stockFromOrders+Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("usedItems")))*unit.getCoefficient());
             } while (cursor.moveToNext());
         }
 

@@ -33,6 +33,9 @@ public class DailyTasksRepo {
                 + DailyTask.KEY_latitude  + "   TEXT    ,"
                 + DailyTask.KEY_longitude  + "   TEXT    ,"
                 + DailyTask.KEY_photo  + "   TEXT    ,"
+                + DailyTask.KEY_rate_comment  + "   TEXT    ,"
+                + DailyTask.KEY_rate  + "   TEXT    ,"
+                + DailyTask.KEY_rate_date  + "   TEXT    ,"
                 + DailyTask.KEY_priority  + "   INTEGER    ,"
                 + DailyTask.KEY_status  +  "   TEXT    )";
     }
@@ -53,6 +56,10 @@ public class DailyTasksRepo {
         values.put(DailyTask.KEY_priority, dailyTask.getPriority());
         values.put(DailyTask.KEY_base, dailyTask.getBase());
         values.put(DailyTask.KEY_status, dailyTask.getStatus());
+        values.put(DailyTask.KEY_rate, dailyTask.getRate());
+        values.put(DailyTask.KEY_rate_comment, dailyTask.getRateComment());
+        values.put(DailyTask.KEY_rate_date, dailyTask.getRateDate());
+
         // Inserting Row
         if (db.isOpen()) {
             dailyTaskId=(int)db.insert(DailyTask.TABLE, null, values);
@@ -83,6 +90,9 @@ public class DailyTasksRepo {
                 + ", "+DailyTask.KEY_priority
                 + ", "+DailyTask.KEY_status
                 + ", "+DailyTask.KEY_base
+                + ", "+DailyTask.KEY_rate_date
+                + ", "+DailyTask.KEY_rate
+                + ", "+DailyTask.KEY_rate_comment
                 + " FROM " + DailyTask.TABLE
                 + " WHERE "+DailyTask.KEY_base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'"
                 + " ORDER BY "+DailyTask.KEY_priority+" ASC;";
@@ -103,6 +113,9 @@ public class DailyTasksRepo {
                 client.setPhoto(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_photo)));
                 client.setPriority(cursor.getInt(cursor.getColumnIndexOrThrow(DailyTask.KEY_priority)));
                 client.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_status)));
+                client.setRate(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate)));
+                client.setRateComment(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate_comment)));
+                client.setRateDate(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate_date)));
 
                 arrayList.add(client);
             } while (cursor.moveToNext());
@@ -129,6 +142,9 @@ public class DailyTasksRepo {
                 + ", "+DailyTask.KEY_priority
                 + ", "+DailyTask.KEY_status
                 + ", "+DailyTask.KEY_base
+                + ", "+DailyTask.KEY_rate_date
+                + ", "+DailyTask.KEY_rate
+                + ", "+DailyTask.KEY_rate_comment
                 + " FROM " + DailyTask.TABLE
                 + " WHERE "+DailyTask.KEY_base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"' "
                 + " ORDER BY "+DailyTask.KEY_priority+" ASC;";
@@ -149,6 +165,9 @@ public class DailyTasksRepo {
                 client.setPhoto(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_photo)));
                 client.setPriority(cursor.getInt(cursor.getColumnIndexOrThrow(DailyTask.KEY_priority)));
                 client.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_status)));
+                client.setRate(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate)));
+                client.setRateComment(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate_comment)));
+                client.setRateDate(cursor.getString(cursor.getColumnIndexOrThrow(DailyTask.KEY_rate_date)));
 
                 arrayList.add(client);
             } while (cursor.moveToNext());
