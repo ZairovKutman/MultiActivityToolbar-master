@@ -1,7 +1,9 @@
 package kg.soulsb.ayu.activities.zakaz;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -20,6 +22,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import kg.soulsb.ayu.R;
 import kg.soulsb.ayu.adapters.RecyclerTovarAdapter;
@@ -41,7 +46,8 @@ public class TovarsFragment extends Fragment {
     RecyclerView recyclerView;
     PricesRepo pricesRepo;
     StocksRepo stocksRepo;
-    ArrayList<Item> arrayListAllTovars = new ArrayList<Item>();
+    ArrayList<Item> arrayListAllTovars = new ArrayList<>();
+    List<String> categories = new ArrayList<>();
     RecyclerTovarAdapter recyclerTovarAdapter;
 
     @Override
@@ -52,15 +58,18 @@ public class TovarsFragment extends Fragment {
 
         DBHelper dbHelper = new DBHelper(parentActivity.getApplicationContext());
         DatabaseManager.initializeInstance(dbHelper);
-        if (parentActivity.order == null) {
+        categories = new ItemsRepo().getItemCategories();
+//        if (parentActivity.order == null) {
             arrayListAllTovars = new ItemsRepo().getItemsObjectByCategory(parentActivity.category);
-        }
-        else
-        {
-            arrayListAllTovars = new ItemsRepo().getItemsObjectByCategory(parentActivity.order.getDogovorObject().getCategory());
-        }
+//        }
+//        else
+//        {
+//            arrayListAllTovars = new ItemsRepo().getItemsObjectByCategory(parentActivity.order.getDogovorObject().getCategory());
+//        }
+
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.tovars_fragment,container,false);
@@ -78,10 +87,15 @@ public class TovarsFragment extends Fragment {
 
         // Создаем отбор
         otborSpinner = (Spinner) v.findViewById(R.id.spinner_otbor);
-        ArrayList<String> otborArrayList = new ArrayList<String>();
-        otborArrayList.add("Показать все");
-        otborArrayList.add("Показать выбранные товары");
-        otborArrayList.add("Показать товары в наличии");
+
+        List<String> staticOtborList = new ArrayList<>();
+        staticOtborList.add("Показать все");
+        staticOtborList.add("Показать выбранные товары");
+        staticOtborList.add("Показать товары в наличии");
+
+        // Добавим филтьр по категориям
+        List<String> otborArrayList = Stream.concat(staticOtborList.stream(), categories.stream())
+                .collect(Collectors.toList());
 
         if (parentActivity.order != null){
             for (Item item: parentActivity.order.getArraylistTovar() )
@@ -105,12 +119,14 @@ public class TovarsFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 if (otborSpinner.getItemAtPosition(position).equals("Показать выбранные товары")) {
-                    recyclerTovarAdapter.setSpinnerSelectedState(1);
+                    recyclerTovarAdapter.setSpinnerSelectedState(1, null);
                 } else if (otborSpinner.getItemAtPosition(position).equals("Показать товары в наличии")) {
-                    recyclerTovarAdapter.setSpinnerSelectedState(2);
-                }
-                else {
-                    recyclerTovarAdapter.setSpinnerSelectedState(0);
+                    recyclerTovarAdapter.setSpinnerSelectedState(2, null);
+                } else if (otborSpinner.getItemAtPosition(position).equals("Показать все")) {
+                    recyclerTovarAdapter.setSpinnerSelectedState(0, null);
+                } else {
+                    String category = categories.get(position - 3);
+                    recyclerTovarAdapter.setSpinnerSelectedState(-1, category);
                 }
 
             }
@@ -119,11 +135,11 @@ public class TovarsFragment extends Fragment {
         });
 
 
-        if (otborSpinner.getSelectedItem().equals("Показать выбранные товары")) {
-            recyclerTovarAdapter.setSpinnerSelectedState(1);
-        } else {
-            recyclerTovarAdapter.setSpinnerSelectedState(0);
-        }
+//        if (otborSpinner.getSelectedItem().equals("Показать выбранные товары")) {
+//            recyclerTovarAdapter.setSpinnerSelectedState(1);
+//        } else {
+//            recyclerTovarAdapter.setSpinnerSelectedState(0);
+//        }
 
 
         recyclerView.setAdapter(recyclerTovarAdapter);

@@ -23,7 +23,6 @@ import kg.soulsb.ayu.helpers.repo.PricesRepo;
 import kg.soulsb.ayu.helpers.repo.StocksRepo;
 import kg.soulsb.ayu.helpers.repo.UnitsRepo;
 import kg.soulsb.ayu.models.Item;
-import kg.soulsb.ayu.models.SalesHistory;
 import kg.soulsb.ayu.models.Unit;
 
 /**
@@ -153,7 +152,7 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
         return spinnerSelectedState;
     }
 
-    public void setSpinnerSelectedState(int spinnerSelectedState) {
+    public void setSpinnerSelectedState(int spinnerSelectedState, String category) {
         this.spinnerSelectedState = spinnerSelectedState;
         if (spinnerSelectedState==1) {
             tovarsList.clear();
@@ -164,16 +163,22 @@ public class RecyclerTovarAdapter extends RecyclerView.Adapter<RecyclerTovarAdap
             tovarsList.clear();
             tovarsList.addAll(allTovarsList);
         }
-        else {
-                tovarsList.clear();
-                for (Item item: allTovarsList)
-                {
-                    if (item.getStock()>0)
-                    {
-                        tovarsList.add(item);
-                    }
+        else if (spinnerSelectedState == 2) {
+            tovarsList.clear();
+            for (Item item : allTovarsList) {
+                if (item.getStock() > 0) {
+                    tovarsList.add(item);
                 }
             }
+        }
+        else {
+            tovarsList.clear();
+            for (Item item : allTovarsList) {
+                if (item.getCategory().equals(category)) {
+                    tovarsList.add(item);
+                }
+            }
+        }
 
         notifyDataSetChanged();
     }
