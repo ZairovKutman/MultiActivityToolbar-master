@@ -48,7 +48,7 @@ public class DBHelper extends SQLiteOpenHelper {
     //version number to upgrade database version
     //each time if you Add, Edit table, you need to change the
     //version number.
-    private static final int DATABASE_VERSION = 14;
+    private static final int DATABASE_VERSION = 15;
     // Database Name
     private static final String DATABASE_NAME = "ayu_sqlite.db";
     private static final String TAG = DBHelper.class.getSimpleName().toString();
@@ -209,6 +209,11 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate_date + " text NOT NULL DEFAULT '';");
             db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate + " text NOT NULL DEFAULT '';");
             db.execSQL("ALTER TABLE " + DailyTask.TABLE + " ADD COLUMN " + DailyTask.KEY_rate_comment + " text NOT NULL DEFAULT '';");
+        }
+
+        if (oldVersion<15)
+        {
+            db.execSQL("ALTER TABLE " + Client.TABLE + " ADD COLUMN " + Client.KEY_Oborot + " text NOT NULL DEFAULT '';");
         }
     }
 }
