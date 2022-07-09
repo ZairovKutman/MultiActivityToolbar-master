@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">АЮ-Агент</string>
+    <string name="app_name">Т-Агент</string>
     <string name="action_settings">Загрузить данные</string>
     <string name="title_activity_base">BaseActivity</string>
     <string name="nav_drawer_opened">Слайдер открыт</string>

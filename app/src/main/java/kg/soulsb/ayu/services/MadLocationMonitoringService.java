@@ -34,16 +34,16 @@ public class MadLocationMonitoringService extends Service {
         Notification.Builder builder;
         if (Build.VERSION.SDK_INT >= 26) {
             createNotificationChannel();
-            builder = new Notification.Builder(this, "Аю-Агент GPS");
+            builder = new Notification.Builder(this, "Т-Агент GPS");
         } else {
             builder = new Notification.Builder(this);
         }
 
         Notification notification = builder
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setTicker("АЮ-Агент")
+                .setTicker("Т-Агент")
                 .setWhen(System.currentTimeMillis())
-                .setContentTitle("АЮ-Агент")
+                .setContentTitle("Т-Агент")
                 .setContentText("GPS сервис работает")
                 .build();
 
@@ -56,8 +56,8 @@ public class MadLocationMonitoringService extends Service {
         if (Build.VERSION.SDK_INT >= 26) {
             NotificationManager mNotificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            String id = "Аю-Агент GPS";
-            CharSequence name = "АЮ-Агент";
+            String id = "Т-Агент GPS";
+            CharSequence name = "Т-Агент";
             String description = "GPS сервис работает";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel mChannel = new NotificationChannel(id, name, importance);

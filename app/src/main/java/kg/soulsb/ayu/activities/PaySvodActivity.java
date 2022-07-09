@@ -716,7 +716,7 @@ public class PaySvodActivity extends BaseActivity {
             DocPurch docPurch = new DocPurch();
             docPurch.organizationGuid = arrayListOrganization.get(editText_organization.getSelectedItemPosition()).getGuid();
             docPurch.agent = name;
-            docPurch.comment = "Аю-Агент сводная оплата";
+            docPurch.comment = "Т-Агент сводная оплата";
             docPurch.date = editTextDate.getText().toString();
             docPurch.docType = docType;
             docPurch.docId = docId;
