@@ -136,6 +136,38 @@ public class ItemsRepo {
         DatabaseManager.getInstance().closeDatabase();
     }
 
+    public ArrayList<String> getItemCategories() {
+        ArrayList<String> arrayList = new ArrayList<>();
+
+        db = DatabaseManager.getInstance().openDatabase();
+        String selectQuery =  " SELECT " + Item.KEY_Category
+                + " FROM " + Item.TABLE
+                + " GROUP BY " + Item.KEY_Category
+                + " ORDER BY "+Item.KEY_Category+" ASC;";
+
+        if (db.isOpen()) {
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        else
+        {
+            db = DatabaseManager.getInstance().openDatabase();
+            cursor = db.rawQuery(selectQuery, null);
+        }
+        if (cursor.moveToFirst()) {
+            do {
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(Item.KEY_Category));
+                arrayList.add(category);
+            } while (cursor.moveToNext());
+        }
+
+        if (!cursor.isClosed()) {
+            cursor.close();
+        }
+
+        DatabaseManager.getInstance().closeDatabase();
+        return arrayList;
+    }
+
     public ArrayList<Item> getItemsObjectByCategory(String category) {
         ArrayList<Item> arrayList = new ArrayList<>();
         String whereClause;

@@ -53,7 +53,7 @@ import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 public class ClientDetailActivity extends BaseActivity {
 
     private AyuServiceGrpc.AyuServiceBlockingStub blockingStub;
-    TextView clientNameTextView;
+    TextView clientNameTextView, clientOborotTextView;
     TextView clientPhoneTextView;
     TextView clientAddressTextView;
     TextView clientCommentTextView;
@@ -115,6 +115,7 @@ public class ClientDetailActivity extends BaseActivity {
         clientSaveLocationButton = (Button) findViewById(R.id.Client_saveLocation);
         clientDebtTextView = (TextView) findViewById(R.id.ClientDebt);
         clientAccuracy = (TextView) findViewById(R.id.Client_accuracy);
+        clientOborotTextView = (TextView) findViewById(R.id.ClientOborot);
 
         clientNameTextView.setText(getIntent().getStringExtra("name"));
         clientAddressTextView.setText(getIntent().getStringExtra("address"));
@@ -123,6 +124,7 @@ public class ClientDetailActivity extends BaseActivity {
         clientLatitudeTextView.setText("Широта: "+getIntent().getStringExtra("latitude"));
         clientLongitudeTextView.setText("Долгота: "+getIntent().getStringExtra("longitude"));
         clientDebtTextView.setText(getIntent().getStringExtra("debt"));
+        clientOborotTextView.setText(getIntent().getStringExtra("oborot"));
         //
         if (getIntent().getStringExtra("phone").equals(""))
         {

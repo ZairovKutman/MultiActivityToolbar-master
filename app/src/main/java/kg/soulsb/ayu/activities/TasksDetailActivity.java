@@ -22,7 +22,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.esafirm.imagepicker.features.ImagePicker;
-import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
 
 import java.io.ByteArrayOutputStream;
@@ -48,7 +47,7 @@ import kg.soulsb.ayu.singletons.CurrentLocationClass;
 
 public class TasksDetailActivity extends BaseActivity {
 
-    TextView clientTextView, taskDetailTextView,rateTextView,rateDetailsTextView, clientDebtTextView;
+    TextView clientTextView, taskDetailTextView,rateTextView,rateDetailsTextView, clientDebtTextView, clientOborotTextView;
     Button newOrderButton, newPhotoButton, newClosedPhotoButton;
     ListView listViewDocuments;
     ArrayList<Order> orderArrayList;
@@ -69,7 +68,7 @@ public class TasksDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasks_detail);
-
+        clientOborotTextView = findViewById(R.id.textView_task_oborot);
         linearLayout = findViewById(R.id.gv);
         clientTextView = findViewById(R.id.textView_task_client);
         taskDetailTextView = findViewById(R.id.textView_task_details);
@@ -81,7 +80,7 @@ public class TasksDetailActivity extends BaseActivity {
         rateDetailsTextView = findViewById(R.id.textView_rate_details);
         client = new ClientsRepo().getClientObjectByGuid(getIntent().getStringExtra("clientGuid"));
         clientTextView.setText(client.getName());
-
+        clientOborotTextView.setText(client.getOborot());
         clientDebtTextView.setText(Double.toString(client.getDebt()));
         String rate = getIntent().getStringExtra("rate");
         String rateDetails = getIntent().getStringExtra("rateDetails");

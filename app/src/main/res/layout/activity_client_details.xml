@@ -53,6 +53,17 @@
         android:textColor="@android:color/holo_blue_dark" />
 
     <TextView
+        android:id="@+id/ClientOborotText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Оборот за месяц" />
+
+    <TextView
+        android:id="@+id/ClientOborot"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:text="Телефоны"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

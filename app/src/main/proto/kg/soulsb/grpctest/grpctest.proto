@@ -136,6 +136,7 @@ message Point{
 	string code = 6;
 	string guid = 7;
 	double debt = 8;
+	string oborot = 9;
 }
 
 message Report{

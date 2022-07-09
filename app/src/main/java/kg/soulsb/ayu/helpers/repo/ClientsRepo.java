@@ -33,6 +33,7 @@ public class ClientsRepo {
                 + Client.KEY_Latitude  + "   TEXT    ,"
                 + Client.KEY_Longitude  + "   TEXT    ,"
                 + Client.KEY_Base  + "   TEXT    ,"
+                + Client.KEY_Oborot  + "   TEXT    ,"
                 + Client.KEY_Debt + " TEXT )";
     }
 
@@ -47,6 +48,7 @@ public class ClientsRepo {
         values.put(Client.KEY_Latitude, client.getLatitude());
         values.put(Client.KEY_Longitude, client.getLongitude());
         values.put(Client.KEY_Debt, client.getDebt());
+        values.put(Client.KEY_Oborot, client.getOborot());
         values.put(Client.KEY_Base, client.getBase());
 
         // Inserting Row
@@ -77,6 +79,7 @@ public class ClientsRepo {
                 + ", "+Client.KEY_Longitude
                 + ", "+Client.KEY_Phone
                 + ", "+Client.KEY_Debt
+                + ", "+Client.KEY_Oborot
                 + " FROM " + Client.TABLE
                 + " WHERE "+Client.KEY_Guid+"='"+guid+"' AND "+Client.KEY_Base+" = '"+ CurrentBaseClass.getInstance().getCurrentBase()+"'";
 
@@ -100,6 +103,7 @@ public class ClientsRepo {
                 myClient.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Latitude)));
                 myClient.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Longitude)));
                 myClient.setClientId(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_ClientId)));
+                myClient.setOborot(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Oborot)));
                 myClient.setDebt(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Debt))));
             } while (cursor.moveToNext());
         }
@@ -129,6 +133,7 @@ public class ClientsRepo {
                 + ", "+Client.KEY_Base
                 + ", "+Client.KEY_Phone
                 + ", "+Client.KEY_Debt
+                + ", "+Client.KEY_Oborot
                 + " FROM " + Client.TABLE
                 + " WHERE "+Client.KEY_Base+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'"
                 + " ORDER BY "+Client.KEY_Name+" ASC;";
@@ -147,6 +152,7 @@ public class ClientsRepo {
                 client.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Longitude)));
                 client.setClientId(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_ClientId)));
                 client.setDebt(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Debt))));
+                client.setOborot(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Oborot)));
                 arrayList.add(client);
             } while (cursor.moveToNext());
         }
@@ -170,6 +176,7 @@ public class ClientsRepo {
                 + ", "+Client.KEY_Base
                 + ", "+Client.KEY_Phone
                 + ", "+Client.KEY_Debt
+                + ", "+Client.KEY_Oborot
                 + " FROM " + Client.TABLE
                 + " WHERE "+Client.KEY_Base+" = '"+CurrentBaseClass.getInstance().getCurrentBase()+"'"
                 + " ORDER BY "+Client.KEY_Name+" ASC;";
@@ -187,6 +194,7 @@ public class ClientsRepo {
                 client.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Latitude)));
                 client.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Longitude)));
                 client.setClientId(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_ClientId)));
+                client.setOborot(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Oborot)));
                 client.setDebt(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(Client.KEY_Debt))));
                 client.setLocOfAgent(loc.getLatitude(),loc.getLongitude());
 

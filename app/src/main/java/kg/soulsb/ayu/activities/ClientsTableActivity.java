@@ -58,6 +58,7 @@ public class ClientsTableActivity extends BaseActivity{
                 intent.putExtra("latitude", client.getLatitude());
                 intent.putExtra("debt", Double.toString(client.getDebt()));
                 intent.putExtra("guid", client.getGuid());
+                intent.putExtra("oborot", client.getOborot());
                 startActivity(intent);
             }
         });

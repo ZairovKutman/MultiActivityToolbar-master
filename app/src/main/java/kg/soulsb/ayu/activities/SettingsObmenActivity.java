@@ -624,7 +624,7 @@ public class SettingsObmenActivity extends BaseActivity {
             ClientsRepo clientsRepo = new ClientsRepo();
             clientsRepo.deleteByBase(CurrentBaseClass.getInstance().getCurrentBase());
             for (Point point : pointIterator.point) {
-                Client client = new Client(point.guid, point.description, point.address, point.phoneNumber, point.latitude, point.longitude, point.debt);
+                Client client = new Client(point.guid, point.description, point.address, point.phoneNumber, point.latitude, point.longitude, point.debt, point.oborot);
                 client.setBase(CurrentBaseClass.getInstance().getCurrentBase());
                 clientsArray.add(client);
                 clientsRepo.insert(client);

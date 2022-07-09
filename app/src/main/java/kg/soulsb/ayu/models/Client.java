@@ -20,6 +20,7 @@ public class Client implements Comparable {
     public static String KEY_Longitude= "Longitude";
     public static String KEY_Debt= "Debt";
     public static String KEY_Base= "Base";
+    public static String KEY_Oborot= "Oborot";
 
     private String clientId;
     private String guid;
@@ -30,10 +31,11 @@ public class Client implements Comparable {
     private String longitude;
     private String base;
     private double debt;
+    private String oborot;
     private Location loc;
     private Location locOfAgent = new Location("locOfAgent");
 
-    public Client(String guid, String name, String address, String phone, String latitude, String longitude, double debt) {
+    public Client(String guid, String name, String address, String phone, String latitude, String longitude, double debt, String oborot) {
         this.guid = guid;
         this.name = name;
         this.address = address;
@@ -42,6 +44,8 @@ public class Client implements Comparable {
         this.longitude = longitude;
         this.debt = debt;
         this.loc = new Location("loc");
+        this.oborot = oborot;
+
         if (!latitude.isEmpty())
             this.loc.setLatitude(Double.parseDouble(latitude));
         else this.loc.setLatitude(0);
@@ -185,5 +189,13 @@ public class Client implements Comparable {
             return (int)(this.loc.distanceTo(locOfAgent))+"м.";}
         else
             return "нет крднт.";
+    }
+
+    public String getOborot() {
+        return oborot;
+    }
+
+    public void setOborot(String oborot) {
+        this.oborot = oborot;
     }
 }
